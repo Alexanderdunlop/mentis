@@ -24,5 +24,8 @@
     "mention tag",
     "react"
   ],
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "prepack": "./scripts/prepack.sh"
+  }
 }
