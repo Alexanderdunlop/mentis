@@ -1,25 +1,38 @@
 name: Publish Package to npmjs
+
+permissions:
+  contents: write
+  id-token: write
+
 on:
   release:
     types: [published]
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v4
-      # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v4
         with:
-          node-version: "22.x"
+          fetch-depth: 0
+
+      # Setup .npmrc file to publish to npm
+      - name: Set node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
           registry-url: "https://registry.npmjs.org"
+
       - uses: pnpm/action-setup@v4
         with:
-          version: 10.7.0
-      - run: chmod +x packages/mentis/scripts/prepack.sh
+          version: 10.10.0
+
       - run: pnpm install --filter mentis --frozen-lockfile
+      - run: pnpm --filter mentis build
       - run: pnpm --filter mentis publish --provenance --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - run: npx changelogithub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

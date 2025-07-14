@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "mentis": "latest",
+    "mentis": "0.0.2-alpha.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
