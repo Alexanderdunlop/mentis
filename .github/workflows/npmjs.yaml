@@ -15,7 +15,10 @@ jobs:
         with:
           node-version: "22.x"
           registry-url: "https://registry.npmjs.org"
-      - run: npm ci
-      - run: npm publish --provenance --access public
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.7.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter mentis publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
