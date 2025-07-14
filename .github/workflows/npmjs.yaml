@@ -19,6 +19,6 @@ jobs:
         with:
           version: 10.7.0
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter mentis publish --provenance --access public
+      - run: pnpm --filter mentis publish --provenance --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
