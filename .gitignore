@@ -1,1 +1,7 @@
 node_modules/
+dist/
+.turbo/
+
+*.log
+.DS_Store
+.eslintcache

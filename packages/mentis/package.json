@@ -2,18 +2,19 @@
   "name": "mentis",
   "version": "0.0.2",
   "description": "A flexible mention tagger for React that hooks into your existing inputs.",
+  "type": "module",
   "license": "MIT",
-  "author": {
-    "name": "Alexander Dunlop",
-    "email": "alexjamesdunlop@gmail.com",
-    "url": "https://alexdunlop.com"
+  "homepage": "https://github.com/alexanderdunlop/mentis#readme",
+  "bugs": {
+    "url": "https://github.com/alexanderdunlop/mentis/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alexanderdunlop/mentis.git",
     "directory": "packages/mentis"
   },
-  "homepage": "https://alexdunlop.com",
+  "author": "Alexander Dunlop <alexjamesdunlop@gmail.com>",
+  "funding": "https://github.com/sponsors/alexanderdunlop",
   "keywords": [
     "mentions",
     "mentis",
@@ -24,8 +25,34 @@
     "mention tag",
     "react"
   ],
-  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "playground": "vite --config playground/vite.config.ts",
     "prepack": "./scripts/prepack.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.13",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tsdown": "^0.12.9",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.4"
   }
 }
