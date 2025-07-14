@@ -1,0 +1,28 @@
+{
+  "name": "mentis",
+  "version": "0.0.0",
+  "description": "A flexible mention tagger for React that hooks into your existing inputs.",
+  "license": "MIT",
+  "author": {
+    "name": "Alexander Dunlop",
+    "email": "alexjamesdunlop@gmail.com",
+    "url": "https://alexdunlop.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexanderdunlop/mentis.git",
+    "directory": "packages/mentis"
+  },
+  "homepage": "https://alexdunlop.com",
+  "keywords": [
+    "mentions",
+    "mentis",
+    "mention tagger",
+    "mention",
+    "tag",
+    "tagger",
+    "mention tag",
+    "react"
+  ],
+  "type": "module"
+}
