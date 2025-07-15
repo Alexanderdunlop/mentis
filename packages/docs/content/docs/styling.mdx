@@ -1,0 +1,38 @@
+---
+title: Styling & Customization
+---
+
+The `MentionInput` component is designed to be fully customizable. You can use Tailwind CSS, your own CSS classes, or any CSS framework by passing className props for each part of the component. This allows you to match the look and feel of your application or design system.
+
+## Customizing with className Props
+
+The following props let you control the styling of each part of the component:
+
+- `containerClassName`
+- `inputClassName`
+- `listboxClassName`
+- `optionClassName`
+- `optionHighlightedClassName`
+- `noOptionsClassName`
+
+## Example: Tailwind Chat Input
+
+Here's an example using Tailwind CSS to create a modern chat-style input:
+
+```tsx
+<MentionInput
+  options={options}
+  containerClassName="w-full max-w-lg relative"
+  inputClassName="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition placeholder-gray-400"
+  listboxClassName="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto"
+  optionClassName="px-4 py-2 cursor-pointer text-base text-gray-800 hover:bg-gray-100 rounded-lg transition"
+  optionHighlightedClassName="bg-blue-500 text-white hover:bg-blue-500"
+  noOptionsClassName="px-4 py-2 text-gray-400"
+/>
+```
+
+This approach gives you complete control over the component's appearance. You can use any combination of utility classes or your own CSS modules.
+
+---
+
+For more advanced usage, see the [Props Reference](./props) and [Basic Usage](./basic-usage) pages.

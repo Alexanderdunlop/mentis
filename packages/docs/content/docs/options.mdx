@@ -8,7 +8,9 @@ The `options` prop is an array of objects that define the available mention targ
 ### Example
 
 ```tsx
-const options = [
+import { type MentionOption } from "mentis";
+
+const options: MentionOption[] = [
   { label: "Alice", value: "alice" },
   { label: "Bob", value: "bob" },
   { label: "Charlie", value: "charlie" },

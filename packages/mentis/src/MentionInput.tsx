@@ -9,12 +9,24 @@ export type MentionOption = {
 type MentionInputProps = {
   defaultValue?: string;
   options: MentionOption[];
+  containerClassName?: string;
+  inputClassName?: string;
+  listboxClassName?: string;
+  optionClassName?: string;
+  optionHighlightedClassName?: string;
+  noOptionsClassName?: string;
   onChange?: (value: string) => void;
 };
 
 export const MentionInput: React.FC<MentionInputProps> = ({
   defaultValue = "",
   options,
+  containerClassName = "mention-input-container",
+  inputClassName = "mention-input",
+  listboxClassName = "mention-listbox",
+  optionClassName = "mention-option",
+  optionHighlightedClassName = "mention-option-highlighted",
+  noOptionsClassName = "mention-no-options",
   onChange,
 }) => {
   const [value, setValue] = useState<string>(defaultValue);
@@ -106,10 +118,10 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   );
 
   return (
-    <div className="mention-input-container">
+    <div className={containerClassName}>
       <input
         ref={inputRef}
-        className="mention-input"
+        className={inputClassName}
         value={value}
         placeholder="Type @ to mention someone"
         onChange={handleChange}
@@ -129,7 +141,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
         <div
           id="mention-listbox"
           role="listbox"
-          className="mention-listbox"
+          className={listboxClassName}
           style={{
             top:
               modalPosition.top -
@@ -137,7 +149,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
           }}
         >
           {filteredOptions.length === 0 && (
-            <div style={{ padding: 8 }}>No items found</div>
+            <div className={noOptionsClassName}>No items found</div>
           )}
           {filteredOptions.length > 0 &&
             filteredOptions.map((option, idx) => (
@@ -146,10 +158,9 @@ export const MentionInput: React.FC<MentionInputProps> = ({
                 id={`mention-option-${option.value}`}
                 role="option"
                 aria-selected={idx === highlightedIndex}
-                className="mention-option"
-                style={{
-                  background: idx === highlightedIndex ? "#f0f0f0" : undefined,
-                }}
+                className={`${optionClassName} ${
+                  idx === highlightedIndex ? optionHighlightedClassName : ""
+                }`}
                 onMouseDown={() => handleSelect(option)}
               >
                 {option.label}

@@ -1,5 +1,5 @@
 {
-  "name": "alexanderdunlop/mentis-react-simple",
+  "name": "alexanderdunlop/mentis-react-tailwind",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,9 +8,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "mentis": "0.0.2-alpha.7",
+    "@tailwindcss/vite": "^4.1.11",
+    "mentis": "workspace:*",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
     "@types/react": "^19.1.8",

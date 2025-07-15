@@ -2,14 +2,20 @@
   "title": "Documentation",
   "root": true,
   "pages": [
-    "---Documentation---",
+    "---Getting Started---",
     "installation",
-    "basic-usage",
-    "keyboard-navigation",
     "overview",
-    "props",
+    "basic-usage",
+    "---Core Concepts---",
     "options",
+    "styling",
+    "props",
+    "---Accessibility---",
     "accessibility",
-    "events"
+    "keyboard-navigation",
+    "---Advanced---",
+    "events",
+    "---Examples---",
+    "examples-react"
   ]
 }
