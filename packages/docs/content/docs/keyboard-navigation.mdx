@@ -1,0 +1,21 @@
+---
+title: Keyboard Navigation
+description: How to use keyboard controls when the mention modal is open.
+---
+
+import { Suspense } from "react";
+import { DemoFallback, BasicUsageDemo } from "@/components";
+
+When you trigger the mention modal by typing <code>@</code>, you can use the following keyboard controls to navigate and select options:
+
+- <strong>Up Arrow / Down Arrow</strong>: Move the selection up or down in the
+  list.
+- <strong>Enter</strong> or <strong>Tab</strong>: Select the currently
+  highlighted option.
+- <strong>Escape (Esc)</strong>: Close the modal without making a selection.
+
+This allows for fast, accessible navigation and selection of mention options using only the keyboard.
+
+<Suspense fallback={<DemoFallback />}>
+  <BasicUsageDemo />
+</Suspense>

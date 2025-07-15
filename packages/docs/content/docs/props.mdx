@@ -1,0 +1,21 @@
+---
+title: Props Reference
+description: Detailed documentation of MentionInput component props.
+---
+
+## Props
+
+| Name         | Type                    | Required | Description                                                      |
+| ------------ | ----------------------- | -------- | ---------------------------------------------------------------- |
+| defaultValue | string                  | No       | The initial value of the input.                                  |
+| options      | MentionOption[]         | Yes      | Array of mentionable options. See [Options](./options) for more. |
+| onChange     | (value: string) => void | No       | Callback fired when the input value changes.                     |
+
+### MentionOption
+
+```
+type MentionOption = {
+  label: string;
+  value: string;
+};
+```

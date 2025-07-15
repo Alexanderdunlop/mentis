@@ -1,0 +1,19 @@
+---
+title: Options
+description: How to structure and use the options prop for mentions.
+---
+
+The `options` prop is an array of objects that define the available mention targets. Each option must have a `label` (displayed in the modal) and a `value` (unique identifier).
+
+### Example
+
+```tsx
+const options = [
+  { label: "Alice", value: "alice" },
+  { label: "Bob", value: "bob" },
+  { label: "Charlie", value: "charlie" },
+];
+```
+
+- **label**: The text shown in the mention dropdown.
+- **value**: A unique string identifier for the option.
