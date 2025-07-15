@@ -7,7 +7,7 @@ import { DemoContainer } from "./DemoContainer";
 export function BasicUsageDemo() {
   const [value, setValue] = useState("");
   return (
-    <DemoContainer demoKey="basic-usage">
+    <DemoContainer>
       <MentionInput
         defaultValue={value}
         options={[

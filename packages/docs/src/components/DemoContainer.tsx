@@ -1,15 +1,10 @@
 import { cn } from "fumadocs-ui/utils/cn";
 
-type DemoContainerProps = React.ComponentProps<"section"> & {
-  demoKey: string;
-};
-
 export function DemoContainer({
   children,
   className,
-  demoKey,
   ...props
-}: DemoContainerProps) {
+}: React.ComponentProps<"section">) {
   return (
     <section
       className={cn(
