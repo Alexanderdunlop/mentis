@@ -72,14 +72,48 @@ importers:
   packages/examples/react/simple:
     dependencies:
       mentis:
-        specifier: 0.0.2-alpha.6
-        version: 0.0.2-alpha.6(react@19.1.0)
+        specifier: 0.0.2-alpha.7
+        version: 0.0.2-alpha.7(react@19.1.0)
       react:
         specifier: ^19.1.0
         version: 19.1.0
       react-dom:
         specifier: ^19.1.0
         version: 19.1.0(react@19.1.0)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.1.8
+        version: 19.1.8
+      '@types/react-dom':
+        specifier: ^19.1.6
+        version: 19.1.6(@types/react@19.1.8)
+      '@vitejs/plugin-react':
+        specifier: ^4.6.0
+        version: 4.6.0(vite@7.0.4(@types/node@24.0.13)(jiti@2.4.2)(lightningcss@1.30.1))
+      typescript:
+        specifier: ~5.8.3
+        version: 5.8.3
+      vite:
+        specifier: ^7.0.4
+        version: 7.0.4(@types/node@24.0.13)(jiti@2.4.2)(lightningcss@1.30.1)
+
+  packages/examples/react/tailwind:
+    dependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.1.11
+        version: 4.1.11(vite@7.0.4(@types/node@24.0.13)(jiti@2.4.2)(lightningcss@1.30.1))
+      mentis:
+        specifier: workspace:*
+        version: link:../../../mentis
+      react:
+        specifier: ^19.1.0
+        version: 19.1.0
+      react-dom:
+        specifier: ^19.1.0
+        version: 19.1.0(react@19.1.0)
+      tailwindcss:
+        specifier: ^4.1.11
+        version: 4.1.11
     devDependencies:
       '@types/react':
         specifier: ^19.1.8
@@ -1325,6 +1359,11 @@ packages:
 
   '@tailwindcss/postcss@4.1.11':
     resolution: {integrity: sha512-q/EAIIpF6WpLhKEuQSEVMZNMIY8KhWoAemZ9eylNAih9jxMGAYPPWBn3I9QL/2jZ+e7OEz/tZkX5HwbBR4HohA==}
+
+  '@tailwindcss/vite@4.1.11':
+    resolution: {integrity: sha512-RHYhrR3hku0MJFRV+fN2gNbDNEh3dwKvY8XJvTxCSXeMOsCRSr+uKvDWQcbizrHgjML6ZmTE5OwMrl5wKcujCw==}
+    peerDependencies:
+      vite: ^5.2.0 || ^6 || ^7
 
   '@tybys/wasm-util@0.10.0':
     resolution: {integrity: sha512-VyyPYFlOMNylG45GoAe0xDoLwWuowvf92F9kySqzYh8vmYm7D2u4iUJKa1tOUpS70Ku13ASrOkS4ScXFsTaCNQ==}
@@ -2665,11 +2704,6 @@ packages:
 
   mdast-util-to-string@4.0.0:
     resolution: {integrity: sha512-0H44vDimn51F0YwvxSJSm0eCDOJTRlmN0R1yBh4HLj9wiV1Dn0QoXGbvFAWj2hSItVTlCmBF1hqKlIyUBVFLPg==}
-
-  mentis@0.0.2-alpha.6:
-    resolution: {integrity: sha512-VPH3HQBSS+mP26u0XrVe/AZkojXIYs6S5wNI206LD1daq+2KgKGOPJ3oUCetd4B30J67sui2g4/1Dp78NMx1ag==}
-    peerDependencies:
-      react: '>=18.2.0 || ^19.0.0-0'
 
   mentis@0.0.2-alpha.7:
     resolution: {integrity: sha512-rtpbX2jchr3jykIrR2xPAu3IRDq8Qkp86X1sf7U/OBKA5hvcDCGDj0z9eoDfu72wwSA1Ll4WfVwVHfXA7zvrlQ==}
@@ -4656,6 +4690,13 @@ snapshots:
       postcss: 8.5.6
       tailwindcss: 4.1.11
 
+  '@tailwindcss/vite@4.1.11(vite@7.0.4(@types/node@24.0.13)(jiti@2.4.2)(lightningcss@1.30.1))':
+    dependencies:
+      '@tailwindcss/node': 4.1.11
+      '@tailwindcss/oxide': 4.1.11
+      tailwindcss: 4.1.11
+      vite: 7.0.4(@types/node@24.0.13)(jiti@2.4.2)(lightningcss@1.30.1)
+
   '@tybys/wasm-util@0.10.0':
     dependencies:
       tslib: 2.8.1
@@ -6358,10 +6399,6 @@ snapshots:
   mdast-util-to-string@4.0.0:
     dependencies:
       '@types/mdast': 4.0.4
-
-  mentis@0.0.2-alpha.6(react@19.1.0):
-    dependencies:
-      react: 19.1.0
 
   mentis@0.0.2-alpha.7(react@19.1.0):
     dependencies:

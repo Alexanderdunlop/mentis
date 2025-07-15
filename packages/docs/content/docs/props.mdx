@@ -5,15 +5,21 @@ description: Detailed documentation of MentionInput component props.
 
 ## Props
 
-| Name         | Type                    | Required | Description                                                      |
-| ------------ | ----------------------- | -------- | ---------------------------------------------------------------- |
-| defaultValue | string                  | No       | The initial value of the input.                                  |
-| options      | MentionOption[]         | Yes      | Array of mentionable options. See [Options](./options) for more. |
-| onChange     | (value: string) => void | No       | Callback fired when the input value changes.                     |
+| Name                       | Type                    | Required | Description                                                                 |
+| -------------------------- | ----------------------- | -------- | --------------------------------------------------------------------------- |
+| defaultValue               | string                  | No       | The initial value of the input.                                             |
+| options                    | MentionOption[]         | Yes      | Array of mentionable options. See [Options](./options) for more.            |
+| onChange                   | (value: string) => void | No       | Callback fired when the input value changes.                                |
+| containerClassName         | string                  | No       | Custom class for the outer container. Useful for layout and positioning.    |
+| inputClassName             | string                  | No       | Custom class for the input element. Use for input styling (e.g., Tailwind). |
+| listboxClassName           | string                  | No       | Custom class for the dropdown listbox.                                      |
+| optionClassName            | string                  | No       | Custom class for each option in the dropdown.                               |
+| optionHighlightedClassName | string                  | No       | Custom class for the currently highlighted option.                          |
+| noOptionsClassName         | string                  | No       | Custom class for the 'No items found' message.                              |
 
 ### MentionOption
 
-```
+```tsx
 type MentionOption = {
   label: string;
   value: string;
