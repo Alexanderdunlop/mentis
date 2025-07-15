@@ -1,4 +1,5 @@
-import React, { useState, useRef, type ChangeEvent } from "react";
+import React, { useState, useRef, type ChangeEvent, useMemo } from "react";
+import "./MentionInput.css";
 
 export type MentionOption = {
   label: string;
@@ -6,11 +7,17 @@ export type MentionOption = {
 };
 
 type MentionInputProps = {
+  defaultValue?: string;
   options: MentionOption[];
+  onChange?: (value: string) => void;
 };
 
-export const MentionInput: React.FC<MentionInputProps> = ({ options }) => {
-  const [value, setValue] = useState<string>("");
+export const MentionInput: React.FC<MentionInputProps> = ({
+  defaultValue = "",
+  options,
+  onChange,
+}) => {
+  const [value, setValue] = useState<string>(defaultValue);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [modalPosition, setModalPosition] = useState<{
     top: number;
@@ -23,6 +30,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({ options }) => {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const val = event.currentTarget.value;
     setValue(val);
+    onChange?.(val);
     const atIndex = val.lastIndexOf("@");
     if (atIndex !== -1) {
       setShowModal(true);
@@ -42,17 +50,28 @@ export const MentionInput: React.FC<MentionInputProps> = ({ options }) => {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showModal || filteredOptions.length === 0) return;
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      setHighlightedIndex((prev) => (prev + 1) % filteredOptions.length);
-    } else if (event.key === "ArrowUp") {
-      event.preventDefault();
-      setHighlightedIndex((prev) =>
-        prev === 0 ? filteredOptions.length - 1 : prev - 1
-      );
-    } else if (event.key === "Enter") {
-      event.preventDefault();
-      handleSelect(filteredOptions[highlightedIndex]);
+
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault();
+        setHighlightedIndex((prev) => (prev + 1) % filteredOptions.length);
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev === 0 ? filteredOptions.length - 1 : prev - 1
+        );
+        break;
+      case "Tab":
+      case "Enter":
+        event.preventDefault();
+        handleSelect(filteredOptions[highlightedIndex]);
+        break;
+      case "Escape":
+        setShowModal(false);
+        break;
+      default:
+        break;
     }
   };
 
@@ -65,6 +84,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({ options }) => {
       const after = value.slice(start);
       const newValue = `${before}@${option.label} ${after}`;
       setValue(newValue);
+      onChange?.(newValue);
       setShowModal(false);
       setSearch("");
       setTimeout(() => {
@@ -77,35 +97,43 @@ export const MentionInput: React.FC<MentionInputProps> = ({ options }) => {
     }
   };
 
-  const filteredOptions = options.filter((option) =>
-    option.label.toLowerCase().startsWith(search.toLowerCase())
+  const filteredOptions = useMemo(
+    () =>
+      options.filter((option) =>
+        option.label.toLowerCase().startsWith(search.toLowerCase())
+      ),
+    [options, search]
   );
 
   return (
-    <div style={{ position: "relative", width: 300 }}>
+    <div className="mention-input-container">
       <input
         ref={inputRef}
+        className="mention-input"
         value={value}
+        placeholder="Type @ to mention someone"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        placeholder="Type @ to mention someone"
-        style={{ width: "100%", padding: 8, fontSize: 16 }}
+        role="combobox"
+        aria-controls={showModal ? "mention-listbox" : undefined}
+        aria-activedescendant={
+          showModal && filteredOptions.length > 0
+            ? `mention-option-${filteredOptions[highlightedIndex].value}`
+            : undefined
+        }
+        aria-autocomplete="list"
+        aria-haspopup="listbox"
+        aria-expanded={showModal}
       />
       {showModal && (
         <div
+          id="mention-listbox"
+          role="listbox"
+          className="mention-listbox"
           style={{
-            position: "absolute",
             top:
               modalPosition.top -
               (inputRef.current?.getBoundingClientRect().top || 0),
-            left: 0,
-            background: "#fff",
-            border: "1px solid #ccc",
-            textAlign: "left",
-            borderRadius: 4,
-            zIndex: 100,
-            width: "100%",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           }}
         >
           {filteredOptions.length === 0 && (
@@ -115,9 +143,11 @@ export const MentionInput: React.FC<MentionInputProps> = ({ options }) => {
             filteredOptions.map((option, idx) => (
               <div
                 key={option.value}
+                id={`mention-option-${option.value}`}
+                role="option"
+                aria-selected={idx === highlightedIndex}
+                className="mention-option"
                 style={{
-                  padding: 8,
-                  cursor: "pointer",
                   background: idx === highlightedIndex ? "#f0f0f0" : undefined,
                 }}
                 onMouseDown={() => handleSelect(option)}

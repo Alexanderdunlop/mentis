@@ -1,0 +1,31 @@
+.mention-input-container {
+  position: relative;
+  width: 300px;
+}
+
+.mention-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.mention-listbox {
+  position: absolute;
+  left: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  text-align: left;
+  border-radius: 4px;
+  z-index: 100;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mention-option {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.mention-option.highlighted {
+  background: #f0f0f0;
+}

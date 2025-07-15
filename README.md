@@ -1,56 +1,43 @@
 # mentis
 
-[![NPM](https://img.shields.io/npm/v/mentis?color=red)](https://www.npmjs.com/package/mentis)
-[![MIT License](https://img.shields.io/github/license/alexanderdunlop/mentis.svg?color=blue)](https://github.com/alexanderdunlop/mentis/blob/main/LICENSE)
+[![Version](https://img.shields.io/npm/v/mentis?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/mentis)
+[![Downloads](https://img.shields.io/npm/dt/mentis.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/mentis)
+[![MIT License](https://img.shields.io/github/license/alexanderdunlop/mentis.svg?style=flat&colorA=000000&colorB=000000)](https://github.com/alexanderdunlop/mentis/blob/main/LICENSE)
 
-A flexible mention tagger for React that hooks into your existing inputs.
+A small, fast, and flexible mention input solution for React.
 
-## Features
-
-- 🎯 **Hooks into existing inputs**: Works with any text input, textarea, or rich text editor
-- 🎨 **Fully customizable**: Bring your own menu, styling, and mention components
-- ⚡️ **Smart positioning**: Automatically positions mention menus relative to cursor
-- 🔍 **Flexible triggers**: Support for `@`, `#`, `/` or custom trigger characters
-- 📝 **Rich metadata**: Attach custom data to mentions (IDs, avatars, roles, etc.)
-- 🌐 **Framework agnostic**: Works with React, Next.js, Remix, and any React setup
-- 🎛️ **Cursor-style UX**: Familiar mention experience like modern editors
-
-## Documentation
-
-Read the complete documentation at [mentis.dev](https://mentis.dev).
-
-## Installation
+"mentis" means: of sound mind, memory, and understanding. The goal is to provide a solution that gets mentioning right.
 
 ```bash
 npm install mentis
 ```
 
-```bash
-yarn add mentis
-```
+:warning: This readme is currently written for TypeScript users.
 
-```bash
-pnpm add mentis
-```
+## First create a mention input
 
-## Usage
+Your input is a component! You can put options in it. When you call the trigger character, the options will be shown. When selecting an option, the input will be updated with the selected value.
 
 ```tsx
-import { MentionInput, type MentionOption } from "mentis";
-
-const options: MentionOption[] = [
-  { label: "Alice", value: "alice" },
-  { label: "Bob", value: "bob" },
-  { label: "Charlie", value: "charlie" },
-];
+import { MentionInput } from "mentis";
 
 function App() {
-  return <MentionInput options={options} />;
+  const [value, setValue] = useState<string>("");
+  return (
+    <MentionInput
+      defaultValue={value}
+      options={[
+        { label: "Alice", value: "alice" },
+        { label: "Bob", value: "bob" },
+        { label: "Charlie", value: "charlie" },
+      ]}
+      onChange={setValue}
+    />
+  );
 }
 ```
 
-## License
+### Why mentis over react-mentions?
 
-MIT
-
-Made with ❤️ by Alexander Dunlop
+- Simple
+- More recently maintained

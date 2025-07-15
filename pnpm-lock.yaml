@@ -17,8 +17,8 @@ importers:
   packages/examples/react/simple:
     dependencies:
       mentis:
-        specifier: 0.0.2-alpha.5
-        version: 0.0.2-alpha.5
+        specifier: 0.0.2-alpha.6
+        version: 0.0.2-alpha.6(react@19.1.0)
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -681,8 +681,10 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  mentis@0.0.2-alpha.5:
-    resolution: {integrity: sha512-7wobb4a32TRe3c6jBTyFJyzP2uj/CYXPlVZpX+9UlhF5zes4O5cG8NPxm2NyXxFeB0d4rX/4E+c9AwttDT5Vag==}
+  mentis@0.0.2-alpha.6:
+    resolution: {integrity: sha512-VPH3HQBSS+mP26u0XrVe/AZkojXIYs6S5wNI206LD1daq+2KgKGOPJ3oUCetd4B30J67sui2g4/1Dp78NMx1ag==}
+    peerDependencies:
+      react: '>=18.2.0 || ^19.0.0-0'
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -1401,7 +1403,9 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  mentis@0.0.2-alpha.5: {}
+  mentis@0.0.2-alpha.6(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   ms@2.1.3: {}
 
