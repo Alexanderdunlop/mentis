@@ -1,6 +1,6 @@
 {
   "name": "mentis",
-  "version": "0.0.2-alpha.5",
+  "version": "0.0.2-alpha.6",
   "description": "A flexible mention tagger for React that hooks into your existing inputs.",
   "type": "module",
   "license": "MIT",
@@ -54,5 +54,8 @@
     "tsdown": "^0.12.9",
     "typescript": "~5.8.3",
     "vite": "^7.0.4"
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0 || ^19.0.0-0"
   }
 }

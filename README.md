@@ -36,40 +36,18 @@ pnpm add mentis
 ## Usage
 
 ```tsx
-import { useMentis } from "mentis";
+import { MentionInput, type MentionOption } from "mentis";
 
-function MyInput() {
-  const { inputProps, menuProps, isOpen, mentions } = useMentis({
-    triggers: ["@"],
-    onSearch: (query) => searchUsers(query),
-    onSelect: (user) => ({ id: user.id, display: user.name }),
-  });
+const options: MentionOption[] = [
+  { label: "Alice", value: "alice" },
+  { label: "Bob", value: "bob" },
+  { label: "Charlie", value: "charlie" },
+];
 
-  return (
-    <div>
-      <input {...inputProps} placeholder="Type @ to mention someone" />
-      {isOpen && (
-        <div {...menuProps}>
-          {mentions.map((user) => (
-            <div key={user.id} onClick={() => menuProps.onSelect(user)}>
-              {user.name}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+function App() {
+  return <MentionInput options={options} />;
 }
 ```
-
-## Why mentis?
-
-Unlike libraries that replace your input component, `mentis` enhances your existing inputs by:
-
-- Preserving your input's styling, validation, and behavior
-- Working with controlled and uncontrolled components
-- Supporting complex text editors and rich text inputs
-- Giving you complete control over the mention UI and data
 
 ## License
 
