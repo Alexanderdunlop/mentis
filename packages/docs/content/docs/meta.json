@@ -1,0 +1,15 @@
+{
+  "title": "Documentation",
+  "root": true,
+  "pages": [
+    "---Documentation---",
+    "installation",
+    "basic-usage",
+    "keyboard-navigation",
+    "overview",
+    "props",
+    "options",
+    "accessibility",
+    "events"
+  ]
+}

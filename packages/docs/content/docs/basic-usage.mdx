@@ -1,0 +1,29 @@
+---
+title: Basic usage
+---
+
+import { Suspense } from "react";
+import { DemoFallback, BasicUsageDemo } from "@/components";
+
+```tsx
+import { MentionInput } from "mentis";
+
+function App() {
+  const [value, setValue] = useState<string>("");
+  return (
+    <MentionInput
+      defaultValue={value}
+      options={[
+        { label: "Alice", value: "alice" },
+        { label: "Bob", value: "bob" },
+        { label: "Charlie", value: "charlie" },
+      ]}
+      onChange={setValue}
+    />
+  );
+}
+```
+
+<Suspense fallback={<DemoFallback />}>
+  <BasicUsageDemo />
+</Suspense>
