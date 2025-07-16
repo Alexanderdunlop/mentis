@@ -5,12 +5,13 @@ description: Detailed documentation of MentionInput component props.
 
 ## Props
 
-| Name         | Type                    | Required | Description                                                      |
-| ------------ | ----------------------- | -------- | ---------------------------------------------------------------- |
-| defaultValue | string                  | No       | The initial value of the input.                                  |
-| options      | MentionOption[]         | Yes      | Array of mentionable options. See [Options](./options) for more. |
-| onChange     | (value: string) => void | No       | Callback fired when the input value changes.                     |
-| slotsProps   | SlotProps               | No       | Customization for internal component slots (see below).          |
+| Name                | Type                    | Required | Description                                                                                     |
+| ------------------- | ----------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| defaultValue        | string                  | No       | The initial value of the input.                                                                 |
+| options             | MentionOption[]         | Yes      | Array of mentionable options. See [Options](./options) for more.                                |
+| onChange            | (value: string) => void | No       | Callback fired when the input value changes.                                                    |
+| keepTriggerOnSelect | boolean                 | No       | Whether to keep the trigger character (e.g. '@') when an option is selected. Defaults to false. |
+| slotsProps          | SlotProps               | No       | Customization for internal component slots (see below).                                         |
 
 ### MentionOption
 
@@ -54,3 +55,9 @@ type SlotProps = Partial<{
 - `option`: Props for each option in the dropdown.
 - `noOptions`: Props for the 'No items found' message.
 - `highlightedClassName`: Custom class for the currently highlighted option.
+
+---
+
+#### `keepTriggerOnSelect`
+
+If `true`, the trigger character (such as `@`) will be kept in the input when an option is selected. If `false` (default), the trigger character will be removed before the selected label.

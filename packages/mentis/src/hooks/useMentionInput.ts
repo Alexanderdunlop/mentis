@@ -2,15 +2,19 @@ import { useState, useRef, useMemo, type ChangeEvent } from "react";
 import type { MentionOption } from "../types/MentionInput.types";
 import { isSingleAtMention } from "../utils/isSingleAtMention";
 
+type UseMentionInputProps = {
+  options: MentionOption[];
+  defaultValue?: string;
+  keepTriggerOnSelect?: boolean;
+  onChange?: (value: string) => void;
+};
+
 export function useMentionInput({
   options,
   defaultValue = "",
+  keepTriggerOnSelect = false,
   onChange,
-}: {
-  options: MentionOption[];
-  defaultValue?: string;
-  onChange?: (value: string) => void;
-}) {
+}: UseMentionInputProps) {
   const [value, setValue] = useState<string>(defaultValue);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [modalPosition, setModalPosition] = useState<{
@@ -89,9 +93,13 @@ export function useMentionInput({
       return;
     }
 
-    const before = value.slice(0, atIndex);
+    const before = value.slice(0, atIndex); // up to but not including '@'
     const after = value.slice(start);
-    const newValue = `${before}@${option.label} ${after}`;
+    // Use keepTriggerOnSelect to determine whether to keep '@' or remove it
+    const newValue = keepTriggerOnSelect
+      ? `${before}@${option.label} ${after}`
+      : `${before}${option.label} ${after}`;
+
     setValue(newValue);
     onChange?.(newValue);
     setShowModal(false);
@@ -99,8 +107,8 @@ export function useMentionInput({
     setTimeout(() => {
       input.focus();
       input.setSelectionRange(
-        before.length + option.label.length + 2,
-        before.length + option.label.length + 2
+        before.length + option.label.length + 1 + (keepTriggerOnSelect ? 1 : 0),
+        before.length + option.label.length + 1 + (keepTriggerOnSelect ? 1 : 0)
       );
     }, 0);
   };

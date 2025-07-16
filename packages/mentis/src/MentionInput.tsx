@@ -6,9 +6,10 @@ import { MentionInputBox } from "./components/MentionInputBox";
 import { MentionListbox } from "./components/MentionListbox";
 
 export const MentionInput: React.FC<MentionInputProps> = ({
-  defaultValue = "",
+  defaultValue,
   options,
   slotsProps,
+  keepTriggerOnSelect,
   onChange,
 }) => {
   const {
@@ -24,6 +25,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   } = useMentionInput({
     options,
     defaultValue,
+    keepTriggerOnSelect,
     onChange,
   });
 
