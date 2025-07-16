@@ -137,6 +137,18 @@ export const MentionInput: React.FC<MentionInputProps> = ({
     [options, search]
   );
 
+  const getOptionClassName = (idx: number) => {
+    const optionClassName = [
+      slotsProps?.option?.className ?? "mention-option",
+      idx === highlightedIndex
+        ? slotsProps?.highlightedClassName ?? "mention-option-highlighted"
+        : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+    return optionClassName;
+  };
+
   return (
     <div className="mention-input-container" {...slotsProps?.container}>
       <input
@@ -178,15 +190,8 @@ export const MentionInput: React.FC<MentionInputProps> = ({
           {filteredOptions.length > 0 &&
             filteredOptions.map((option, idx) => (
               <div
-                className={`${
-                  slotsProps?.option?.className ?? "mention-option"
-                } ${
-                  idx === highlightedIndex
-                    ? slotsProps?.highlightedClassName ??
-                      "mention-option-highlighted"
-                    : ""
-                }`}
                 {...slotsProps?.option}
+                className={getOptionClassName(idx)}
                 key={option.value}
                 id={`mention-option-${option.value}`}
                 role="option"
