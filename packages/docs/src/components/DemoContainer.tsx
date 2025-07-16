@@ -8,7 +8,7 @@ export function DemoContainer({
   return (
     <section
       className={cn(
-        "not-prose flex flex-wrap items-center gap-2 rounded-xl border border-dashed p-2",
+        "relative not-prose flex flex-wrap items-center gap-2 rounded-xl border border-dashed p-2",
         className
       )}
       {...props}
