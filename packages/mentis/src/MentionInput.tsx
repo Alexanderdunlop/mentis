@@ -6,27 +6,47 @@ export type MentionOption = {
   value: string;
 };
 
+type InputProps = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  | "ref"
+  | "value"
+  | "onChange"
+  | "onKeyDown"
+  | "aria-controls"
+  | "aria-activedescendant"
+  | "aria-haspopup"
+>;
+
+type ListboxProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "id" | "role" | "style"
+>;
+
+type OptionProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "id" | "key" | "role" | "style" | "aria-selected" | "onMouseDown"
+>;
+
+type SlotProps = Partial<{
+  container: React.HTMLAttributes<HTMLDivElement>;
+  input: InputProps;
+  listbox: ListboxProps;
+  option: OptionProps;
+  noOptions: React.HTMLAttributes<HTMLDivElement>;
+  highlightedClassName: string;
+}>;
+
 type MentionInputProps = {
   defaultValue?: string;
   options: MentionOption[];
-  containerClassName?: string;
-  inputClassName?: string;
-  listboxClassName?: string;
-  optionClassName?: string;
-  optionHighlightedClassName?: string;
-  noOptionsClassName?: string;
+  slotsProps?: SlotProps;
   onChange?: (value: string) => void;
 };
 
 export const MentionInput: React.FC<MentionInputProps> = ({
   defaultValue = "",
   options,
-  containerClassName = "mention-input-container",
-  inputClassName = "mention-input",
-  listboxClassName = "mention-listbox",
-  optionClassName = "mention-option",
-  optionHighlightedClassName = "mention-option-highlighted",
-  noOptionsClassName = "mention-no-options",
+  slotsProps,
   onChange,
 }) => {
   const [value, setValue] = useState<string>(defaultValue);
@@ -118,30 +138,32 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   );
 
   return (
-    <div className={containerClassName}>
+    <div className="mention-input-container" {...slotsProps?.container}>
       <input
-        ref={inputRef}
-        className={inputClassName}
-        value={value}
+        className="mention-input"
         placeholder="Type @ to mention someone"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded={showModal}
+        {...slotsProps?.input}
+        ref={inputRef}
+        value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        role="combobox"
+        aria-haspopup="listbox"
         aria-controls={showModal ? "mention-listbox" : undefined}
         aria-activedescendant={
           showModal && filteredOptions.length > 0
             ? `mention-option-${filteredOptions[highlightedIndex].value}`
             : undefined
         }
-        aria-autocomplete="list"
-        aria-haspopup="listbox"
-        aria-expanded={showModal}
       />
       {showModal && (
         <div
+          className="mention-listbox"
+          {...slotsProps?.listbox}
           id="mention-listbox"
           role="listbox"
-          className={listboxClassName}
           style={{
             top:
               modalPosition.top -
@@ -149,18 +171,26 @@ export const MentionInput: React.FC<MentionInputProps> = ({
           }}
         >
           {filteredOptions.length === 0 && (
-            <div className={noOptionsClassName}>No items found</div>
+            <div className="mention-no-options" {...slotsProps?.noOptions}>
+              No items found
+            </div>
           )}
           {filteredOptions.length > 0 &&
             filteredOptions.map((option, idx) => (
               <div
+                className={`${
+                  slotsProps?.option?.className ?? "mention-option"
+                } ${
+                  idx === highlightedIndex
+                    ? slotsProps?.highlightedClassName ??
+                      "mention-option-highlighted"
+                    : ""
+                }`}
+                {...slotsProps?.option}
                 key={option.value}
                 id={`mention-option-${option.value}`}
                 role="option"
                 aria-selected={idx === highlightedIndex}
-                className={`${optionClassName} ${
-                  idx === highlightedIndex ? optionHighlightedClassName : ""
-                }`}
                 onMouseDown={() => handleSelect(option)}
               >
                 {option.label}

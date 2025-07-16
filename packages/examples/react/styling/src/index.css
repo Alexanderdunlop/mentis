@@ -1,0 +1,73 @@
+.mentis-demo-container {
+  width: 100%;
+  max-width: 512px;
+  position: relative;
+}
+
+.mentis-demo-input {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  padding: 12px 16px;
+  font-size: 16px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  color: #111827;
+}
+.mentis-demo-input::placeholder {
+  color: #9ca3af;
+}
+
+.mentis-demo-listbox {
+  position: absolute;
+  z-index: 10;
+  margin-top: 8px;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.08);
+  max-height: 240px;
+  overflow: auto;
+}
+
+.mentis-demo-option {
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #1f2937;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.mentis-demo-option:hover {
+  background: #f3f4f6;
+}
+
+.mentis-demo-option-highlighted {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.mentis-demo-no-options {
+  padding: 8px 16px;
+  color: #9ca3af;
+}
+
+.mentis-demo-outer {
+  min-height: 100vh;
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.mentis-demo-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 24px;
+}

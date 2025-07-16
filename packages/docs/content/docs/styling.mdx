@@ -2,36 +2,71 @@
 title: Styling & Customization
 ---
 
-The `MentionInput` component is designed to be fully customizable. You can use Tailwind CSS, your own CSS classes, or any CSS framework by passing className props for each part of the component. This allows you to match the look and feel of your application or design system.
+The `MentionInput` component is designed to be fully customizable. You can use Tailwind CSS, your own CSS classes, or any CSS framework by passing className values for each part of the component via the `slotsProps` object. This flexible approach allows you to match the look and feel of your application or design system.
 
-## Customizing with className Props
+## Customizing with className
 
-The following props let you control the styling of each part of the component:
+You can customize the appearance of each part of the `MentionInput` component by passing a `slotsProps` object. This object lets you specify a `className` for each slot:
 
-- `containerClassName`
-- `inputClassName`
-- `listboxClassName`
-- `optionClassName`
-- `optionHighlightedClassName`
-- `noOptionsClassName`
+- `container`: The outer container
+- `input`: The input element
+- `listbox`: The dropdown list container
+- `option`: Each option in the list
+- `highlightedClassName`: Applied to the currently highlighted option
+- `noOptions`: The element shown when there are no options
 
-## Example: Tailwind Chat Input
+For each slot (except `highlightedClassName`), pass an object with a `className` property. For `highlightedClassName`, pass a string with the class name to apply when an option is highlighted.
 
-Here's an example using Tailwind CSS to create a modern chat-style input:
+## Example: Custom CSS with className
+
+Here's an example using your own CSS classes (see `index.css` for definitions):
 
 ```tsx
 <MentionInput
   options={options}
-  containerClassName="w-full max-w-lg relative"
-  inputClassName="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition placeholder-gray-400"
-  listboxClassName="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto"
-  optionClassName="px-4 py-2 cursor-pointer text-base text-gray-800 hover:bg-gray-100 rounded-lg transition"
-  optionHighlightedClassName="bg-blue-500 text-white hover:bg-blue-500"
-  noOptionsClassName="px-4 py-2 text-gray-400"
+  slotsProps={{
+    container: { className: "mentis-demo-container" },
+    input: { className: "mentis-demo-input" },
+    listbox: { className: "mentis-demo-listbox" },
+    option: { className: "mentis-demo-option" },
+    highlightedClassName: "mentis-demo-option-highlighted",
+    noOptions: { className: "mentis-demo-no-options" },
+  }}
 />
 ```
 
-This approach gives you complete control over the component's appearance. You can use any combination of utility classes or your own CSS modules.
+This approach gives you complete control over the component's appearance using your own CSS. You can define these classes in your project's CSS file (for example, `index.css`).
+
+---
+
+## Example: Tailwind CSS
+
+Here's an example using Tailwind CSS utility classes directly in the `slotsProps`:
+
+```tsx
+<MentionInput
+  options={options}
+  slotsProps={{
+    container: { className: "w-full max-w-lg relative" },
+    input: {
+      className:
+        "w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition placeholder-gray-400",
+    },
+    listbox: {
+      className:
+        "absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto",
+    },
+    option: {
+      className:
+        "px-4 py-2 cursor-pointer text-base text-gray-800 hover:bg-gray-100 rounded-lg transition",
+    },
+    highlightedClassName: "bg-blue-500 text-white hover:bg-blue-500",
+    noOptions: { className: "px-4 py-2 text-gray-400" },
+  }}
+/>
+```
+
+This approach lets you style the component using Tailwind's utility classes for rapid prototyping and design consistency.
 
 ---
 
