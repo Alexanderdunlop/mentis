@@ -10,6 +10,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   options,
   slotsProps,
   keepTriggerOnSelect,
+  trigger,
   onChange,
 }) => {
   const {
@@ -26,6 +27,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
     options,
     defaultValue,
     keepTriggerOnSelect,
+    trigger,
     onChange,
   });
 
@@ -37,9 +39,10 @@ export const MentionInput: React.FC<MentionInputProps> = ({
         showModal={showModal}
         filteredOptions={filteredOptions}
         highlightedIndex={highlightedIndex}
+        slotsProps={slotsProps}
+        trigger={trigger}
         handleChange={handleChange}
         handleKeyDown={handleKeyDown}
-        slotsProps={slotsProps}
       />
       {showModal && (
         <MentionListbox
@@ -47,8 +50,8 @@ export const MentionInput: React.FC<MentionInputProps> = ({
           modalPosition={modalPosition}
           filteredOptions={filteredOptions}
           highlightedIndex={highlightedIndex}
-          handleSelect={handleSelect}
           slotsProps={slotsProps}
+          handleSelect={handleSelect}
         />
       )}
     </div>

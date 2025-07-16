@@ -3,6 +3,8 @@ title: Events & Callbacks
 description: Explanation of MentionInput events and the onChange callback.
 ---
 
+import { MentisAlertDemo } from "@/components";
+
 ## onChange
 
 The `onChange` prop is a callback function that is called whenever the input value changes, either by typing or by selecting a mention option.
@@ -14,10 +16,12 @@ The `onChange` prop is a callback function that is called whenever the input val
   options={options}
   onChange={(value) => {
     // Handle the updated value
-    console.log(value);
+    alert(value);
   }}
 />
 ```
+
+<MentisAlertDemo />
 
 - The callback receives the current input value as a string argument.
 - It is called both when the user types and when a mention is inserted.

@@ -4,7 +4,7 @@ description: How to use keyboard controls when the mention modal is open.
 ---
 
 import { Suspense } from "react";
-import { DemoFallback, BasicUsageDemo } from "@/components";
+import { DemoFallback, MentisDemo } from "@/components";
 
 When you trigger the mention modal by typing <code>@</code>, you can use the following keyboard controls to navigate and select options:
 
@@ -16,6 +16,4 @@ When you trigger the mention modal by typing <code>@</code>, you can use the fol
 
 This allows for fast, accessible navigation and selection of mention options using only the keyboard.
 
-<Suspense fallback={<DemoFallback />}>
-  <BasicUsageDemo />
-</Suspense>
+<MentisDemo />

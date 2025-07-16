@@ -1,11 +1,12 @@
 import { useState, useRef, useMemo, type ChangeEvent } from "react";
 import type { MentionOption } from "../types/MentionInput.types";
-import { isSingleAtMention } from "../utils/isSingleAtMention";
+import { isSingleTriggerMention } from "../utils/isSingleTriggerMention";
 
 type UseMentionInputProps = {
   options: MentionOption[];
   defaultValue?: string;
   keepTriggerOnSelect?: boolean;
+  trigger?: string;
   onChange?: (value: string) => void;
 };
 
@@ -13,6 +14,7 @@ export function useMentionInput({
   options,
   defaultValue = "",
   keepTriggerOnSelect = false,
+  trigger = "@",
   onChange,
 }: UseMentionInputProps) {
   const [value, setValue] = useState<string>(defaultValue);
@@ -29,10 +31,10 @@ export function useMentionInput({
     const val = event.currentTarget.value;
     setValue(val);
     onChange?.(val);
-    const atIndex = val.lastIndexOf("@");
-    const isSingleAt = isSingleAtMention(val, atIndex);
+    const triggerIndex = val.lastIndexOf(trigger);
+    const isSingleTrigger = isSingleTriggerMention(val, triggerIndex, trigger);
 
-    if (!isSingleAt) {
+    if (!isSingleTrigger) {
       setShowModal(false);
       setSearch("");
       setHighlightedIndex(0);
@@ -40,7 +42,7 @@ export function useMentionInput({
     }
 
     setShowModal(true);
-    setSearch(val.slice(atIndex + 1));
+    setSearch(val.slice(triggerIndex + trigger.length));
     setHighlightedIndex(0); // Reset highlight on new search
     const rect = event.currentTarget.getBoundingClientRect();
     setModalPosition({
@@ -87,17 +89,17 @@ export function useMentionInput({
   const handleSelect = (option: MentionOption) => {
     const input = inputRef.current as HTMLInputElement;
     const start = input.selectionStart ?? 0;
-    const atIndex = value.lastIndexOf("@", start - 1);
+    const triggerIndex = value.lastIndexOf(trigger, start - 1);
 
-    if (atIndex === -1) {
+    if (triggerIndex === -1) {
       return;
     }
 
-    const before = value.slice(0, atIndex); // up to but not including '@'
+    const before = value.slice(0, triggerIndex);
     const after = value.slice(start);
-    // Use keepTriggerOnSelect to determine whether to keep '@' or remove it
+
     const newValue = keepTriggerOnSelect
-      ? `${before}@${option.label} ${after}`
+      ? `${before}${trigger}${option.label} ${after}`
       : `${before}${option.label} ${after}`;
 
     setValue(newValue);
@@ -107,8 +109,14 @@ export function useMentionInput({
     setTimeout(() => {
       input.focus();
       input.setSelectionRange(
-        before.length + option.label.length + 1 + (keepTriggerOnSelect ? 1 : 0),
-        before.length + option.label.length + 1 + (keepTriggerOnSelect ? 1 : 0)
+        before.length +
+          option.label.length +
+          1 +
+          (keepTriggerOnSelect ? trigger.length : 0),
+        before.length +
+          option.label.length +
+          1 +
+          (keepTriggerOnSelect ? trigger.length : 0)
       );
     }, 0);
   };

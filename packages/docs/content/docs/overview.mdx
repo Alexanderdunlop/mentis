@@ -3,12 +3,15 @@ title: Overview
 description: Introduction to the MentionInput component and its main features.
 ---
 
-The `MentionInput` component provides an accessible, customizable input field with support for mentioning users or entities using the `@` symbol. It is designed for chat, comment, and editor interfaces where users need to reference others quickly and intuitively.
+The `MentionInput` component is an accessible, customizable input field designed for chat, comment, and editor interfaces where users need to mention others or reference entities quickly and intuitively. It supports a flexible trigger (default `@`, but can be any character or string), customizable mention options, and advanced slot-based customization for internal elements.
 
 **Main Features:**
 
-- Type `@` to trigger a mention modal with selectable options
-- Keyboard and mouse navigation
-- Customizable options and callbacks
-- Accessible with ARIA roles and keyboard support
-- Easy integration and styling
+- Type a trigger (default: `@`, customizable via the `trigger` prop) to open a mention dropdown with selectable options
+- Keyboard and mouse navigation for fast, accessible selection
+- Customizable mention options via the `options` prop
+- Flexible callbacks, including `onChange` for input value changes
+- Option to keep or remove the trigger character on selection (`keepTriggerOnSelect`)
+- Slot-based customization for container, input, listbox, options, and more via `slotsProps`
+- Fully accessible with ARIA roles and keyboard support
+- Easy integration and styling for a variety of use cases

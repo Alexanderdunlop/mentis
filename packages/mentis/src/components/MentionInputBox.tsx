@@ -7,9 +7,10 @@ type MentionInputBoxProps = {
   showModal: boolean;
   filteredOptions: MentionInputProps["options"];
   highlightedIndex: number;
+  slotsProps?: MentionInputProps["slotsProps"];
+  trigger?: string;
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
   handleKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
-  slotsProps?: MentionInputProps["slotsProps"];
 };
 
 export const MentionInputBox: React.FC<MentionInputBoxProps> = ({
@@ -18,13 +19,14 @@ export const MentionInputBox: React.FC<MentionInputBoxProps> = ({
   showModal,
   filteredOptions,
   highlightedIndex,
+  trigger,
+  slotsProps,
   handleChange,
   handleKeyDown,
-  slotsProps,
 }) => (
   <input
     className="mention-input"
-    placeholder="Type @ to mention someone"
+    placeholder={`Type ${trigger} to mention someone`}
     role="combobox"
     aria-autocomplete="list"
     aria-expanded={showModal}

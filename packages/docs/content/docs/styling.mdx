@@ -2,8 +2,7 @@
 title: Styling & Customization
 ---
 
-import { Suspense } from "react";
-import { DemoFallback, TailwindUsageDemo } from "@/components";
+import { MentisDemo } from "@/components";
 
 The `MentionInput` component is designed to be fully customizable. You can use Tailwind CSS, your own CSS classes, or any CSS framework by passing className values for each part of the component via the `slotsProps` object. This flexible approach allows you to match the look and feel of your application or design system.
 
@@ -69,9 +68,7 @@ Here's an example using Tailwind CSS utility classes directly in the `slotsProps
 />
 ```
 
-<Suspense fallback={<DemoFallback />}>
-  <TailwindUsageDemo />
-</Suspense>
+<MentisDemo />
 
 This approach lets you style the component using Tailwind's utility classes for rapid prototyping and design consistency.
 

@@ -40,5 +40,6 @@ export type MentionInputProps = {
   options: MentionOption[];
   slotsProps?: SlotProps;
   keepTriggerOnSelect?: boolean;
+  trigger?: string;
   onChange?: (value: string) => void;
 };

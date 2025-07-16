@@ -16,8 +16,8 @@ export const MentionListbox: React.FC<MentionListboxProps> = ({
   modalPosition,
   filteredOptions,
   highlightedIndex,
-  handleSelect,
   slotsProps,
+  handleSelect,
 }) => (
   <div
     className="mention-listbox"
