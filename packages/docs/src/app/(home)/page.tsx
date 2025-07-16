@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col justify-center items-center text-center">
-      <div className="max-w-md text-left grid gap-4">
+      <div className="max-w-md text-left grid gap-4 px-6">
         <h1 className="text-5xl font-bold">mentis</h1>
         <p className="text-black text-xl">
           A small, fast, and flexible mention input solution for React.
