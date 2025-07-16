@@ -1,1 +1,0 @@
-packages/mentis/README.md
