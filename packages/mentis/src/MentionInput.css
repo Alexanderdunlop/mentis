@@ -30,6 +30,6 @@
   cursor: pointer;
 }
 
-.mention-option.highlighted {
+.mention-option-highlighted {
   background: #f0f0f0;
 }

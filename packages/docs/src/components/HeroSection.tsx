@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Github, Library } from "lucide-react";
 import { LandingDemo } from "./LandingDemo";
 import Image from "next/image";
+import { WorksWith } from "./WorksWith";
 
 export const HeroSection = () => {
   return (
@@ -15,7 +16,7 @@ export const HeroSection = () => {
           A small, fast, and flexible
           <br /> mention input solution.
         </p>
-        <nav className="flex flex-wrap gap-8 items-center">
+        <nav className="mb-8 flex flex-wrap gap-8 items-center">
           <Link
             href="/docs"
             className="text-md bg-black px-4 py-2 text-white w-full rounded-full sm:w-auto"
@@ -31,6 +32,7 @@ export const HeroSection = () => {
             GitHub
           </a>
         </nav>
+        <WorksWith />
       </aside>
       <aside className="relative my-4 xl:my-auto xl:flex-1 xl:pt-4">
         <LandingDemo />
