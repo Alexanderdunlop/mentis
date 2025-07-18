@@ -19,7 +19,7 @@ function App() {
           container: {
             className: "mentis-demo-container",
           },
-          input: {
+          contentEditable: {
             className: "mentis-demo-input",
           },
           listbox: {

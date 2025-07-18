@@ -16,13 +16,13 @@ export const LandingDemoClient = () => {
       ]}
       slotsProps={{
         container: { className: "w-full max-w-lg relative" },
-        input: {
+        contentEditable: {
           className:
-            "w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition placeholder-gray-400",
+            "w-full text-left rounded-xl border border-gray-300 bg-white px-4 py-3 text-base shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition placeholder-gray-400",
         },
         listbox: {
           className:
-            "absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto",
+            "z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto",
         },
         option: {
           className:

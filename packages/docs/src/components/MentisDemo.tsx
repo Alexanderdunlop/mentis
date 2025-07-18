@@ -1,10 +1,9 @@
 import { MentisDemoClient } from "./MentisDemoClient";
 import { DemoFallback } from "./DemoFallback";
 import { Suspense } from "react";
+import type { MentionInputProps } from "mentis";
 
-// TODO: Replace any with MentionInputProps when type is exported
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function MentisDemo(props: any) {
+export function MentisDemo(props: MentionInputProps) {
   return (
     <Suspense fallback={<DemoFallback />}>
       <MentisDemoClient {...props} />

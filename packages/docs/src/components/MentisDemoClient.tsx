@@ -1,11 +1,9 @@
 "use client";
 
-import { MentionInput } from "mentis";
+import { MentionInput, type MentionInputProps } from "mentis";
 import { DemoContainer } from "./DemoContainer";
 
-// TODO: Replace any with MentionInputProps when type is exported
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function MentisDemoClient(props: any) {
+export function MentisDemoClient(props: Partial<MentionInputProps>) {
   return (
     <DemoContainer>
       <MentionInput
@@ -16,7 +14,7 @@ export function MentisDemoClient(props: any) {
         ]}
         slotsProps={{
           container: { className: "w-full max-w-lg relative" },
-          input: {
+          contentEditable: {
             className:
               "w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition placeholder-gray-400",
           },

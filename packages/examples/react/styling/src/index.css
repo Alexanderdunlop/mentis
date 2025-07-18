@@ -1,73 +1,79 @@
-.mentis-demo-container {
-  width: 100%;
-  max-width: 512px;
-  position: relative;
-}
-
-.mentis-demo-input {
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid #d1d5db;
-  background: #fff;
-  padding: 12px 16px;
-  font-size: 16px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  color: #111827;
-}
-.mentis-demo-input::placeholder {
-  color: #9ca3af;
-}
-
-.mentis-demo-listbox {
-  position: absolute;
-  z-index: 10;
-  margin-top: 8px;
-  width: 100%;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.08);
-  max-height: 240px;
-  overflow: auto;
-}
-
-.mentis-demo-option {
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 16px;
-  color: #1f2937;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.mentis-demo-option:hover {
-  background: #f3f4f6;
-}
-
-.mentis-demo-option-highlighted {
-  background: #3b82f6;
-  color: #fff;
-}
-
-.mentis-demo-no-options {
-  padding: 8px 16px;
-  color: #9ca3af;
-}
-
 .mentis-demo-outer {
   min-height: 100vh;
-  background: #f9fafb;
+  background: #f8fafc;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .mentis-demo-title {
   font-size: 24px;
-  font-weight: bold;
+  font-weight: 600;
   margin-bottom: 24px;
+  color: #1e293b;
+}
+
+.mentis-demo-container {
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+}
+
+.mentis-demo-input {
+  width: 100%;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  background: #ffffff;
+  padding: 12px 16px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  color: #334155;
+}
+
+.mentis-demo-input:focus {
+  border-color: #3b82f6;
+}
+
+.mentis-demo-input::placeholder {
+  color: #94a3b8;
+}
+
+.mentis-demo-listbox {
+  z-index: 10;
+  margin-top: 8px;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow: auto;
+}
+
+.mentis-demo-option {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #334155;
+  transition: background-color 0.2s ease;
+}
+
+.mentis-demo-option:hover {
+  background: #f1f5f9;
+}
+
+.mentis-demo-option-highlighted {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.mentis-demo-no-options {
+  padding: 12px 16px;
+  color: #94a3b8;
+  font-size: 14px;
+  text-align: center;
 }
