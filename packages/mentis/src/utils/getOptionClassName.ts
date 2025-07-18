@@ -1,4 +1,4 @@
-import type { SlotProps } from "../types/MentionInput.types";
+import type { SlotProps } from "../types/SlotProps.types";
 
 export function getOptionClassName(
   idx: number,

@@ -11,12 +11,13 @@ export function App() {
   const [value, setValue] = useState<string>("");
   return (
     <>
-      {value}
       <MentionInput
+        keepTriggerOnSelect
         defaultValue={value}
         options={options}
         onChange={setValue}
       />
+      {value}
     </>
   );
 }

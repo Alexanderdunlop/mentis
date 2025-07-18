@@ -1,8 +1,7 @@
 import React from "react";
 import "./MentionInput.css";
 import type { MentionInputProps } from "./types/MentionInput.types";
-import { useMentionInput } from "./hooks/useMentionInput";
-import { MentionInputBox } from "./components/MentionInputBox";
+import { useContentEditableMention } from "./hooks/useContentEditableMention";
 import { MentionListbox } from "./components/MentionListbox";
 
 export const MentionInput: React.FC<MentionInputProps> = ({
@@ -10,20 +9,22 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   options,
   slotsProps,
   keepTriggerOnSelect,
-  trigger,
+  trigger = "@",
   onChange,
 }) => {
   const {
-    inputRef,
-    value,
+    editorRef,
     showModal,
     modalPosition,
     highlightedIndex,
     filteredOptions,
-    handleChange,
+    handleInput,
     handleKeyDown,
     handleSelect,
-  } = useMentionInput({
+    handleFocus,
+    handleBlur,
+    handlePaste,
+  } = useContentEditableMention({
     options,
     defaultValue,
     keepTriggerOnSelect,
@@ -33,20 +34,31 @@ export const MentionInput: React.FC<MentionInputProps> = ({
 
   return (
     <div className="mention-input-container" {...slotsProps?.container}>
-      <MentionInputBox
-        inputRef={inputRef}
-        value={value}
-        showModal={showModal}
-        filteredOptions={filteredOptions}
-        highlightedIndex={highlightedIndex}
-        slotsProps={slotsProps}
-        trigger={trigger}
-        handleChange={handleChange}
-        handleKeyDown={handleKeyDown}
+      <div
+        className="content-editable-input"
+        data-placeholder={`Type ${trigger} to mention someone`}
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded={showModal}
+        aria-activedescendant={
+          showModal && filteredOptions.length > 0
+            ? `mention-option-${filteredOptions[highlightedIndex].value}`
+            : undefined
+        }
+        aria-haspopup="listbox"
+        aria-controls={showModal ? "mention-listbox" : undefined}
+        {...slotsProps?.contentEditable}
+        ref={editorRef}
+        contentEditable
+        suppressContentEditableWarning
+        onInput={handleInput}
+        onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onPaste={handlePaste}
       />
       {showModal && (
         <MentionListbox
-          inputRef={inputRef}
           modalPosition={modalPosition}
           filteredOptions={filteredOptions}
           highlightedIndex={highlightedIndex}

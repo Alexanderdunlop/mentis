@@ -1,3 +1,4 @@
+// TODO: This isn't being used bring it back in.
 export function isSingleTriggerMention(
   val: string,
   triggerIndex: number,

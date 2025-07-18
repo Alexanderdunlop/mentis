@@ -3,8 +3,7 @@ import type { MentionInputProps } from "../types/MentionInput.types";
 import { getOptionClassName } from "../utils/getOptionClassName";
 
 type MentionListboxProps = {
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  modalPosition: { top: number };
+  modalPosition: { top: number; left: number };
   filteredOptions: MentionInputProps["options"];
   highlightedIndex: number;
   slotsProps?: MentionInputProps["slotsProps"];
@@ -12,7 +11,6 @@ type MentionListboxProps = {
 };
 
 export const MentionListbox: React.FC<MentionListboxProps> = ({
-  inputRef,
   modalPosition,
   filteredOptions,
   highlightedIndex,
@@ -25,9 +23,8 @@ export const MentionListbox: React.FC<MentionListboxProps> = ({
     id="mention-listbox"
     role="listbox"
     style={{
-      top:
-        modalPosition.top -
-        (inputRef.current?.getBoundingClientRect().top || 0),
+      top: modalPosition.top,
+      left: modalPosition.left,
     }}
   >
     {filteredOptions.length === 0 && (
