@@ -13,7 +13,6 @@ export function App() {
     <>
       {value}
       <MentionInput
-        trigger="#"
         defaultValue={value}
         options={options}
         onChange={setValue}
