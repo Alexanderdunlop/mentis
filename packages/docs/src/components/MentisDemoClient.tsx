@@ -4,6 +4,7 @@ import { MentionInput } from "mentis";
 import { DemoContainer } from "./DemoContainer";
 
 // TODO: Replace any with MentionInputProps when type is exported
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function MentisDemoClient(props: any) {
   return (
     <DemoContainer>
