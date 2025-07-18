@@ -11,5 +11,6 @@ export type MentionInputProps = {
   slotsProps?: SlotProps;
   keepTriggerOnSelect?: boolean;
   trigger?: string;
+  autoConvertMentions?: boolean;
   onChange?: (value: string) => void;
 };

@@ -2,7 +2,7 @@ import React from "react";
 import type { MentionInputProps } from "../types/MentionInput.types";
 import { getOptionClassName } from "../utils/getOptionClassName";
 
-type MentionListboxProps = {
+type MentionModalProps = {
   modalPosition: { top: number; left: number };
   filteredOptions: MentionInputProps["options"];
   highlightedIndex: number;
@@ -10,7 +10,7 @@ type MentionListboxProps = {
   handleSelect: (option: MentionInputProps["options"][number]) => void;
 };
 
-export const MentionListbox: React.FC<MentionListboxProps> = ({
+export const MentionModal: React.FC<MentionModalProps> = ({
   modalPosition,
   filteredOptions,
   highlightedIndex,
@@ -18,9 +18,9 @@ export const MentionListbox: React.FC<MentionListboxProps> = ({
   handleSelect,
 }) => (
   <div
-    className="mention-listbox"
-    {...slotsProps?.listbox}
-    id="mention-listbox"
+    className="mention-modal"
+    {...slotsProps?.modal}
+    id="mention-modal"
     role="listbox"
     style={{
       top: modalPosition.top,

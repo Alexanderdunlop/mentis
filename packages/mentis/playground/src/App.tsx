@@ -13,7 +13,8 @@ export function App() {
     <>
       <div style={{ width: "300px", height: "200px", overflowY: "auto" }}>
         <MentionInput
-          keepTriggerOnSelect
+          keepTriggerOnSelect={false}
+          autoConvertMentions={true}
           defaultValue={value}
           options={options}
           onChange={setValue}

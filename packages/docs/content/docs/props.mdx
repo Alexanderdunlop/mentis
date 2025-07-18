@@ -7,14 +7,15 @@ import { MentisDemo } from "@/components";
 
 ## Props
 
-| Name                | Type                    | Required | Description                                                                                     |
-| ------------------- | ----------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-| defaultValue        | string                  | No       | The initial value of the input.                                                                 |
-| options             | MentionOption[]         | Yes      | Array of mentionable options. See [Options](./options) for more.                                |
-| onChange            | (value: string) => void | No       | Callback fired when the input value changes.                                                    |
-| keepTriggerOnSelect | boolean                 | No       | Whether to keep the trigger character (e.g. '@') when an option is selected. Defaults to false. |
-| trigger             | string                  | No       | The character or string that triggers the mention dropdown. Defaults to '@'.                    |
-| slotsProps          | SlotProps               | No       | Customization for internal component slots (see below).                                         |
+| Name                | Type                    | Required | Description                                                                                            |
+| ------------------- | ----------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
+| defaultValue        | string                  | No       | The initial value of the input.                                                                        |
+| options             | MentionOption[]         | Yes      | Array of mentionable options. See [Options](./options) for more.                                       |
+| slotsProps          | SlotProps               | No       | Customization for internal component slots (see below).                                                |
+| keepTriggerOnSelect | boolean                 | No       | Whether to keep the trigger character (e.g. '@') when an option is selected. Defaults to true.         |
+| trigger             | string                  | No       | The character or string that triggers the mention dropdown. Defaults to '@'.                           |
+| autoConvertMentions | boolean                 | No       | Whether to automatically convert text mentions to chips when typing space or enter. Defaults to false. |
+| onChange            | (value: string) => void | No       | Callback fired when the input value changes.                                                           |
 
 ### MentionOption
 
@@ -49,7 +50,7 @@ type SlotProps = Partial<{
     | "aria-autocomplete"
     | "aria-expanded"
   >; // Props for the contentEditable element
-  listbox: Omit<React.HTMLAttributes<HTMLDivElement>, "id" | "role" | "style">; // Props for the dropdown listbox
+  modal: Omit<React.HTMLAttributes<HTMLDivElement>, "id" | "role" | "style">; // Props for the dropdown listbox
   option: Omit<
     React.HTMLAttributes<HTMLDivElement>,
     "id" | "key" | "role" | "style" | "aria-selected" | "onMouseDown"
@@ -61,16 +62,16 @@ type SlotProps = Partial<{
 
 - `container`: Props for the outer `<div>` container.
 - `contentEditable`: Props for the contentEditable `<div>` element (excluding controlled props for mention functionality).
-- `listbox`: Props for the dropdown listbox container.
+- `modal`: Props for the dropdown listbox container.
 - `option`: Props for each option in the dropdown.
 - `noOptions`: Props for the 'No items found' message.
 - `highlightedClassName`: Custom class for the currently highlighted option.
 
 ---
 
-#### `keepTriggerOnSelect`
+### `keepTriggerOnSelect`
 
-If `true`, the trigger character (such as `@`) will be kept in the input when an option is selected. If `false` (default), the trigger character will be removed before the selected label.
+If `true` (default), the trigger character (such as `@`) will be kept in the input when an option is selected. If `false`, the trigger character will be removed before the selected label.
 
 ```tsx
 <MentionInput keepTriggerOnSelect ... />
@@ -80,7 +81,7 @@ If `true`, the trigger character (such as `@`) will be kept in the input when an
 
 ---
 
-#### `trigger`
+### `trigger`
 
 The `trigger` prop allows you to customize which character or string opens the mention dropdown. By default, this is set to `@`, but you can use any character (e.g., `#`) or even a multi-character string (e.g., `::`).
 
@@ -91,3 +92,23 @@ The `trigger` prop allows you to customize which character or string opens the m
 <MentisDemo trigger="#" />
 
 This will open the mention dropdown when the user types `#` instead of `@`.
+
+---
+
+### `autoConvertMentions`
+
+When `true`, the component will automatically convert text mentions to chips when the user types a space or presses Enter. This is useful for scenarios where users type mentions manually without selecting from the dropdown.
+
+```tsx
+<MentionInput autoConvertMentions={true} ... />
+```
+
+**How it works:**
+
+- When enabled, the component monitors for space characters and Enter key presses
+- It scans the text for patterns like `@username` that match your options
+- Matching text is automatically converted to chips
+- The conversion happens asynchronously to ensure DOM updates are complete
+- This feature works independently of the paste functionality, which has its own mention parsing
+
+**⚠️ Performance Warning:** This feature is not enabled by default as it requires additional performance testing in production environments. The automatic conversion process runs on every space/enter key press and may impact performance with large option lists or frequent typing.

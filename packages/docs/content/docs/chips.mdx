@@ -1,0 +1,115 @@
+---
+title: Chips
+description: Understanding mention chips and their role in the MentionInput component.
+---
+
+import { MentisDemo } from "@/components";
+
+# Mention Chips
+
+Mention chips are the visual representation of selected mentions within the `MentionInput` component. They transform plain text mentions into styled, interactive elements that provide better visual feedback and user experience.
+
+## What are Chips?
+
+Chips are `<span>` elements with the class `mention-chip` that replace text-based mentions in the contentEditable interface. They serve several important purposes:
+
+- **Visual Distinction**: Chips are styled differently from regular text to clearly indicate they represent mentions
+- **Data Storage**: Each chip contains metadata about the mentioned entity via `data-*` attributes
+- **Interactive Elements**: Chips can be navigated with keyboard and provide rich interaction
+- **Content Protection**: Chips are set to `contentEditable="false"` to prevent accidental editing
+
+## Chip Structure
+
+When a mention is selected, it's converted into a chip with this structure:
+
+```html
+<span
+  class="mention-chip"
+  contenteditable="false"
+  data-value="user123"
+  data-label="John Doe"
+>
+  @John Doe
+</span>
+```
+
+### Chip Attributes
+
+| Attribute                 | Purpose                                              | Example        |
+| ------------------------- | ---------------------------------------------------- | -------------- |
+| `class="mention-chip"`    | Identifies the element as a mention chip             | `mention-chip` |
+| `contenteditable="false"` | Prevents editing of the chip content                 | `false`        |
+| `data-value`              | Stores the unique identifier of the mentioned entity | `user123`      |
+| `data-label`              | Stores the display name of the mentioned entity      | `John Doe`     |
+
+## Chip Creation
+
+Chips are created in several scenarios:
+
+### 1. Manual Selection
+
+When a user selects an option from the dropdown, a chip is immediately created:
+
+```tsx
+<MentionInput
+  options={[
+    { label: "Alice", value: "alice" },
+    { label: "Bob", value: "bob" },
+  ]}
+  trigger="@"
+/>
+```
+
+### 2. Auto-Conversion
+
+When `autoConvertMentions` is enabled, text mentions are automatically converted to chips when the user types a space or presses Enter:
+
+```tsx
+<MentionInput autoConvertMentions={true} options={options} trigger="@" />
+```
+
+### 3. Paste Operations
+
+When pasting text containing mentions, the component automatically parses and converts them to chips:
+
+```tsx
+// Pasting "@Alice @Bob" will create chips for both mentions
+```
+
+## Chip Styling
+
+Chips come with default styling:
+
+```css
+.mention-chip {
+  display: inline-block;
+  background: #007bff;
+  color: white;
+  padding: 0px 4px;
+  border-radius: 4px;
+}
+```
+
+## Chip Behavior
+
+### Keyboard Navigation
+
+Chips support full keyboard navigation:
+
+- **Arrow Keys**: Navigate through chips and text
+- **Backspace/Delete**: Remove chips when cursor is adjacent
+  {/* - **Click**: Position cursor before or after the chip */}
+
+### Trigger Character Display
+
+The `keepTriggerOnSelect` prop controls whether the trigger character is included in the chip:
+
+```tsx
+// With keepTriggerOnSelect: true (default)
+<span class="mention-chip">@Alice</span>
+
+// With keepTriggerOnSelect: false
+<span class="mention-chip">Alice</span>
+```
+
+Chips are a fundamental part of the MentionInput component that enhance user experience by providing clear visual feedback and maintaining data integrity for mentions within your application.

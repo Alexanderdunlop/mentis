@@ -2,14 +2,15 @@ import React from "react";
 import "./MentionInput.css";
 import type { MentionInputProps } from "./types/MentionInput.types";
 import { useContentEditableMention } from "./hooks/useContentEditableMention";
-import { MentionListbox } from "./components/MentionListbox";
+import { MentionModal } from "./components/MentionModal";
 
 export const MentionInput: React.FC<MentionInputProps> = ({
-  defaultValue,
+  defaultValue = "",
   options,
   slotsProps,
-  keepTriggerOnSelect,
+  keepTriggerOnSelect = true,
   trigger = "@",
+  autoConvertMentions = false,
   onChange,
 }) => {
   const {
@@ -29,6 +30,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
     defaultValue,
     keepTriggerOnSelect,
     trigger,
+    autoConvertMentions,
     onChange,
   });
 
@@ -46,19 +48,19 @@ export const MentionInput: React.FC<MentionInputProps> = ({
             : undefined
         }
         aria-haspopup="listbox"
-        aria-controls={showModal ? "mention-listbox" : undefined}
+        aria-controls={showModal ? "mention-modal" : undefined}
         {...slotsProps?.contentEditable}
         ref={editorRef}
         contentEditable
         suppressContentEditableWarning
-        onInput={handleInput}
+        onInput={(e) => handleInput(e.nativeEvent)}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}
         onPaste={handlePaste}
       />
       {showModal && (
-        <MentionListbox
+        <MentionModal
           modalPosition={modalPosition}
           filteredOptions={filteredOptions}
           highlightedIndex={highlightedIndex}

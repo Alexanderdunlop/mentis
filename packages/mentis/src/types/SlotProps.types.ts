@@ -10,7 +10,7 @@ export type ContentEditableInputCustomProps = Omit<
   | "onPaste"
 >;
 
-export type ListboxProps = Omit<
+export type ModalProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "id" | "role" | "style"
 >;
@@ -23,7 +23,7 @@ export type OptionProps = Omit<
 export type SlotProps = Partial<{
   container: React.HTMLAttributes<HTMLDivElement>;
   contentEditable: ContentEditableInputCustomProps;
-  listbox: ListboxProps;
+  modal: ModalProps;
   option: OptionProps;
   noOptions: React.HTMLAttributes<HTMLDivElement>;
   highlightedClassName: string;

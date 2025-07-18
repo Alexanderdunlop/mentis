@@ -30,8 +30,8 @@
   border-radius: 4px;
 }
 
-.mention-listbox {
-  position: fixed;
+.mention-modal {
+  position: absolute;
   background: #fff;
   border: 1px solid #ccc;
   text-align: left;

@@ -8,14 +8,43 @@ export const parseMentionsInText = (
 ): DocumentFragment => {
   const fragment = document.createDocumentFragment();
   
-  // Create a regex to match mentions (e.g., @Alice, @Bob)
-  const mentionRegex = new RegExp(`\\${trigger}([a-zA-Z0-9_]+)`, 'g');
+  // Create regex patterns to match mentions
+  // Pattern 1: With trigger (e.g., @Alice, @Bob)
+  const mentionWithTriggerRegex = new RegExp(`\\${trigger}([a-zA-Z0-9_]+)`, 'g');
+  // Pattern 2: Without trigger - match option labels/values as standalone words
+  const mentionWithoutTriggerRegex = new RegExp(`\\b(${options.map(opt => 
+    [opt.label, opt.value].map(val => val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')
+  ).join('|')})\\b`, 'gi');
   
   let lastIndex = 0;
-  let match;
+  let matches: Array<{match: RegExpExecArray, hasTrigger: boolean}> = [];
   
-  while ((match = mentionRegex.exec(text)) !== null) {
-    const mentionText = match[1]; // The text after the trigger
+  // Collect all matches with trigger
+  let match: RegExpExecArray | null;
+  while ((match = mentionWithTriggerRegex.exec(text)) !== null) {
+    matches.push({match, hasTrigger: true});
+  }
+  
+  // Collect all matches without trigger (only if keepTriggerOnSelect is false)
+  if (!keepTriggerOnSelect) {
+    mentionWithoutTriggerRegex.lastIndex = 0;
+    while ((match = mentionWithoutTriggerRegex.exec(text)) !== null) {
+      // Check if this match overlaps with any trigger-based match
+      const overlaps = matches.some(m => 
+        match!.index < m.match.index + m.match[0].length && 
+        match!.index + match![0].length > m.match.index
+      );
+      if (!overlaps) {
+        matches.push({match, hasTrigger: false});
+      }
+    }
+  }
+  
+  // Sort matches by position
+  matches.sort((a, b) => a.match.index - b.match.index);
+  
+  for (const {match, hasTrigger} of matches) {
+    const mentionText = hasTrigger ? match[1] : match[0];
     const startIndex = match.index;
     
     // Add text before the mention
@@ -47,7 +76,7 @@ export const parseMentionsInText = (
       fragment.appendChild(document.createTextNode(match[0]));
     }
     
-    lastIndex = mentionRegex.lastIndex;
+    lastIndex = startIndex + match[0].length;
   }
   
   // Add remaining text after the last mention
