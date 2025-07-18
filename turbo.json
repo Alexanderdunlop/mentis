@@ -6,6 +6,9 @@
     },
     "mentis#build": {
       "outputs": ["dist/**"]
+    },
+    "docs#build": {
+      "outputs": [".next/**", "!.next/cache/**"]
     }
   }
 }
