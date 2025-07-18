@@ -22,7 +22,7 @@
   position: relative;
 }
 
-.mentis-demo-input {
+.mentis-demo-content-editable {
   width: 100%;
   border-radius: 8px;
   border: 2px solid #e2e8f0;
@@ -42,7 +42,8 @@
   color: #94a3b8;
 }
 
-.mentis-demo-listbox {
+.mentis-demo-modal {
+  position: absolute;
   z-index: 10;
   margin-top: 8px;
   width: 100%;
@@ -64,6 +65,7 @@
 
 .mentis-demo-option:hover {
   background: #f1f5f9;
+  color: #000;
 }
 
 .mentis-demo-option-highlighted {

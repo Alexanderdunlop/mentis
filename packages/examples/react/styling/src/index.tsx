@@ -20,10 +20,10 @@ function App() {
             className: "mentis-demo-container",
           },
           contentEditable: {
-            className: "mentis-demo-input",
+            className: "mentis-demo-content-editable",
           },
-          listbox: {
-            className: "mentis-demo-listbox",
+          modal: {
+            className: "mentis-demo-modal",
           },
           option: {
             className: "mentis-demo-option",
