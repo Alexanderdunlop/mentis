@@ -32,16 +32,23 @@ The `slotsProps` prop allows you to customize the internal elements of the Menti
 ```tsx
 type SlotProps = Partial<{
   container: React.HTMLAttributes<HTMLDivElement>; // Props for the outer container
-  input: Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
+  contentEditable: Omit<
+    React.HTMLAttributes<HTMLDivElement>,
     | "ref"
-    | "value"
-    | "onChange"
+    | "contentEditable"
+    | "suppressContentEditableWarning"
+    | "onInput"
     | "onKeyDown"
+    | "onFocus"
+    | "onBlur"
+    | "onPaste"
+    | "role"
     | "aria-controls"
     | "aria-activedescendant"
     | "aria-haspopup"
-  >; // Props for the input element
+    | "aria-autocomplete"
+    | "aria-expanded"
+  >; // Props for the contentEditable element
   listbox: Omit<React.HTMLAttributes<HTMLDivElement>, "id" | "role" | "style">; // Props for the dropdown listbox
   option: Omit<
     React.HTMLAttributes<HTMLDivElement>,
@@ -53,7 +60,7 @@ type SlotProps = Partial<{
 ```
 
 - `container`: Props for the outer `<div>` container.
-- `input`: Props for the `<input>` element (excluding some controlled props).
+- `contentEditable`: Props for the contentEditable `<div>` element (excluding controlled props for mention functionality).
 - `listbox`: Props for the dropdown listbox container.
 - `option`: Props for each option in the dropdown.
 - `noOptions`: Props for the 'No items found' message.
