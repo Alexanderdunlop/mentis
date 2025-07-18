@@ -20,7 +20,7 @@ export function MentisAlertDemoClient() {
           },
           modal: {
             className:
-              "z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto",
+              "absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto",
           },
           option: {
             className:
