@@ -8,5 +8,5 @@ export type {
   SlotProps,
   ContentEditableInputCustomProps,
   OptionProps,
-  ListboxProps,
+  ModalProps,
 } from "./types/SlotProps.types";

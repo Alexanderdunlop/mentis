@@ -24,9 +24,9 @@ type UseContentEditableMentionProps = {
 
 export function useContentEditableMention({
   options,
-  defaultValue = "",
+  defaultValue,
   keepTriggerOnSelect,
-  trigger = "@",
+  trigger,
   onChange,
 }: UseContentEditableMentionProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
