@@ -1,21 +1,17 @@
 "use client";
 
 import { MentionInput } from "mentis";
-import { useState } from "react";
 import { DemoContainer } from "./DemoContainer";
 
-export function TailwindUsageDemo() {
-  const [value, setValue] = useState("");
+export function MentisAlertDemoClient() {
   return (
     <DemoContainer>
       <MentionInput
-        defaultValue={value}
         options={[
           { label: "Alice", value: "alice" },
           { label: "Bob", value: "bob" },
           { label: "Charlie", value: "charlie" },
         ]}
-        onChange={(value) => setValue(value)}
         slotsProps={{
           container: { className: "w-full max-w-lg relative" },
           input: {
@@ -33,6 +29,7 @@ export function TailwindUsageDemo() {
           highlightedClassName: "bg-blue-500 text-white hover:bg-blue-500",
           noOptions: { className: "px-4 py-2 text-gray-400" },
         }}
+        onChange={(value: string) => alert(value)}
       />
     </DemoContainer>
   );

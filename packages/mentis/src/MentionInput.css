@@ -1,23 +1,43 @@
 .mention-input-container {
   position: relative;
   width: 100%;
+  min-width: 250px;
 }
 
-.mention-input {
-  width: 100%;
+.content-editable-input {
   padding: 8px;
   font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  line-height: 1.4;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  text-align: left;
+}
+
+.content-editable-input:empty::before {
+  content: attr(data-placeholder);
+  color: #999;
+  pointer-events: none;
+}
+
+.mention-chip {
+  display: inline-block;
+  background: #007bff;
+  color: white;
+  padding: 0px 4px;
+  border-radius: 4px;
 }
 
 .mention-listbox {
-  position: absolute;
-  left: 0;
+  position: fixed;
   background: #fff;
   border: 1px solid #ccc;
   text-align: left;
-  border-radius: 4px;
-  z-index: 100;
-  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 250px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -30,6 +50,6 @@
   cursor: pointer;
 }
 
-.mention-option.highlighted {
+.mention-option-highlighted {
   background: #f0f0f0;
 }

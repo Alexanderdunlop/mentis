@@ -4,18 +4,18 @@ description: How to use keyboard controls when the mention modal is open.
 ---
 
 import { Suspense } from "react";
-import { DemoFallback, BasicUsageDemo } from "@/components";
+import { DemoFallback, MentisDemo } from "@/components";
 
-When you trigger the mention modal by typing <code>@</code>, you can use the following keyboard controls to navigate and select options:
+When you trigger the mention modal by typing <code>@</code> (or your custom trigger), you can use the following keyboard controls to navigate and select options:
 
 - <strong>Up Arrow / Down Arrow</strong>: Move the selection up or down in the
   list.
 - <strong>Enter</strong> or <strong>Tab</strong>: Select the currently
   highlighted option.
 - <strong>Escape (Esc)</strong>: Close the modal without making a selection.
+- <strong>Left Arrow / Right Arrow</strong>: Navigate into mention chips for
+  enhanced text editing.
 
-This allows for fast, accessible navigation and selection of mention options using only the keyboard.
+This allows for fast, accessible navigation and selection of mention options using only the keyboard. The contentEditable architecture provides enhanced cursor navigation, including the ability to navigate into existing mention chips with the left arrow key.
 
-<Suspense fallback={<DemoFallback />}>
-  <BasicUsageDemo />
-</Suspense>
+<MentisDemo />

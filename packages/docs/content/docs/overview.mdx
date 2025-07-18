@@ -3,12 +3,17 @@ title: Overview
 description: Introduction to the MentionInput component and its main features.
 ---
 
-The `MentionInput` component provides an accessible, customizable input field with support for mentioning users or entities using the `@` symbol. It is designed for chat, comment, and editor interfaces where users need to reference others quickly and intuitively.
+The `MentionInput` component is an accessible, customizable mention input solution designed for chat, comment, and editor interfaces where users need to mention others or reference entities quickly and intuitively. Built on a modern contentEditable architecture, it provides rich text capabilities with enhanced mention handling and DOM manipulation.
 
 **Main Features:**
 
-- Type `@` to trigger a mention modal with selectable options
-- Keyboard and mouse navigation
-- Customizable options and callbacks
-- Accessible with ARIA roles and keyboard support
-- Easy integration and styling
+- **ContentEditable Architecture**: Modern implementation using contentEditable for rich text support and enhanced cursor navigation
+- **Smart Mention Detection**: DOM-aware mention detection that distinguishes between mentions inside chips versus regular text
+- **Flexible Trigger System**: Customizable trigger character or string (default `@`) via the `trigger` prop
+- **Enhanced Navigation**: Full keyboard navigation including arrow key navigation into mention chips
+- **Robust Text Handling**: Advanced mention insertion and parsing with comprehensive clipboard support
+- **Customizable Display**: Option to keep or remove the trigger character on selection (`keepTriggerOnSelect`)
+- **Slot-based Customization**: Comprehensive customization for container, contentEditable, listbox, options, and more via `slotsProps`
+- **Zero Dependencies**: Lightweight implementation with no external dependencies
+- **Fully Accessible**: Complete ARIA roles and keyboard support for optimal accessibility
+- **Rich Text Support**: Display mentions as styled chips within the contentEditable interface

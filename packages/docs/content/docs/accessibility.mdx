@@ -5,10 +5,11 @@ description: Accessibility features and ARIA support in MentionInput.
 
 The `MentionInput` component is designed with accessibility in mind:
 
-- Uses `role="combobox"` for the input and `role="listbox"`/`role="option"` for the dropdown and options.
-- Supports keyboard navigation (see [Keyboard Navigation](./keyboard-navigation)).
+- Uses `role="combobox"` for the contentEditable element and `role="listbox"`/`role="option"` for the dropdown and options.
+- Supports comprehensive keyboard navigation including arrow key navigation into mention chips (see [Keyboard Navigation](./keyboard-navigation)).
 - Uses `aria-controls`, `aria-activedescendant`, `aria-autocomplete`, `aria-haspopup`, and `aria-expanded` for screen reader support.
-- Focus is managed when selecting options.
+- Focus is managed when selecting options and navigating with contentEditable.
 - The modal can be closed with `Escape` for easy dismissal.
+- ContentEditable implementation provides enhanced text manipulation and cursor positioning for screen readers.
 
-These features ensure the component is usable by keyboard and assistive technology users.
+These features ensure the component is usable by keyboard and assistive technology users, with the contentEditable architecture providing improved accessibility for rich text interactions.
