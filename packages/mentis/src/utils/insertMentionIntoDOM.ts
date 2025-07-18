@@ -30,25 +30,51 @@ export const insertMentionIntoDOM = (
     ? `${trigger}${option.label}`
     : option.label;
 
-  // Clear the element and rebuild with the mention
-  const beforeMention = text.substring(0, triggerIndex);
-  const afterMention = text.substring(triggerIndex + mentionQuery.length + 1);
+  // Find the text node containing the trigger and replace only that part
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null);
 
-  element.innerHTML = "";
+  let textNode: Text | null = null;
+  let currentOffset = 0;
 
-  if (beforeMention) {
-    element.appendChild(document.createTextNode(beforeMention));
+  // Find the text node containing the trigger
+  while (walker.nextNode()) {
+    const node = walker.currentNode as Text;
+    const nodeLength = node.textContent?.length || 0;
+
+    if (currentOffset + nodeLength > triggerIndex) {
+      textNode = node;
+      break;
+    }
+    currentOffset += nodeLength;
   }
 
-  element.appendChild(mentionElement);
+  if (!textNode) return;
+
+  // Calculate the position within the text node
+  const nodeOffset = triggerIndex - currentOffset;
+  const beforeText = textNode.textContent?.substring(0, nodeOffset) || "";
+  const afterText =
+    textNode.textContent?.substring(nodeOffset + mentionQuery.length + 1) || "";
+
+  // Create document fragment to hold the new content
+  const fragment = document.createDocumentFragment();
+
+  if (beforeText) {
+    fragment.appendChild(document.createTextNode(beforeText));
+  }
+
+  fragment.appendChild(mentionElement);
 
   // Add a space after the mention
   const spaceNode = document.createTextNode(" ");
-  element.appendChild(spaceNode);
+  fragment.appendChild(spaceNode);
 
-  if (afterMention) {
-    element.appendChild(document.createTextNode(afterMention));
+  if (afterText) {
+    fragment.appendChild(document.createTextNode(afterText));
   }
+
+  // Replace the text node with the fragment
+  textNode.parentNode?.replaceChild(fragment, textNode);
 
   // Set cursor position immediately after the space
   const newRange = document.createRange();

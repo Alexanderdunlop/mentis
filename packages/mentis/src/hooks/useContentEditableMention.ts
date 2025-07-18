@@ -12,6 +12,7 @@ import { getTextContent } from "../utils/getTextContent";
 import { detectMentionTrigger } from "../utils/detectMentionTrigger";
 import { filterMentionOptions } from "../utils/filterMentionOptions";
 import { insertMentionIntoDOM } from "../utils/insertMentionIntoDOM";
+import { parseMentionsInText } from "../utils/parseMentionsInText";
 
 type UseContentEditableMentionProps = {
   options: MentionOption[];
@@ -75,7 +76,12 @@ export function useContentEditableMention({
 
     onChange?.(text);
 
-    const mentionDetection = detectMentionTrigger(text, caretPos, trigger);
+    const mentionDetection = detectMentionTrigger(
+      text,
+      caretPos,
+      trigger,
+      editorRef.current
+    );
 
     if (!mentionDetection.isActive) {
       setShowModal(false);
@@ -119,59 +125,9 @@ export function useContentEditableMention({
     }
   };
 
-  const handleBackspace = (e: KeyboardEvent<HTMLDivElement>): void => {
-    const selection = window.getSelection();
-
-    // Handle backspace near mention chips
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-
-      // If cursor is right before a mention chip, move it to after the chip
-      if (range.collapsed && range.startContainer.nextSibling) {
-        const nextSibling = range.startContainer.nextSibling;
-        if (
-          nextSibling.nodeType === Node.ELEMENT_NODE &&
-          (nextSibling as Element).classList.contains("mention-chip")
-        ) {
-          e.preventDefault();
-          // Position cursor after the chip
-          const newRange = document.createRange();
-          newRange.setStartAfter(nextSibling);
-          newRange.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(newRange);
-          return;
-        }
-      }
-
-      // If cursor is at the start of a text node and previous sibling is a mention chip
-      if (
-        range.collapsed &&
-        range.startOffset === 0 &&
-        range.startContainer.previousSibling
-      ) {
-        const prevSibling = range.startContainer.previousSibling;
-        if (
-          prevSibling.nodeType === Node.ELEMENT_NODE &&
-          (prevSibling as Element).classList.contains("mention-chip")
-        ) {
-          e.preventDefault();
-          // Remove the mention chip
-          prevSibling.remove();
-          return;
-        }
-      }
-    }
-  };
-
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>): void => {
     if (showModal && filteredOptions.length > 0) {
       handleModalKeyDown(e);
-      return;
-    }
-
-    if (e.key === "Backspace") {
-      handleBackspace(e);
       return;
     }
   };
@@ -212,7 +168,32 @@ export function useContentEditableMention({
   const handlePaste = (e: ClipboardEvent<HTMLDivElement>): void => {
     e.preventDefault();
     const text = e.clipboardData.getData("text/plain");
-    document.execCommand("insertText", false, text);
+
+    if (!editorRef.current) return;
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+
+    // Parse the text and convert mentions to chips
+    const fragment = parseMentionsInText(
+      text,
+      options,
+      trigger,
+      keepTriggerOnSelect
+    );
+    range.insertNode(fragment);
+
+    // Move cursor to the end of the inserted content
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    // Update the text content
+    const newText = getTextContent(editorRef.current);
+    onChange?.(newText);
   };
 
   return {
