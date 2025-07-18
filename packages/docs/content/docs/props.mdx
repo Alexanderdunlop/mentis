@@ -12,7 +12,7 @@ import { MentisDemo } from "@/components";
 | defaultValue        | string                  | No       | The initial value of the input.                                                                 |
 | options             | MentionOption[]         | Yes      | Array of mentionable options. See [Options](./options) for more.                                |
 | onChange            | (value: string) => void | No       | Callback fired when the input value changes.                                                    |
-| keepTriggerOnSelect | boolean                 | No       | Whether to keep the trigger character (e.g. '@') when an option is selected. Defaults to false. |
+| keepTriggerOnSelect | boolean                 | No       | Whether to keep the trigger character (e.g. '@') when an option is selected. Defaults to true. |
 | trigger             | string                  | No       | The character or string that triggers the mention dropdown. Defaults to '@'.                    |
 | slotsProps          | SlotProps               | No       | Customization for internal component slots (see below).                                         |
 
@@ -70,7 +70,7 @@ type SlotProps = Partial<{
 
 #### `keepTriggerOnSelect`
 
-If `true`, the trigger character (such as `@`) will be kept in the input when an option is selected. If `false` (default), the trigger character will be removed before the selected label.
+If `true` (default), the trigger character (such as `@`) will be kept in the input when an option is selected. If `false`, the trigger character will be removed before the selected label.
 
 ```tsx
 <MentionInput keepTriggerOnSelect ... />

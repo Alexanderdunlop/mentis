@@ -16,16 +16,16 @@ import { parseMentionsInText } from "../utils/parseMentionsInText";
 
 type UseContentEditableMentionProps = {
   options: MentionOption[];
-  defaultValue?: string;
-  keepTriggerOnSelect?: boolean;
-  trigger?: string;
+  defaultValue: string;
+  keepTriggerOnSelect: boolean;
+  trigger: string;
   onChange?: (value: string) => void;
 };
 
 export function useContentEditableMention({
   options,
   defaultValue = "",
-  keepTriggerOnSelect = false,
+  keepTriggerOnSelect,
   trigger = "@",
   onChange,
 }: UseContentEditableMentionProps) {
@@ -93,10 +93,9 @@ export function useContentEditableMention({
     setHighlightedIndex(0);
     setMentionStart(mentionDetection.start);
 
-    const rect = editorRef.current.getBoundingClientRect();
     setModalPosition({
-      top: rect.bottom,
-      left: rect.left,
+      top: editorRef.current.offsetTop + editorRef.current.offsetHeight,
+      left: editorRef.current.offsetLeft,
     });
   };
 
