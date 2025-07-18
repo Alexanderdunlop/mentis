@@ -10,6 +10,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   slotsProps,
   keepTriggerOnSelect = true,
   trigger = "@",
+  autoConvertMentions = false,
   onChange,
 }) => {
   const {
@@ -29,6 +30,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
     defaultValue,
     keepTriggerOnSelect,
     trigger,
+    autoConvertMentions,
     onChange,
   });
 
@@ -51,7 +53,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
         ref={editorRef}
         contentEditable
         suppressContentEditableWarning
-        onInput={handleInput}
+        onInput={(e) => handleInput(e.nativeEvent)}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}

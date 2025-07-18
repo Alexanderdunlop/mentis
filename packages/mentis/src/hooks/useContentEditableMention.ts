@@ -13,12 +13,14 @@ import { detectMentionTrigger } from "../utils/detectMentionTrigger";
 import { filterMentionOptions } from "../utils/filterMentionOptions";
 import { insertMentionIntoDOM } from "../utils/insertMentionIntoDOM";
 import { parseMentionsInText } from "../utils/parseMentionsInText";
+import { convertTextToChips } from "../utils/convertTextToChips";
 
 type UseContentEditableMentionProps = {
   options: MentionOption[];
   defaultValue: string;
   keepTriggerOnSelect: boolean;
   trigger: string;
+  autoConvertMentions: boolean;
   onChange?: (value: string) => void;
 };
 
@@ -27,6 +29,7 @@ export function useContentEditableMention({
   defaultValue,
   keepTriggerOnSelect,
   trigger,
+  autoConvertMentions,
   onChange,
 }: UseContentEditableMentionProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -68,11 +71,32 @@ export function useContentEditableMention({
     return filterMentionOptions(options, mentionQuery);
   }, [options, mentionQuery]);
 
-  const handleInput = (): void => {
+  const handleInput = (e?: Event): void => {
     if (!editorRef.current) return;
 
     const text = getTextContent(editorRef.current);
     const caretPos = getCaretPosition(editorRef.current);
+
+    // Check if user just typed a space or pressed enter - good time to convert mentions
+    if (autoConvertMentions) {
+      const inputEvent = e as InputEvent;
+      if (
+        inputEvent?.data === " " ||
+        inputEvent?.inputType === "insertParagraph"
+      ) {
+        // Use setTimeout to ensure DOM has updated before conversion
+        setTimeout(
+          () =>
+            convertTextToChips({
+              editorRef,
+              options,
+              keepTriggerOnSelect,
+              trigger,
+            }),
+          0
+        );
+      }
+    }
 
     onChange?.(text);
 
