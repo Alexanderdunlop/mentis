@@ -5,3 +5,5 @@ dist/
 *.log
 .DS_Store
 .eslintcache
+
+CLAUDE.md
