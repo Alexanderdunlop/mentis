@@ -2,6 +2,7 @@
 
 import { MentionInput, type MentionInputProps } from "mentis";
 import { DemoContainer } from "./DemoContainer";
+import "mentis/dist/index.css";
 
 export function MentisDemoClient(props: Partial<MentionInputProps>) {
   return (

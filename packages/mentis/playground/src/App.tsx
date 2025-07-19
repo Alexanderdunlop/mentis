@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { MentionInput, type MentionOption } from "../../src";
+import { MentionInput, type MentionOption } from "../../dist/index.js";
+import "../../dist/index.css";
 
 const options: MentionOption[] = [
   { label: "Alice", value: "alice" },

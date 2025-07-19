@@ -2,6 +2,7 @@
 
 import { MentionInput } from "mentis";
 import { DemoContainer } from "./DemoContainer";
+import "mentis/dist/index.css";
 
 export function MentisAlertDemoClient() {
   return (
