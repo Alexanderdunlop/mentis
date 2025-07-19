@@ -14,10 +14,11 @@ You can customize the appearance of each part of the `MentionInput` component by
 - `contentEditable`: The contentEditable element for rich text input
 - `modal`: The dropdown list container
 - `option`: Each option in the list
+- `chipClassName`: The CSS class name for mention chips that appear in the input
 - `highlightedClassName`: Applied to the currently highlighted option
 - `noOptions`: The element shown when there are no options
 
-For each slot (except `highlightedClassName`), pass an object with a `className` property. For `highlightedClassName`, pass a string with the class name to apply when an option is highlighted.
+For each slot (except `highlightedClassName` and `chipClassName`), pass an object with a `className` property. For `highlightedClassName` and `chipClassName`, pass a string with the class name to apply.
 
 ## Example: Default Styles
 
@@ -44,6 +45,7 @@ Here's an example using your own CSS classes (see `index.css` for definitions):
     contentEditable: { className: "mentis-demo-input" },
     modal: { className: "mentis-demo-listbox" },
     option: { className: "mentis-demo-option" },
+    chipClassName: "mentis-demo-chip",
     highlightedClassName: "mentis-demo-option-highlighted",
     noOptions: { className: "mentis-demo-no-options" },
   }}
@@ -75,6 +77,8 @@ Here's an example using Tailwind CSS utility classes directly in the `slotsProps
       className:
         "px-4 py-2 cursor-pointer text-base text-gray-800 hover:bg-gray-100 rounded-lg transition",
     },
+    chipClassName:
+      "inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors",
     highlightedClassName: "bg-blue-500 text-white hover:bg-blue-500",
     noOptions: { className: "px-4 py-2 text-gray-400" },
   }}

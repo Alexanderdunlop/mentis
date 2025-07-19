@@ -90,6 +90,28 @@ Chips come with default styling:
 }
 ```
 
+### Customizing Chip Styles
+
+You can customize the appearance of chips using the `chipClassName` property in `slotsProps`:
+
+```tsx
+<MentionInput options={options} chipClassName="mentis-demo-chip" />
+```
+
+```tsx
+<MentionInput
+  options={options}
+  slotsProps={{
+    chipClassName:
+      "inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800",
+  }}
+/>
+```
+
+This allows you to apply a custom CSS class to the chip elements.
+
+For more advanced styling examples, see the [Styling & Customization](./styling) page.
+
 ## Chip Behavior
 
 ### Keyboard Navigation

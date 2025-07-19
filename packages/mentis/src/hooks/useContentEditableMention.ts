@@ -21,6 +21,7 @@ type UseContentEditableMentionProps = {
   keepTriggerOnSelect: boolean;
   trigger: string;
   autoConvertMentions: boolean;
+  chipClassName?: string;
   onChange?: (value: string) => void;
 };
 
@@ -30,6 +31,7 @@ export function useContentEditableMention({
   keepTriggerOnSelect,
   trigger,
   autoConvertMentions,
+  chipClassName,
   onChange,
 }: UseContentEditableMentionProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -92,6 +94,7 @@ export function useContentEditableMention({
               options,
               keepTriggerOnSelect,
               trigger,
+              chipClassName,
             }),
           0
         );
@@ -158,14 +161,15 @@ export function useContentEditableMention({
   const handleSelect = (option: MentionOption): void => {
     if (!editorRef.current) return;
 
-    insertMentionIntoDOM(
-      editorRef.current,
+    insertMentionIntoDOM({
+      element: editorRef.current,
       option,
       mentionStart,
       mentionQuery,
       trigger,
-      keepTriggerOnSelect
-    );
+      keepTriggerOnSelect,
+      chipClassName,
+    });
 
     setShowModal(false);
 
@@ -201,12 +205,13 @@ export function useContentEditableMention({
     range.deleteContents();
 
     // Parse the text and convert mentions to chips
-    const fragment = parseMentionsInText(
+    const fragment = parseMentionsInText({
       text,
       options,
       trigger,
-      keepTriggerOnSelect
-    );
+      keepTriggerOnSelect,
+      chipClassName,
+    });
     range.insertNode(fragment);
 
     // Move cursor to the end of the inserted content
