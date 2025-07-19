@@ -1,5 +1,4 @@
 import React from "react";
-import "./MentionInput.css";
 import type { MentionInputProps } from "./types/MentionInput.types";
 import { useContentEditableMention } from "./hooks/useContentEditableMention";
 import { MentionModal } from "./components/MentionModal";

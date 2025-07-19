@@ -1,4 +1,5 @@
 export { MentionInput } from "./MentionInput";
+import "./index.css";
 
 export type {
   MentionInputProps,
