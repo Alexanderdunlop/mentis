@@ -48,6 +48,7 @@ npm install mentis
 
 ```tsx
 import { MentionInput } from "mentis";
+import "mentis/dist/index.css";
 
 function App() {
   const [value, setValue] = useState("");

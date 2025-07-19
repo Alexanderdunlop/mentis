@@ -2,6 +2,7 @@
 
 import { MentionInput } from "mentis";
 import { useState } from "react";
+import "mentis/dist/index.css";
 
 export const LandingDemoClient = () => {
   const [value, setValue] = useState("");

@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { MentionInput, type MentionOption } from "mentis";
+import "mentis/dist/index.css";
 
 const options: MentionOption[] = [
   { label: "Alice", value: "alice" },

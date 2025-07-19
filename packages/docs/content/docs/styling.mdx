@@ -19,6 +19,19 @@ You can customize the appearance of each part of the `MentionInput` component by
 
 For each slot (except `highlightedClassName`), pass an object with a `className` property. For `highlightedClassName`, pass a string with the class name to apply when an option is highlighted.
 
+## Example: Default Styles
+
+To use the default styles that come with mentis, simply import the CSS file:
+
+```tsx
+import { MentionInput } from "mentis";
+import "mentis/dist/index.css";
+
+<MentionInput options={options} />;
+```
+
+This will apply the default styling to all parts of the component without any additional configuration.
+
 ## Example: Custom CSS with className
 
 Here's an example using your own CSS classes (see `index.css` for definitions):

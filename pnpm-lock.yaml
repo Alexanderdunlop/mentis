@@ -27,8 +27,8 @@ importers:
         specifier: ^0.525.0
         version: 0.525.0(react@19.1.0)
       mentis:
-        specifier: 0.1.0-alpha.2
-        version: 0.1.0-alpha.2(react@19.1.0)
+        specifier: 0.1.0-alpha.3
+        version: 0.1.0-alpha.3(react@19.1.0)
       next:
         specifier: 15.3.4
         version: 15.3.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -78,8 +78,8 @@ importers:
   packages/examples/react/simple:
     dependencies:
       mentis:
-        specifier: 0.1.0-alpha.2
-        version: 0.1.0-alpha.2(react@19.1.0)
+        specifier: 0.1.0-alpha.3
+        version: 0.1.0-alpha.3(react@19.1.0)
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -2750,6 +2750,11 @@ packages:
 
   mentis@0.1.0-alpha.2:
     resolution: {integrity: sha512-xMN0+I5M+LwMzrM6g843xE05tmwkUEmzCoo5ji2u5lKOFgfBnVVdAL74+pKPT+2MJX+ETmm76bRzSWJ/lW7C/w==}
+    peerDependencies:
+      react: '>=18.2.0 || ^19.0.0-0'
+
+  mentis@0.1.0-alpha.3:
+    resolution: {integrity: sha512-eYST6PAx7XzvCvd2Wfi21MCoQrf4r6HZ4l1XyBWBOmdrCvi5QNlpOeqDRrNcC0jFunkALbGtZwYpJC6E4xS0rg==}
     peerDependencies:
       react: '>=18.2.0 || ^19.0.0-0'
 
@@ -6460,6 +6465,10 @@ snapshots:
       '@types/mdast': 4.0.4
 
   mentis@0.1.0-alpha.2(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+
+  mentis@0.1.0-alpha.3(react@19.1.0):
     dependencies:
       react: 19.1.0
 

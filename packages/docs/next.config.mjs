@@ -1,4 +1,4 @@
-const { createMDX } = require("fumadocs-mdx/next");
+import { createMDX } from "fumadocs-mdx/next";
 
 const withMDX = createMDX();
 
@@ -16,4 +16,4 @@ const config = {
   },
 };
 
-module.exports = withMDX(config);
+export default withMDX(config);
