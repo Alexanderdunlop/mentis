@@ -28,6 +28,7 @@ function App() {
           option: {
             className: "mentis-demo-option",
           },
+          chipClassName: "mentis-demo-chip",
           highlightedClassName: "mentis-demo-option-highlighted",
           noOptions: {
             className: "mentis-demo-no-options",

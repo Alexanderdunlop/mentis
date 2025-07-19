@@ -29,6 +29,8 @@ export const LandingDemoClient = () => {
           className:
             "px-4 py-2 cursor-pointer text-left text-base text-gray-800 hover:bg-gray-100 hover:text-black rounded-lg transition",
         },
+        chipClassName:
+          "inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors",
         highlightedClassName: "bg-blue-500 text-white hover:bg-blue-500",
         noOptions: { className: "px-4 py-2 text-gray-400" },
       }}
