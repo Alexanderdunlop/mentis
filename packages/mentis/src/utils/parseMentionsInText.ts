@@ -5,7 +5,7 @@ type ParseMentionsInTextProps = {
   options: MentionOption[];
   trigger: string;
   keepTriggerOnSelect: boolean;
-  chipClassName?: string;
+  chipClassName: string;
 };
 
 export const parseMentionsInText = ({
@@ -83,7 +83,7 @@ export const parseMentionsInText = ({
     if (matchingOption) {
       // Create mention chip
       const mentionElement = document.createElement("span");
-      mentionElement.className = chipClassName ?? "mention-chip";
+      mentionElement.className = chipClassName;
       mentionElement.contentEditable = "false";
       mentionElement.dataset.value = matchingOption.value;
       mentionElement.dataset.label = matchingOption.label;

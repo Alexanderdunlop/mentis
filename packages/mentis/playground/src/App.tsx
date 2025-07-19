@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { MentionInput, type MentionOption } from "../../dist/index.js";
 import "../../dist/index.css";
+import "./style.css";
 
 const options: MentionOption[] = [
   { label: "Alice", value: "alice" },
@@ -19,6 +20,9 @@ export function App() {
           defaultValue={value}
           options={options}
           onChange={setValue}
+          slotsProps={{
+            chipClassName: "custom-chip",
+          }}
         />
       </div>
       {/* {value} */}

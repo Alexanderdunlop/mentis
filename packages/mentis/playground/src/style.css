@@ -18,3 +18,13 @@ body {
   padding: 2rem;
   text-align: center;
 }
+
+.custom-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}

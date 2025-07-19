@@ -21,7 +21,7 @@ type UseContentEditableMentionProps = {
   keepTriggerOnSelect: boolean;
   trigger: string;
   autoConvertMentions: boolean;
-  chipClassName?: string;
+  chipClassName: string;
   onChange?: (value: string) => void;
 };
 

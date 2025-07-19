@@ -7,7 +7,7 @@ type InsertMentionIntoDOMProps = {
   mentionQuery: string;
   trigger: string;
   keepTriggerOnSelect: boolean;
-  chipClassName?: string;
+  chipClassName: string;
 };
 
 export const insertMentionIntoDOM = ({
@@ -33,7 +33,7 @@ export const insertMentionIntoDOM = ({
 
   // Create the mention element
   const mentionElement = document.createElement("span");
-  mentionElement.className = chipClassName ?? "mention-chip";
+  mentionElement.className = chipClassName;
   mentionElement.contentEditable = "false";
   mentionElement.dataset.value = option.value;
   mentionElement.dataset.label = option.label;

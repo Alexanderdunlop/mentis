@@ -6,7 +6,7 @@ type ConvertTextToChipsProps = {
   options: MentionOption[];
   keepTriggerOnSelect: boolean;
   trigger: string;
-  chipClassName?: string;
+  chipClassName: string;
 };
 
 export const convertTextToChips = ({
@@ -129,7 +129,7 @@ export const convertTextToChips = ({
 
         // Create mention chip
         const mentionElement = document.createElement("span");
-        mentionElement.className = chipClassName ?? "mention-chip";
+        mentionElement.className = chipClassName;
         mentionElement.contentEditable = "false";
         mentionElement.dataset.value = replacement.option.value;
         mentionElement.dataset.label = replacement.option.label;
