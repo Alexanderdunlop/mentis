@@ -1,13 +1,24 @@
 import type { MentionOption } from "../types/MentionInput.types";
 
-export const insertMentionIntoDOM = (
-  element: HTMLElement,
-  option: MentionOption,
-  mentionStart: number,
-  mentionQuery: string,
-  trigger: string,
-  keepTriggerOnSelect: boolean
-): void => {
+type InsertMentionIntoDOMProps = {
+  element: HTMLElement;
+  option: MentionOption;
+  mentionStart: number;
+  mentionQuery: string;
+  trigger: string;
+  keepTriggerOnSelect: boolean;
+  chipClassName: string;
+};
+
+export const insertMentionIntoDOM = ({
+  element,
+  option,
+  mentionStart,
+  mentionQuery,
+  trigger,
+  keepTriggerOnSelect,
+  chipClassName,
+}: InsertMentionIntoDOMProps): void => {
   const selection = window.getSelection();
   if (!selection || selection.rangeCount === 0) return;
 
@@ -22,7 +33,7 @@ export const insertMentionIntoDOM = (
 
   // Create the mention element
   const mentionElement = document.createElement("span");
-  mentionElement.className = "mention-chip";
+  mentionElement.className = chipClassName;
   mentionElement.contentEditable = "false";
   mentionElement.dataset.value = option.value;
   mentionElement.dataset.label = option.label;

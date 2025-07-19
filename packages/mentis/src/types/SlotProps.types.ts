@@ -25,6 +25,7 @@ export type SlotProps = Partial<{
   contentEditable: ContentEditableInputCustomProps;
   modal: ModalProps;
   option: OptionProps;
+  chipClassName: string;
   noOptions: React.HTMLAttributes<HTMLDivElement>;
   highlightedClassName: string;
 }>;
