@@ -5,3 +5,8 @@ dist/
 *.log
 .DS_Store
 .eslintcache
+
+CLAUDE.md
+
+packages/mentis/README.md
+packages/mentis/LICENSE

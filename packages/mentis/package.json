@@ -1,6 +1,6 @@
 {
   "name": "mentis",
-  "version": "0.1.0-alpha.5",
+  "version": "0.1.0-alpha.9",
   "description": "A flexible mention tagger for React that hooks into your existing inputs.",
   "type": "module",
   "license": "MIT",
@@ -45,7 +45,7 @@
     "playground": "vite --config playground/vite.config.ts",
     "prepack": "./scripts/prepack.sh",
     "release": "bumpp && pnpm publish",
-    "prepublishOnly": "pnpm run build && pnpm run prepack"
+    "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
     "@types/node": "^24.0.13",
