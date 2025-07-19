@@ -1,6 +1,6 @@
 {
   "name": "mentis",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "description": "A flexible mention tagger for React that hooks into your existing inputs.",
   "type": "module",
   "license": "MIT",
