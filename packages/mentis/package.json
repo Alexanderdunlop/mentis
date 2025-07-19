@@ -45,7 +45,7 @@
     "playground": "vite --config playground/vite.config.ts",
     "prepack": "./scripts/prepack.sh",
     "release": "bumpp && pnpm publish",
-    "prepublishOnly": "pnpm run build && pnpm run prepack"
+    "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
     "@types/node": "^24.0.13",
