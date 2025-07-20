@@ -25,7 +25,7 @@ export function App() {
       <div style={{ width: "300px", height: "200px", overflowY: "auto" }}>
         <MentionInput
           // keepTriggerOnSelect={false}
-          autoConvertMentions={true}
+          // autoConvertMentions={true}
           defaultValue={""}
           options={options}
           onChange={handleChange}
