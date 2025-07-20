@@ -32,6 +32,29 @@ describe("Basic Functionality", () => {
 
     expect(editorElement).toHaveTextContent("@");
   });
+
+  test("Should update placeholder when trigger changes", () => {
+    const { rerender } = render(<MentionInput options={[]} />);
+    let editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveAttribute(
+      "data-placeholder",
+      "Type @ to mention someone"
+    );
+
+    rerender(<MentionInput options={[]} trigger="#" />);
+    editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveAttribute(
+      "data-placeholder",
+      "Type # to mention someone"
+    );
+
+    rerender(<MentionInput options={[]} trigger="!" />);
+    editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveAttribute(
+      "data-placeholder",
+      "Type ! to mention someone"
+    );
+  });
 });
 
 describe("Mention Modal Display", () => {
@@ -184,6 +207,54 @@ describe("Selection", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@Jane Smith");
     expect(mockOnChange).toHaveBeenCalledWith("@Jane Smith ");
+  });
+
+  test("Should select option with different triggers", () => {
+    const options = [
+      { label: "John Doe", value: "john" },
+      { label: "Jane Smith", value: "jane" },
+    ];
+
+    const mockOnChange = vi.fn();
+    const { rerender } = render(
+      <MentionInput options={options} onChange={mockOnChange} trigger="#" />
+    );
+
+    let editorElement = screen.getByRole("combobox");
+
+    fireEvent.focus(editorElement);
+    setupTriggerState(editorElement, "#");
+    fireEvent.input(editorElement, { target: { textContent: "#" } });
+
+    let modal = screen.getByRole("listbox");
+    expect(modal).toBeInTheDocument();
+
+    const johnOption = screen.getByText("John Doe");
+    fireEvent.mouseDown(johnOption);
+
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(editorElement).toHaveTextContent("#John Doe");
+    expect(mockOnChange).toHaveBeenCalledWith("#John Doe ");
+
+    mockOnChange.mockClear();
+    rerender(
+      <MentionInput options={options} onChange={mockOnChange} trigger="!" />
+    );
+    editorElement = screen.getByRole("combobox");
+
+    fireEvent.focus(editorElement);
+    setupTriggerState(editorElement, "!");
+    fireEvent.input(editorElement, { target: { textContent: "!" } });
+
+    modal = screen.getByRole("listbox");
+    expect(modal).toBeInTheDocument();
+
+    const janeOption = screen.getByText("Jane Smith");
+    fireEvent.mouseDown(janeOption);
+
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(editorElement).toHaveTextContent("!Jane Smith");
+    expect(mockOnChange).toHaveBeenCalledWith("!Jane Smith ");
   });
 });
 
