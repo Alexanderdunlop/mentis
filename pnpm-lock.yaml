@@ -27,8 +27,8 @@ importers:
         specifier: ^0.525.0
         version: 0.525.0(react@19.1.0)
       mentis:
-        specifier: 0.1.1-alpha.1
-        version: 0.1.1-alpha.1(react@19.1.0)
+        specifier: 0.1.1-alpha.3
+        version: 0.1.1-alpha.3(react@19.1.0)
       next:
         specifier: 15.3.4
         version: 15.3.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -2946,6 +2946,11 @@ packages:
 
   mentis@0.1.1-alpha.1:
     resolution: {integrity: sha512-+Y+jPWeclC07ErfDj5+DXq/4ph9CCxLp8/KXPBinbBoDjJhbi/1tpk/tv4RCNKHvCcVPfdU4FEzKz9TmIhboVw==}
+    peerDependencies:
+      react: '>=18.2.0 || ^19.0.0-0'
+
+  mentis@0.1.1-alpha.3:
+    resolution: {integrity: sha512-WHYl8rLj/XrEp5obQ2g+xRzOzHp5TFFXTYY4PWs5U+jr2mfdAm+QqQ/vaHQ2la/jMUVRgiig9JSfVx55O48WHA==}
     peerDependencies:
       react: '>=18.2.0 || ^19.0.0-0'
 
@@ -6982,6 +6987,10 @@ snapshots:
       '@types/mdast': 4.0.4
 
   mentis@0.1.1-alpha.1(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+
+  mentis@0.1.1-alpha.3(react@19.1.0):
     dependencies:
       react: 19.1.0
 
