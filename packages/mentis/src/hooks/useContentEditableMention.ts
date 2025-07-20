@@ -1,20 +1,11 @@
-import {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  type KeyboardEvent,
-  type ClipboardEvent,
-} from "react";
+import { useRef, useEffect, type KeyboardEvent } from "react";
 import type { MentionOption, MentionData } from "../types/MentionInput.types";
-import { getCaretPosition } from "../utils/getCaretPosition";
-import { getTextContent } from "../utils/getTextContent";
-import { detectMentionTrigger } from "../utils/detectMentionTrigger";
-import { filterMentionOptions } from "../utils/filterMentionOptions";
 import { insertMentionIntoDOM } from "../utils/insertMentionIntoDOM";
-import { parseMentionsInText } from "../utils/parseMentionsInText";
-import { convertTextToChips } from "../utils/convertTextToChips";
 import { extractMentionData } from "../utils/extractMentionData";
+import { useMentionState } from "./useMentionState";
+import { useMentionInput } from "./useMentionInput";
+import { useMentionPaste } from "./useMentionPaste";
+import { useMentionFocus } from "./useMentionFocus";
 
 type UseContentEditableMentionProps = {
   options: MentionOption[];
@@ -35,130 +26,102 @@ export function useContentEditableMention({
   chipClassName,
   onChange,
 }: UseContentEditableMentionProps) {
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [modalPosition, setModalPosition] = useState<{
-    top: number;
-    left: number;
-  }>({ top: 0, left: 0 });
-  const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
-  const [mentionStart, setMentionStart] = useState<number>(0);
-  const [mentionQuery, setMentionQuery] = useState<string>("");
-
   const editorRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (
-      defaultValue &&
-      editorRef.current &&
-      editorRef.current.textContent !== defaultValue
-    ) {
-      editorRef.current.textContent = defaultValue;
-    }
-  }, [defaultValue]);
+  // Centralized state management
+  const {
+    showModal,
+    modalPosition,
+    highlightedIndex,
+    mentionStart,
+    mentionQuery,
+    filteredOptions,
+    openModal,
+    closeModal,
+    resetSelection,
+    updateSelection,
+    handleKeyboardNavigation,
+    getSelectedOption,
+  } = useMentionState(options);
 
+  // Handle click outside modal
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         editorRef.current &&
         !editorRef.current.contains(event.target as Node)
       ) {
-        setShowModal(false);
+        closeModal();
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [closeModal]);
 
-  const filteredOptions = useMemo(() => {
-    return filterMentionOptions(options, mentionQuery);
-  }, [options, mentionQuery]);
-
-  const handleInput = (e?: Event): void => {
-    if (!editorRef.current) return;
-
-    const text = getTextContent(editorRef.current);
-    const caretPos = getCaretPosition(editorRef.current);
-
-    // Check if user just typed a space or pressed enter - good time to convert mentions
-    if (autoConvertMentions) {
-      const inputEvent = e as InputEvent;
-      if (
-        inputEvent?.data === " " ||
-        inputEvent?.inputType === "insertParagraph"
-      ) {
-        // Use setTimeout to ensure DOM has updated before conversion
-        setTimeout(
-          () =>
-            convertTextToChips({
-              editorRef,
-              options,
-              keepTriggerOnSelect,
-              trigger,
-              chipClassName,
-            }),
-          0
-        );
+  // Input processing
+  const { processInput } = useMentionInput({
+    editorRef,
+    options,
+    trigger,
+    keepTriggerOnSelect,
+    autoConvertMentions,
+    chipClassName,
+    defaultValue,
+    onChange,
+    onMentionDetection: (detection) => {
+      if (!detection.isActive) {
+        closeModal();
+        resetSelection();
+        return;
       }
-    }
 
-    if (editorRef.current) {
-      const mentionData = extractMentionData(editorRef.current);
-      onChange?.(mentionData);
-    }
+      updateSelection(detection.start, detection.query);
+      openModal(editorRef);
+    },
+  });
 
-    const mentionDetection = detectMentionTrigger(
-      text,
-      caretPos,
-      trigger,
-      editorRef.current
-    );
+  // Paste handling
+  const { handlePaste } = useMentionPaste({
+    editorRef,
+    options,
+    trigger,
+    keepTriggerOnSelect,
+    chipClassName,
+    onChange,
+  });
 
-    if (!mentionDetection.isActive) {
-      setShowModal(false);
-      return;
-    }
+  // Focus handling
+  const { handleFocus, handleBlur } = useMentionFocus({
+    editorRef,
+  });
 
-    setMentionQuery(mentionDetection.query);
-    setShowModal(true);
-    setHighlightedIndex(0);
-    setMentionStart(mentionDetection.start);
-
-    setModalPosition({
-      top: editorRef.current.offsetTop + editorRef.current.offsetHeight,
-      left: editorRef.current.offsetLeft,
-    });
-  };
-
-  const handleModalKeyDown = (e: KeyboardEvent<HTMLDivElement>): void => {
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setHighlightedIndex((prev) =>
-          prev < filteredOptions.length - 1 ? prev + 1 : 0
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setHighlightedIndex((prev) =>
-          prev > 0 ? prev - 1 : filteredOptions.length - 1
-        );
-        break;
-      case "Enter":
-      case "Tab":
-        e.preventDefault();
-        handleSelect(filteredOptions[highlightedIndex]);
-        break;
-      case "Escape":
-        setShowModal(false);
-        break;
-    }
+  // Event handlers
+  const handleInput = (e?: Event): void => {
+    processInput(e);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>): void => {
-    if (showModal && filteredOptions.length > 0) {
-      handleModalKeyDown(e);
+    const key = e.key;
+
+    // Handle keyboard navigation
+    if (handleKeyboardNavigation(key)) {
+      if (key === "Escape") {
+        closeModal();
+      }
+      e.preventDefault();
       return;
+    }
+
+    // Handle selection
+    if (showModal && filteredOptions.length > 0) {
+      if (key === "Enter" || key === "Tab") {
+        e.preventDefault();
+        const selectedOption = getSelectedOption();
+        if (selectedOption) {
+          handleSelect(selectedOption);
+        }
+      }
     }
   };
 
@@ -175,7 +138,8 @@ export function useContentEditableMention({
       chipClassName,
     });
 
-    setShowModal(false);
+    closeModal();
+    resetSelection();
 
     const mentionData = extractMentionData(editorRef.current);
     onChange?.(mentionData);
@@ -184,47 +148,6 @@ export function useContentEditableMention({
     setTimeout(() => {
       editorRef.current?.focus();
     }, 0);
-  };
-
-  const handleFocus = (): void => {
-    editorRef.current?.classList.remove("empty");
-  };
-
-  const handleBlur = (): void => {
-    if (editorRef.current?.textContent === "") {
-      editorRef.current.classList.add("empty");
-    }
-  };
-
-  const handlePaste = (e: ClipboardEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-    const text = e.clipboardData.getData("text/plain");
-
-    if (!editorRef.current) return;
-
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    const range = selection.getRangeAt(0);
-    range.deleteContents();
-
-    // Parse the text and convert mentions to chips
-    const fragment = parseMentionsInText({
-      text,
-      options,
-      trigger,
-      keepTriggerOnSelect,
-      chipClassName,
-    });
-    range.insertNode(fragment);
-
-    // Move cursor to the end of the inserted content
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    const mentionData = extractMentionData(editorRef.current);
-    onChange?.(mentionData);
   };
 
   return {

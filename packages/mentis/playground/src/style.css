@@ -22,8 +22,8 @@ body {
 .custom-chip {
   display: inline-flex;
   align-items: center;
-  padding: 4px 8px;
-  border-radius: 16px;
+  padding: 0px 2px;
+  border-radius: 0px;
   font-size: 14px;
   font-weight: 500;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

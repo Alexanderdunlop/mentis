@@ -1,5 +1,6 @@
 import type { MentionOption } from "../types/MentionInput.types";
 import { getCaretPosition } from "./getCaretPosition";
+import { addSpaceIfNeeded } from "./addSpaceIfNeeded";
 
 type ConvertTextToChipsProps = {
   editorRef: React.RefObject<HTMLDivElement | null>;
@@ -130,8 +131,8 @@ export const convertTextToChips = ({
         // Create mention chip
         const mentionElement = document.createElement("span");
         mentionElement.className = chipClassName;
-        mentionElement.contentEditable = "false";
-        mentionElement.dataset.value = replacement.option.value;
+        mentionElement.contentEditable = "true";
+        mentionElement.dataset.value = replacement.option.label;
         mentionElement.dataset.label = replacement.option.label;
         mentionElement.textContent = keepTriggerOnSelect
           ? `${trigger}${replacement.option.label}`
@@ -145,8 +146,14 @@ export const convertTextToChips = ({
         fragment.appendChild(mentionElement);
 
         // Add a space after the mention
-        const spaceNode = document.createTextNode(" ");
-        fragment.appendChild(spaceNode);
+        const spaceNeeded = addSpaceIfNeeded({
+          text: nodeText,
+          startIndex: replacement.start,
+          matchLength: replacement.end - replacement.start,
+        });
+        if (spaceNeeded) {
+          fragment.appendChild(document.createTextNode(" "));
+        }
 
         if (afterText) {
           fragment.appendChild(document.createTextNode(afterText));

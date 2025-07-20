@@ -1,4 +1,5 @@
 import type { MentionOption } from "../types/MentionInput.types";
+import { addSpaceIfNeeded } from "./addSpaceIfNeeded";
 
 type InsertMentionIntoDOMProps = {
   element: HTMLElement;
@@ -34,7 +35,7 @@ export const insertMentionIntoDOM = ({
   // Create the mention element
   const mentionElement = document.createElement("span");
   mentionElement.className = chipClassName;
-  mentionElement.contentEditable = "false";
+  mentionElement.contentEditable = "true";
   mentionElement.dataset.value = option.value;
   mentionElement.dataset.label = option.label;
   mentionElement.textContent = keepTriggerOnSelect
@@ -76,9 +77,16 @@ export const insertMentionIntoDOM = ({
 
   fragment.appendChild(mentionElement);
 
-  // Add a space after the mention
-  const spaceNode = document.createTextNode(" ");
-  fragment.appendChild(spaceNode);
+  const spaceNeeded = addSpaceIfNeeded({
+    text,
+    startIndex: triggerIndex + mentionQuery.length + 1,
+    matchLength: 0,
+  });
+
+  let spaceNode = document.createTextNode(" ");
+  if (spaceNeeded) {
+    fragment.appendChild(spaceNode);
+  }
 
   if (afterText) {
     fragment.appendChild(document.createTextNode(afterText));
@@ -89,7 +97,7 @@ export const insertMentionIntoDOM = ({
 
   // Set cursor position immediately after the space
   const newRange = document.createRange();
-  newRange.setStart(spaceNode, 1); // Position after the space
+  newRange.setStart(spaceNeeded ? spaceNode : mentionElement, 1);
   newRange.collapse(true);
 
   selection.removeAllRanges();
