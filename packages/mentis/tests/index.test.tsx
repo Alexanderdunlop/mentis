@@ -383,3 +383,36 @@ describe("Keyboard Navigation", () => {
     expect(mockOnChange).toHaveBeenCalledWith("@");
   });
 });
+
+describe("Chips", () => {
+  test("Adding one chip should show the chip styles", () => {
+    const options = [
+      { label: "John Doe", value: "john" },
+      { label: "Jane Smith", value: "jane" },
+    ];
+
+    const mockOnChange = vi.fn();
+    render(<MentionInput options={options} onChange={mockOnChange} />);
+
+    const editorElement = screen.getByRole("combobox");
+
+    fireEvent.focus(editorElement);
+    setupTriggerState(editorElement, "@");
+    fireEvent.input(editorElement, { target: { textContent: "@" } });
+
+    const modal = screen.getByRole("listbox");
+    expect(modal).toBeInTheDocument();
+
+    const johnOption = screen.getByText("John Doe");
+    fireEvent.mouseDown(johnOption);
+
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+
+    const chipElement = editorElement.querySelector(".mention-chip");
+    expect(chipElement).toBeInTheDocument();
+    expect(chipElement).toHaveAttribute("data-value", "john");
+    expect(chipElement).toHaveAttribute("data-label", "John Doe");
+    expect(chipElement).toHaveAttribute("contentEditable", "false");
+    expect(chipElement).toHaveTextContent("@John Doe");
+  });
+});
