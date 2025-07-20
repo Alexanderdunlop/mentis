@@ -21,7 +21,11 @@ describe("Basic Functionality", () => {
     const editorElement = screen.getByRole("combobox");
     fireEvent.input(editorElement, { target: { textContent: "Hello world" } });
 
-    expect(mockOnChange).toHaveBeenCalledWith("Hello world");
+    expect(mockOnChange).toHaveBeenCalledWith({
+      displayText: "Hello world",
+      rawText: "Hello world",
+      mentions: [],
+    });
   });
 
   test("Entering text should update the value", async () => {
@@ -206,7 +210,18 @@ describe("Selection", () => {
 
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@Jane Smith");
-    expect(mockOnChange).toHaveBeenCalledWith("@Jane Smith ");
+    expect(mockOnChange).toHaveBeenLastCalledWith({
+      displayText: "@Jane Smith ",
+      rawText: "jane ",
+      mentions: [
+        {
+          label: "Jane Smith",
+          value: "jane",
+          startIndex: 0,
+          endIndex: 11,
+        },
+      ],
+    });
   });
 
   test("Should select option with different triggers", () => {
@@ -234,7 +249,18 @@ describe("Selection", () => {
 
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("#John Doe");
-    expect(mockOnChange).toHaveBeenCalledWith("#John Doe ");
+    expect(mockOnChange).toHaveBeenLastCalledWith({
+      displayText: "#John Doe ",
+      rawText: "john ",
+      mentions: [
+        {
+          label: "John Doe",
+          value: "john",
+          startIndex: 0,
+          endIndex: 9,
+        },
+      ],
+    });
 
     mockOnChange.mockClear();
     rerender(
@@ -254,7 +280,18 @@ describe("Selection", () => {
 
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("!Jane Smith");
-    expect(mockOnChange).toHaveBeenCalledWith("!Jane Smith ");
+    expect(mockOnChange).toHaveBeenLastCalledWith({
+      displayText: "!Jane Smith ",
+      rawText: "jane ",
+      mentions: [
+        {
+          label: "Jane Smith",
+          value: "jane",
+          startIndex: 0,
+          endIndex: 11,
+        },
+      ],
+    });
   });
 });
 
@@ -329,7 +366,18 @@ describe("Keyboard Navigation", () => {
 
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@John Doe");
-    expect(mockOnChange).toHaveBeenCalledWith("@John Doe ");
+    expect(mockOnChange).toHaveBeenLastCalledWith({
+      displayText: "@John Doe ",
+      rawText: "john ",
+      mentions: [
+        {
+          label: "John Doe",
+          value: "john",
+          startIndex: 0,
+          endIndex: 9,
+        },
+      ],
+    });
   });
 
   test("Should select option with Enter", () => {
@@ -355,7 +403,18 @@ describe("Keyboard Navigation", () => {
 
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@Jane Smith");
-    expect(mockOnChange).toHaveBeenCalledWith("@Jane Smith ");
+    expect(mockOnChange).toHaveBeenLastCalledWith({
+      displayText: "@Jane Smith ",
+      rawText: "jane ",
+      mentions: [
+        {
+          label: "Jane Smith",
+          value: "jane",
+          startIndex: 0,
+          endIndex: 11,
+        },
+      ],
+    });
   });
 
   test("Should close modal with Escape", () => {
@@ -380,7 +439,11 @@ describe("Keyboard Navigation", () => {
 
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@");
-    expect(mockOnChange).toHaveBeenCalledWith("@");
+    expect(mockOnChange).toHaveBeenCalledWith({
+      displayText: "@",
+      rawText: "@",
+      mentions: [],
+    });
   });
 });
 
