@@ -4,6 +4,12 @@
     "build": {
       "dependsOn": ["^build"]
     },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "test": {
+      "dependsOn": ["^test"]
+    },
     "mentis#build": {
       "outputs": ["dist/**"]
     },
