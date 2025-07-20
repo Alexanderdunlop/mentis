@@ -1,4 +1,5 @@
 import type { MentionOption } from "../types/MentionInput.types";
+import { addSpaceIfNeeded } from "./addSpaceIfNeeded";
 
 type ParseMentionsInTextProps = {
   text: string;
@@ -84,7 +85,7 @@ export const parseMentionsInText = ({
       // Create mention chip
       const mentionElement = document.createElement("span");
       mentionElement.className = chipClassName;
-      mentionElement.contentEditable = "false";
+      mentionElement.contentEditable = "true";
       mentionElement.dataset.value = matchingOption.value;
       mentionElement.dataset.label = matchingOption.label;
       mentionElement.textContent = keepTriggerOnSelect
@@ -93,8 +94,15 @@ export const parseMentionsInText = ({
 
       fragment.appendChild(mentionElement);
 
-      // Add a space after the mention
-      fragment.appendChild(document.createTextNode(" "));
+      const spaceNeeded = addSpaceIfNeeded({
+        text,
+        startIndex,
+        matchLength: match[0].length,
+      });
+
+      if (spaceNeeded) {
+        fragment.appendChild(document.createTextNode(" "));
+      }
     } else {
       // If no matching option, keep as plain text
       fragment.appendChild(document.createTextNode(match[0]));

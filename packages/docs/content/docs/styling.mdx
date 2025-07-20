@@ -89,6 +89,14 @@ Here's an example using Tailwind CSS utility classes directly in the `slotsProps
 
 This approach lets you style the component using Tailwind's utility classes for rapid prototyping and design consistency.
 
+## Chip Styling Considerations
+
+When styling mention chips, pay special attention to **line-height and padding** to prevent layout shifting:
+
+### Line-Height Matching
+
+Chips are inline elements that flow with text content. To maintain consistent text alignment and prevent vertical layout shifts, ensure your chip's total height (including padding) matches the line-height of your text:
+
 ---
 
 For more advanced usage, see the [Props Reference](./props) and [Basic Usage](./basic-usage) pages.

@@ -120,7 +120,23 @@ Chips support full keyboard navigation:
 
 - **Arrow Keys**: Navigate through chips and text
 - **Backspace/Delete**: Remove chips when cursor is adjacent
-  {/* - **Click**: Position cursor before or after the chip */}
+- **Click**: Position cursor before or after the chip
+
+### Chip Deletion on Input
+
+When a user clicks inside a chip and starts typing, the chip is automatically deleted and replaced with the typed text. This provides an intuitive way to edit or remove mentions:
+
+```tsx
+// User clicks inside "@John Doe" chip and types "X"
+// Result: "@John DoeX" (chip is deleted, text becomes editable)
+```
+
+This behavior ensures that:
+
+- Users can easily modify or remove mentions by typing over them
+- The component maintains data integrity by removing the mention from the data structure
+- The `onChange` callback is triggered with updated mention data
+- The text becomes fully editable after chip deletion
 
 ### Trigger Character Display
 
@@ -133,5 +149,15 @@ The `keepTriggerOnSelect` prop controls whether the trigger character is include
 // With keepTriggerOnSelect: false
 <span class="mention-chip">Alice</span>
 ```
+
+### Interactive Example
+
+<MentisDemo />
+
+Try the following interactions in the demo above:
+
+1. **Create a chip**: Type `@` and select a user from the dropdown
+2. **Delete by typing**: Click inside the chip and start typing - the chip will be deleted
+3. **Edit mentions**: Click inside any chip and modify the text to see the chip deletion in action
 
 Chips are a fundamental part of the MentionInput component that enhance user experience by providing clear visual feedback and maintaining data integrity for mentions within your application.

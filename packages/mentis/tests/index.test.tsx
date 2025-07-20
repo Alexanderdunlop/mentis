@@ -475,7 +475,7 @@ describe("Chips", () => {
     expect(chipElement).toBeInTheDocument();
     expect(chipElement).toHaveAttribute("data-value", "john");
     expect(chipElement).toHaveAttribute("data-label", "John Doe");
-    expect(chipElement).toHaveAttribute("contentEditable", "false");
+    expect(chipElement).toHaveAttribute("contentEditable", "true");
     expect(chipElement).toHaveTextContent("@John Doe");
   });
 
@@ -514,6 +514,59 @@ describe("Chips", () => {
           endIndex: 9,
         },
       ],
+    });
+  });
+
+  test("Should delete chip when typing inside it", () => {
+    const options = [
+      { label: "John Doe", value: "john" },
+      { label: "Jane Smith", value: "jane" },
+    ];
+
+    const mockOnChange = vi.fn();
+    render(<MentionInput options={options} onChange={mockOnChange} />);
+
+    const editorElement = screen.getByRole("combobox");
+
+    // First, create a chip by selecting an option
+    fireEvent.focus(editorElement);
+    setupTriggerState(editorElement, "@");
+    fireEvent.input(editorElement, { target: { textContent: "@" } });
+
+    const modal = screen.getByRole("listbox");
+    const johnOption = screen.getByText("John Doe");
+    fireEvent.mouseDown(johnOption);
+
+    // Verify chip was created
+    const chipElement = editorElement.querySelector(".mention-chip");
+    expect(chipElement).toBeInTheDocument();
+    expect(chipElement).toHaveTextContent("@John Doe");
+
+    // Clear the onChange mock to track the deletion
+    mockOnChange.mockClear();
+
+    // Simulate clicking inside the chip to focus it and set selection
+    fireEvent.click(chipElement!);
+
+    // Set the selection inside the chip to simulate cursor position
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.selectNodeContents(chipElement!);
+    range.collapse(false);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+
+    // Simulate typing inside the chip by firing input on the editor
+    fireEvent.input(editorElement, { target: { textContent: "@John DoeX" } });
+
+    // The chip should be deleted and onChange should be called with updated data
+    expect(
+      editorElement.querySelector(".mention-chip")
+    ).not.toBeInTheDocument();
+    expect(mockOnChange).toHaveBeenCalledWith({
+      displayText: "@John DoeX",
+      rawText: "@John DoeX",
+      mentions: [],
     });
   });
 });
