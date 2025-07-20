@@ -478,4 +478,42 @@ describe("Chips", () => {
     expect(chipElement).toHaveAttribute("contentEditable", "false");
     expect(chipElement).toHaveTextContent("@John Doe");
   });
+
+  test("Should add a space after mention when selecting from dropdown", () => {
+    const options = [
+      { label: "John Doe", value: "john" },
+      { label: "Jane Smith", value: "jane" },
+    ];
+
+    const mockOnChange = vi.fn();
+    render(<MentionInput options={options} onChange={mockOnChange} />);
+
+    const editorElement = screen.getByRole("combobox");
+
+    fireEvent.focus(editorElement);
+    setupTriggerState(editorElement, "@");
+    fireEvent.input(editorElement, { target: { textContent: "@" } });
+
+    const modal = screen.getByRole("listbox");
+    expect(modal).toBeInTheDocument();
+
+    const johnOption = screen.getByText("John Doe");
+    fireEvent.mouseDown(johnOption);
+
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+
+    // Check that the onChange was called with a space after the mention
+    expect(mockOnChange).toHaveBeenLastCalledWith({
+      displayText: "@John Doe ",
+      rawText: "john ",
+      mentions: [
+        {
+          label: "John Doe",
+          value: "john",
+          startIndex: 0,
+          endIndex: 9,
+        },
+      ],
+    });
+  });
 });

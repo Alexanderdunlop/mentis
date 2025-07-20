@@ -92,6 +92,9 @@ export const parseMentionsInText = ({
         : matchingOption.label;
 
       fragment.appendChild(mentionElement);
+
+      // Add a space after the mention
+      fragment.appendChild(document.createTextNode(" "));
     } else {
       // If no matching option, keep as plain text
       fragment.appendChild(document.createTextNode(match[0]));

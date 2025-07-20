@@ -143,6 +143,11 @@ export const convertTextToChips = ({
           fragment.appendChild(document.createTextNode(beforeText));
         }
         fragment.appendChild(mentionElement);
+
+        // Add a space after the mention
+        const spaceNode = document.createTextNode(" ");
+        fragment.appendChild(spaceNode);
+
         if (afterText) {
           fragment.appendChild(document.createTextNode(afterText));
         }
