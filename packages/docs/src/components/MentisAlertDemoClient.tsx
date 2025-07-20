@@ -32,7 +32,7 @@ export function MentisAlertDemoClient() {
           highlightedClassName: "bg-blue-500 text-white hover:bg-blue-500",
           noOptions: { className: "px-4 py-2 text-gray-400" },
         }}
-        onChange={(value: string) => alert(value)}
+        onChange={(mentionData) => alert(mentionData.displayText)}
       />
     </DemoContainer>
   );

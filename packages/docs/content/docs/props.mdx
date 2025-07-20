@@ -7,15 +7,15 @@ import { MentisDemo } from "@/components";
 
 ## Props
 
-| Name                | Type                    | Required | Description                                                                                            |
-| ------------------- | ----------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
-| defaultValue        | string                  | No       | The initial value of the input.                                                                        |
-| options             | MentionOption[]         | Yes      | Array of mentionable options. See [Options](./options) for more.                                       |
-| slotsProps          | SlotProps               | No       | Customization for internal component slots (see below).                                                |
-| keepTriggerOnSelect | boolean                 | No       | Whether to keep the trigger character (e.g. '@') when an option is selected. Defaults to true.         |
-| trigger             | string                  | No       | The character or string that triggers the mention dropdown. Defaults to '@'.                           |
-| autoConvertMentions | boolean                 | No       | Whether to automatically convert text mentions to chips when typing space or enter. Defaults to false. |
-| onChange            | (value: string) => void | No       | Callback fired when the input value changes.                                                           |
+| Name                | Type                         | Required | Description                                                                                            |
+| ------------------- | ---------------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
+| defaultValue        | string                       | No       | The initial value of the input.                                                                        |
+| options             | MentionOption[]              | Yes      | Array of mentionable options. See [Options](./options) for more.                                       |
+| slotsProps          | SlotProps                    | No       | Customization for internal component slots (see below).                                                |
+| keepTriggerOnSelect | boolean                      | No       | Whether to keep the trigger character (e.g. '@') when an option is selected. Defaults to true.         |
+| trigger             | string                       | No       | The character or string that triggers the mention dropdown. Defaults to '@'.                           |
+| autoConvertMentions | boolean                      | No       | Whether to automatically convert text mentions to chips when typing space or enter. Defaults to false. |
+| onChange            | (value: MentionData) => void | No       | Callback fired when the input value changes with structured mention data.                              |
 
 ### MentionOption
 

@@ -1,15 +1,11 @@
 "use client";
 
 import { MentionInput } from "mentis";
-import { useState } from "react";
 import "mentis/dist/index.css";
 
 export const LandingDemoClient = () => {
-  const [value, setValue] = useState("");
   return (
     <MentionInput
-      defaultValue={value}
-      onChange={(value) => setValue(value)}
       options={[
         { label: "React.js", value: "reactjs" },
         { label: "TypeScript", value: "typescript" },

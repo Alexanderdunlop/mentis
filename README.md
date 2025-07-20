@@ -56,7 +56,9 @@ function App() {
   return (
     <MentionInput
       defaultValue={value}
-      onChange={setValue}
+      onChange={(mentionData) => {
+        setValue(mentionData.displayText);
+      }}
       options={[
         { label: "Alice Johnson", value: "alice" },
         { label: "Bob Smith", value: "bob" },
@@ -82,7 +84,7 @@ function BasicExample() {
         { label: "Bob Smith", value: "bob" },
         { label: "Charlie Brown", value: "charlie" },
       ]}
-      onChange={(value) => console.log(value)}
+      onChange={(mentionData) => console.log(mentionData)}
     />
   );
 }
@@ -144,15 +146,15 @@ function CustomTriggerExample() {
 
 ### MentionInput Props
 
-| Prop                  | Type                      | Default | Description                                           |
-| --------------------- | ------------------------- | ------- | ----------------------------------------------------- |
-| `options`             | `MentionOption[]`         | -       | Array of mention options                              |
-| `defaultValue`        | `string`                  | `""`    | Initial value of the input                            |
-| `onChange`            | `(value: string) => void` | -       | Callback when value changes                           |
-| `trigger`             | `string`                  | `"@"`   | Character(s) that trigger the mention dropdown        |
-| `keepTriggerOnSelect` | `boolean`                 | `true`  | Whether to keep the trigger character after selection |
-| `autoConvertMentions` | `boolean`                 | `false` | Automatically convert mentions to chips               |
-| `slotsProps`          | `SlotProps`               | -       | Customization props for different parts               |
+| Prop                  | Type                           | Default | Description                                           |
+| --------------------- | ------------------------------ | ------- | ----------------------------------------------------- |
+| `options`             | `MentionOption[]`              | -       | Array of mention options                              |
+| `defaultValue`        | `string`                       | `""`    | Initial value of the input                            |
+| `onChange`            | `(value: MentionData) => void` | -       | Callback when value changes with mention data         |
+| `trigger`             | `string`                       | `"@"`   | Character(s) that trigger the mention dropdown        |
+| `keepTriggerOnSelect` | `boolean`                      | `true`  | Whether to keep the trigger character after selection |
+| `autoConvertMentions` | `boolean`                      | `false` | Automatically convert mentions to chips               |
+| `slotsProps`          | `SlotProps`                    | -       | Customization props for different parts               |
 
 ### MentionOption
 
@@ -160,6 +162,21 @@ function CustomTriggerExample() {
 type MentionOption = {
   label: string; // Display text
   value: string; // Unique identifier
+};
+```
+
+### MentionData
+
+```tsx
+type MentionData = {
+  displayText: string; // Text as displayed to user (with mention labels)
+  rawText: string; // Raw text with mention values
+  mentions: Array<{
+    label: string; // Display text of the mention
+    value: string; // Unique identifier of the mention
+    startIndex: number; // Start position in the text
+    endIndex: number; // End position in the text
+  }>;
 };
 ```
 
