@@ -114,6 +114,7 @@ function StyledExample() {
             "px-4 py-2 cursor-pointer text-base text-gray-800 hover:bg-gray-100 hover:text-black rounded-lg transition",
         },
         highlightedClassName: "bg-blue-500 text-white hover:bg-blue-500",
+        chipClassName: "bg-blue-500 text-white hover:bg-blue-500",
       }}
     />
   );
@@ -172,6 +173,7 @@ type SlotProps = {
   option?: OptionProps;
   noOptions?: React.HTMLAttributes<HTMLDivElement>;
   highlightedClassName?: string;
+  chipClassName?: string;
 };
 ```
 
