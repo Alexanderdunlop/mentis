@@ -7,6 +7,9 @@
     "typecheck": {
       "dependsOn": ["^typecheck"]
     },
+    "test": {
+      "dependsOn": ["^test"]
+    },
     "mentis#build": {
       "outputs": ["dist/**"]
     },
