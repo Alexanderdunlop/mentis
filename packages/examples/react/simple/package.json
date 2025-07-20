@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "mentis": "0.1.1-alpha.1",
+    "mentis": "0.1.1-alpha.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
