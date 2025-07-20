@@ -6,7 +6,7 @@ import {
   type KeyboardEvent,
   type ClipboardEvent,
 } from "react";
-import type { MentionOption } from "../types/MentionInput.types";
+import type { MentionOption, MentionData } from "../types/MentionInput.types";
 import { getCaretPosition } from "../utils/getCaretPosition";
 import { getTextContent } from "../utils/getTextContent";
 import { detectMentionTrigger } from "../utils/detectMentionTrigger";
@@ -14,6 +14,7 @@ import { filterMentionOptions } from "../utils/filterMentionOptions";
 import { insertMentionIntoDOM } from "../utils/insertMentionIntoDOM";
 import { parseMentionsInText } from "../utils/parseMentionsInText";
 import { convertTextToChips } from "../utils/convertTextToChips";
+import { extractMentionData } from "../utils/extractMentionData";
 
 type UseContentEditableMentionProps = {
   options: MentionOption[];
@@ -22,7 +23,7 @@ type UseContentEditableMentionProps = {
   trigger: string;
   autoConvertMentions: boolean;
   chipClassName: string;
-  onChange?: (value: string) => void;
+  onChange?: (value: MentionData) => void;
 };
 
 export function useContentEditableMention({
@@ -101,7 +102,10 @@ export function useContentEditableMention({
       }
     }
 
-    onChange?.(text);
+    if (editorRef.current) {
+      const mentionData = extractMentionData(editorRef.current);
+      onChange?.(mentionData);
+    }
 
     const mentionDetection = detectMentionTrigger(
       text,
@@ -173,8 +177,8 @@ export function useContentEditableMention({
 
     setShowModal(false);
 
-    const newText = getTextContent(editorRef.current);
-    onChange?.(newText);
+    const mentionData = extractMentionData(editorRef.current);
+    onChange?.(mentionData);
 
     // Focus the editor after insertion
     setTimeout(() => {
@@ -219,9 +223,8 @@ export function useContentEditableMention({
     selection.removeAllRanges();
     selection.addRange(range);
 
-    // Update the text content
-    const newText = getTextContent(editorRef.current);
-    onChange?.(newText);
+    const mentionData = extractMentionData(editorRef.current);
+    onChange?.(mentionData);
   };
 
   return {

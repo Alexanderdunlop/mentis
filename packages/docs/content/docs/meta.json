@@ -11,11 +11,10 @@
     "chips",
     "styling",
     "props",
+    "onchange",
     "---Accessibility---",
     "accessibility",
     "keyboard-navigation",
-    "---Advanced---",
-    "events",
     "---Examples---",
     "examples-react"
   ]

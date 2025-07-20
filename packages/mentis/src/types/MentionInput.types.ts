@@ -5,6 +5,17 @@ export type MentionOption = {
   value: string;
 };
 
+export type MentionData = {
+  displayText: string;
+  rawText: string;
+  mentions: Array<{
+    label: string;
+    value: string;
+    startIndex: number;
+    endIndex: number;
+  }>;
+};
+
 export type MentionInputProps = {
   defaultValue?: string;
   options: MentionOption[];
@@ -12,5 +23,5 @@ export type MentionInputProps = {
   keepTriggerOnSelect?: boolean;
   trigger?: string;
   autoConvertMentions?: boolean;
-  onChange?: (value: string) => void;
+  onChange?: (value: MentionData) => void;
 };
