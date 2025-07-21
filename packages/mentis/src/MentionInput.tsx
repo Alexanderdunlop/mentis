@@ -2,6 +2,7 @@ import React from "react";
 import type { MentionInputProps } from "./types/MentionInput.types";
 import { useContentEditableMention } from "./hooks/useContentEditableMention";
 import { MentionModal } from "./components/MentionModal";
+import { cn } from "./utils/cn";
 
 export const MentionInput: React.FC<MentionInputProps> = ({
   defaultValue = "",
@@ -37,7 +38,6 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   return (
     <div className="mention-input-container" {...slotsProps?.container}>
       <div
-        className="content-editable-input"
         data-placeholder={`Type ${trigger} to mention someone`}
         role="combobox"
         aria-autocomplete="list"
@@ -50,6 +50,10 @@ export const MentionInput: React.FC<MentionInputProps> = ({
         aria-haspopup="listbox"
         aria-controls={showModal ? "mention-modal" : undefined}
         {...slotsProps?.contentEditable}
+        className={cn(
+          "content-editable-input",
+          slotsProps?.contentEditable?.className
+        )}
         ref={editorRef}
         contentEditable
         suppressContentEditableWarning
