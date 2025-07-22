@@ -1,10 +1,10 @@
-import type { MentionOption } from "../types/MentionInput.types";
 import { getCaretPosition } from "./getCaretPosition";
 import { addSpaceIfNeeded } from "./addSpaceIfNeeded";
+import { type MentionOptionWithoutFunction } from "./filterOutOptionFunctions";
 
 type ConvertTextToChipsProps = {
   editorRef: React.RefObject<HTMLDivElement | null>;
-  options: MentionOption[];
+  options: MentionOptionWithoutFunction[];
   keepTriggerOnSelect: boolean;
   trigger: string;
   chipClassName: string;

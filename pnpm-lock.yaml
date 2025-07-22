@@ -78,7 +78,7 @@ importers:
 
   packages/examples: {}
 
-  packages/examples/nextjs/simple:
+  packages/examples/nextjs:
     dependencies:
       mentis:
         specifier: 0.1.1-alpha.7
@@ -121,7 +121,7 @@ importers:
         specifier: ^5
         version: 5.8.3
 
-  packages/examples/react/simple:
+  packages/examples/simple:
     dependencies:
       mentis:
         specifier: 0.1.1-alpha.4
@@ -149,7 +149,7 @@ importers:
         specifier: ^7.0.4
         version: 7.0.5(@types/node@24.0.15)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
 
-  packages/examples/react/styling:
+  packages/examples/styling:
     dependencies:
       mentis:
         specifier: 0.1.1-alpha.4
@@ -177,7 +177,7 @@ importers:
         specifier: ^7.0.4
         version: 7.0.5(@types/node@24.0.15)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
 
-  packages/examples/react/tailwind:
+  packages/examples/tailwind:
     dependencies:
       '@tailwindcss/vite':
         specifier: ^4.1.11

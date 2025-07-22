@@ -9,7 +9,7 @@ This document provides comprehensive context about the `@/mentis` library for AI
 
 ## Overview
 
-**Mentis** is a modern React library for implementing mention/tagging functionality in text inputs. It's designed to be flexible, accessible, and highly customizable.
+**Mentis** is a modern React library for implementing mention/tagging functionality in text inputs. It's designed to be flexible, accessible, and highly customizable with support for both string and function values.
 
 ## Core Architecture
 
@@ -24,7 +24,7 @@ The library is built around several specialized hooks:
 - **`useContentEditableMention`** - Main orchestration hook that coordinates all functionality
 - **`useMentionState`** - State management for modal, selection, and filtering
 - **`useMentionInput`** - Input processing and mention detection
-- **`useMentionPaste`** - Paste event handling
+- **`useMentionPaste`** - Paste event handling with intelligent mention parsing
 - **`useMentionFocus`** - Focus/blur management
 
 ## Key Features
@@ -32,7 +32,7 @@ The library is built around several specialized hooks:
 ### Smart Mention Detection
 
 - DOM-aware detection that distinguishes between actual text and rendered mention chips
-- Configurable trigger characters (default: `@`)
+- Configurable trigger characters or strings (default: `@`)
 - Intelligent boundary detection to prevent false triggers
 - Handles complex text structures with multiple mentions
 
@@ -41,6 +41,25 @@ The library is built around several specialized hooks:
 - Mentions can be displayed as styled "chips" with custom CSS classes
 - Maintains both display text (user-friendly) and raw text (data-friendly) representations
 - Supports complex text structures with multiple mentions
+
+### Function Values
+
+- Options can have function values that execute when selected
+- Useful for actions like sending messages, clearing input, or triggering side effects
+- When a function value is selected, the trigger and query text are removed and the function executes
+
+### Auto-Conversion
+
+- Optional automatic conversion of text mentions to chips when typing space or Enter
+- Monitors for space characters and Enter key presses
+- Scans text for patterns like `@username` that match available options
+- Performance consideration: runs on every space/enter key press
+
+### Advanced Paste Handling
+
+- Intelligent parsing and conversion of mentions from pasted content
+- Automatically converts matching mentions to chips
+- Preserves non-matching text as-is
 
 ### Accessibility
 
@@ -59,7 +78,7 @@ The library is built around several specialized hooks:
 
 1. **Input Processing**: User types trigger character → mention detection activates
 2. **Filtering**: Options filtered based on query text
-3. **Selection**: User selects option → mention inserted into DOM
+3. **Selection**: User selects option → mention inserted into DOM (or function executed)
 4. **Output**: `onChange` callback receives structured data with both display and raw text
 
 ## Core Types
@@ -67,7 +86,7 @@ The library is built around several specialized hooks:
 ```typescript
 type MentionOption = {
   label: string; // Display text
-  value: string; // Unique identifier
+  value: string | Function; // Unique identifier or executable function
 };
 
 type MentionData = {
@@ -90,6 +109,16 @@ type MentionInputProps = {
   autoConvertMentions?: boolean;
   onChange?: (value: MentionData) => void;
 };
+
+type SlotProps = Partial<{
+  container: React.HTMLAttributes<HTMLDivElement>;
+  contentEditable: ContentEditableInputCustomProps;
+  modal: ModalProps;
+  option: OptionProps;
+  noOptions: React.HTMLAttributes<HTMLDivElement>;
+  highlightedClassName: string;
+  chipClassName: string;
+}>;
 ```
 
 ## Utility Functions
@@ -102,6 +131,7 @@ The library includes sophisticated utilities for:
 - **Data Extraction**: `extractMentionData()` - Convert DOM content to structured data
 - **Text Conversion**: `convertTextToChips()` - Convert text to styled chips
 - **Option Filtering**: `filterMentionOptions()` - Filter options based on query
+- **Trigger Removal**: `removeTriggerAndQuery()` - Remove trigger and query text for function values
 
 ## Technical Highlights
 
@@ -132,6 +162,7 @@ src/
 │   ├── insertMentionIntoDOM.ts       # DOM manipulation
 │   ├── extractMentionData.ts         # Data extraction
 │   ├── convertTextToChips.ts         # Chip conversion
+│   ├── removeTriggerAndQuery.ts      # Trigger removal for functions
 │   └── ... (other utility functions)
 ├── MentionInput.tsx                  # Main component
 └── index.ts                          # Public exports
@@ -144,6 +175,7 @@ src/
 - Content management systems
 - Chat applications
 - Any interface requiring user tagging/mentioning
+- Action-triggering interfaces (with function values)
 
 ## Implementation Patterns
 
@@ -173,6 +205,16 @@ Comprehensive event handling for:
 - Focus/blur management
 - Paste events with mention processing
 - Click outside to close modal
+- Auto-conversion on space/enter
+
+### Function Value Handling
+
+When an option with a function value is selected:
+
+1. **Trigger Removal**: The trigger character and query text are removed from the input
+2. **Function Execution**: The function is executed immediately
+3. **Modal Closure**: The mention dropdown is closed
+4. **No Data Addition**: No mention data is added to the input content
 
 ## Customization Examples
 
@@ -180,6 +222,33 @@ Comprehensive event handling for:
 
 ```tsx
 <MentionInput
+  options={[
+    { label: "Alice Johnson", value: "alice" },
+    { label: "Bob Smith", value: "bob" },
+  ]}
+  onChange={(mentionData) => console.log(mentionData)}
+/>
+```
+
+### Function Values
+
+```tsx
+<MentionInput
+  options={[
+    { label: "Send Message", value: () => console.log("Message sent!") },
+    { label: "Clear Input", value: () => setValue("") },
+    { label: "Alice Johnson", value: "alice" },
+  ]}
+  onChange={(mentionData) => setValue(mentionData.displayText)}
+/>
+```
+
+### Auto-Conversion
+
+```tsx
+<MentionInput
+  autoConvertMentions={true}
+  keepTriggerOnSelect={false}
   options={[
     { label: "Alice Johnson", value: "alice" },
     { label: "Bob Smith", value: "bob" },
@@ -198,7 +267,8 @@ Comprehensive event handling for:
     contentEditable: { className: "border rounded-lg p-3" },
     modal: { className: "bg-white border shadow-lg" },
     option: { className: "px-4 py-2 hover:bg-gray-100" },
-    chipClassName: "bg-blue-500 text-white",
+    chipClassName: "bg-blue-500 text-white px-2 py-1 rounded-md",
+    highlightedClassName: "bg-blue-500 text-white",
   }}
 />
 ```
@@ -215,6 +285,28 @@ Comprehensive event handling for:
 />
 ```
 
-This library represents a modern, well-architected solution for mention functionality that prioritizes accessibility, customization, and developer experience.
+## Advanced Features
 
-Updated 2025-07-22 - v0.1.1-alpha.11
+### Performance Considerations
+
+- **Auto-Conversion**: May impact performance with large option lists or frequent typing
+- **Large Option Lists**: Consider virtual scrolling for very large lists
+- **Memory Management**: Event listeners are properly cleaned up
+
+### Accessibility Features
+
+- Complete ARIA implementation with proper roles and attributes
+- Full keyboard navigation support
+- Screen reader compatibility
+- Focus management for complex interactions
+
+### Rich Text Capabilities
+
+- ContentEditable architecture for enhanced text manipulation
+- Chip-based mention display with custom styling
+- Structured data output for both display and processing
+- Clipboard integration with mention parsing
+
+This library represents a modern, well-architected solution for mention functionality that prioritizes accessibility, customization, and developer experience with support for both traditional mentions and dynamic function execution.
+
+Updated 2025-07-22 - v0.1.1-alpha.12

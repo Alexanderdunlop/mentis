@@ -16,7 +16,7 @@ export function useMentionState(options: MentionOption[]) {
 
   const updateModalPosition = (
     editorRef: React.RefObject<HTMLDivElement | null>
-  ) => {
+  ): void => {
     if (editorRef.current) {
       setModalPosition({
         top: editorRef.current.offsetTop + editorRef.current.offsetHeight,
@@ -25,22 +25,24 @@ export function useMentionState(options: MentionOption[]) {
     }
   };
 
-  const openModal = (editorRef: React.RefObject<HTMLDivElement | null>) => {
+  const openModal = (
+    editorRef: React.RefObject<HTMLDivElement | null>
+  ): void => {
     setShowModal(true);
     updateModalPosition(editorRef);
   };
 
-  const closeModal = () => {
+  const closeModal = (): void => {
     setShowModal(false);
   };
 
-  const resetSelection = () => {
+  const resetSelection = (): void => {
     setHighlightedIndex(0);
     setMentionStart(0);
     setMentionQuery("");
   };
 
-  const updateSelection = (start: number, query: string) => {
+  const updateSelection = (start: number, query: string): void => {
     setMentionStart(start);
     setMentionQuery(query);
     setHighlightedIndex(0);

@@ -1,4 +1,4 @@
-import { test, expect } from "vitest";
+import { test, expect, vi } from "vitest";
 import { screen, render } from "@testing-library/react";
 import { MentionInput } from "../src/MentionInput";
 import { MentionOption } from "../src/types/MentionInput.types";
@@ -137,7 +137,7 @@ describe("Mention Modal Filtering", () => {
   });
 });
 
-describe("Mention Modal Selection", () => {
+describe("Mention Modal Selection Value", () => {
   test("Should select option when clicked and close modal", async () => {
     render(<MentionInput options={options} />);
 
@@ -199,5 +199,32 @@ describe("Mention Modal Selection", () => {
 
     expect(editorElement).toHaveTextContent("@John Doe");
     expect(modal).not.toBeInTheDocument();
+  });
+
+  test("Should run function value when selected, close modal, and clear input", async () => {
+    const mockFunction = vi.fn();
+    const options = [
+      { label: "John Doe", value: "john" },
+      { label: "Jane Smith", value: mockFunction },
+    ];
+    render(<MentionInput options={options} />);
+
+    const user = userEvent.setup();
+
+    const editorElement = screen.getByRole("combobox");
+    await user.click(editorElement);
+
+    await user.type(editorElement, "@j");
+    expect(editorElement).toHaveTextContent("@j");
+
+    const modal = screen.getByRole("listbox");
+    expect(modal).toBeInTheDocument();
+
+    const janeOption = screen.getByText("Jane Smith");
+    await user.click(janeOption);
+
+    expect(editorElement).toBeEmptyDOMElement();
+    expect(modal).not.toBeInTheDocument();
+    expect(mockFunction).toHaveBeenCalled();
   });
 });

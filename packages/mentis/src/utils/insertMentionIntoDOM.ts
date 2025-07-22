@@ -1,9 +1,9 @@
-import type { MentionOption } from "../types/MentionInput.types";
 import { addSpaceIfNeeded } from "./addSpaceIfNeeded";
+import { type MentionOptionWithoutFunction } from "./filterOutOptionFunctions";
 
 type InsertMentionIntoDOMProps = {
   element: HTMLElement;
-  option: MentionOption;
+  option: MentionOptionWithoutFunction;
   mentionStart: number;
   mentionQuery: string;
   trigger: string;

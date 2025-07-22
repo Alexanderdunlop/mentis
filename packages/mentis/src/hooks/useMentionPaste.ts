@@ -2,6 +2,7 @@ import type { ClipboardEvent } from "react";
 import type { MentionOption, MentionData } from "../types/MentionInput.types";
 import { parseMentionsInText } from "../utils/parseMentionsInText";
 import { extractMentionData } from "../utils/extractMentionData";
+import { filterOutOptionFunctions } from "../utils/filterOutOptionFunctions";
 
 type UseMentionPasteProps = {
   editorRef: React.RefObject<HTMLDivElement | null>;
@@ -32,10 +33,12 @@ export function useMentionPaste({
     const range = selection.getRangeAt(0);
     range.deleteContents();
 
+    const optionsWithoutFunctions = filterOutOptionFunctions(options);
+
     // Parse the text and convert mentions to chips
     const fragment = parseMentionsInText({
       text,
-      options,
+      options: optionsWithoutFunctions,
       trigger,
       keepTriggerOnSelect,
       chipClassName,
