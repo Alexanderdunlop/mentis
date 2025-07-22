@@ -37,8 +37,11 @@
 - ♿ **Fully Accessible** - Complete ARIA roles and keyboard navigation
 - 🎨 **Highly Customizable** - Slot-based customization system
 - 🔧 **TypeScript Support** - Full type safety out of the box
-- 📱 **Flexible Triggers** - Customizable trigger characters
+- 📱 **Flexible Triggers** - Customizable trigger characters or strings
 - 🎪 **Rich Text Support** - Display mentions as styled chips
+- 🚀 **Function Values** - Support for executable functions as option values
+- 📋 **Advanced Paste Handling** - Intelligent mention parsing from pasted content
+- 🔄 **Auto-Conversion** - Optional automatic conversion of text mentions to chips
 
 ## Quick Start
 
@@ -83,6 +86,25 @@ function BasicExample() {
         { label: "Alice Johnson", value: "alice" },
         { label: "Bob Smith", value: "bob" },
         { label: "Charlie Brown", value: "charlie" },
+      ]}
+      onChange={(mentionData) => console.log(mentionData)}
+    />
+  );
+}
+```
+
+### Function Values
+
+```tsx
+import { MentionInput } from "mentis";
+
+function FunctionValueExample() {
+  return (
+    <MentionInput
+      options={[
+        { label: "Send Message", value: () => console.log("Message sent!") },
+        { label: "Clear Input", value: () => setValue("") },
+        { label: "Alice Johnson", value: "alice" },
       ]}
       onChange={(mentionData) => console.log(mentionData)}
     />
@@ -142,6 +164,25 @@ function CustomTriggerExample() {
 }
 ```
 
+### Auto-Convert Mentions
+
+```tsx
+import { MentionInput } from "mentis";
+
+function AutoConvertExample() {
+  return (
+    <MentionInput
+      autoConvertMentions={true}
+      keepTriggerOnSelect={false}
+      options={[
+        { label: "Alice Johnson", value: "alice" },
+        { label: "Bob Smith", value: "bob" },
+      ]}
+    />
+  );
+}
+```
+
 ## API Reference
 
 ### MentionInput Props
@@ -161,7 +202,7 @@ function CustomTriggerExample() {
 ```tsx
 type MentionOption = {
   label: string; // Display text
-  value: string; // Unique identifier
+  value: string | Function; // Unique identifier or executable function
 };
 ```
 
@@ -201,6 +242,33 @@ type SlotProps = {
 - **Escape**: Close mention dropdown
 - **Tab**: Navigate through options and select
 - **Backspace**: Navigate into mention chips
+
+## Advanced Features
+
+### Function Values
+
+Options can have function values that execute when selected, useful for actions like sending messages or clearing input.
+
+### Auto-Conversion
+
+When `autoConvertMentions` is enabled, the component automatically converts text mentions to chips when users type space or press Enter.
+
+### Paste Handling
+
+The component intelligently parses mentions from pasted content, converting them to chips automatically.
+
+### Rich Text Support
+
+Mentions are displayed as styled chips within the contentEditable interface, providing a rich text experience.
+
+## Examples Directory
+
+Explore complete examples in the following directories:
+
+- [simple](https://github.com/Alexanderdunlop/mentis/tree/main/packages/examples/simple)
+- [styling](https://github.com/Alexanderdunlop/mentis/tree/main/packages/examples/styling)
+- [tailwind](https://github.com/Alexanderdunlop/mentis/tree/main/packages/examples/tailwind)
+- [nextjs](https://github.com/Alexanderdunlop/mentis/tree/main/packages/examples/nextjs)
 
 ## License
 

@@ -22,7 +22,7 @@ import { MentisDemo } from "@/components";
 ```tsx
 type MentionOption = {
   label: string;
-  value: string;
+  value: string | Function; // Can be a string identifier or executable function
 };
 ```
 
@@ -57,6 +57,7 @@ type SlotProps = Partial<{
   >; // Props for each option
   noOptions: React.HTMLAttributes<HTMLDivElement>; // Props for the 'No items found' message
   highlightedClassName: string; // Custom class for the highlighted option
+  chipClassName: string; // Custom class for mention chips
 }>;
 ```
 
@@ -66,6 +67,7 @@ type SlotProps = Partial<{
 - `option`: Props for each option in the dropdown.
 - `noOptions`: Props for the 'No items found' message.
 - `highlightedClassName`: Custom class for the currently highlighted option.
+- `chipClassName`: Custom class for mention chips displayed in the input.
 
 ---
 
@@ -118,3 +120,26 @@ When `true`, the component will automatically convert text mentions to chips whe
 - This feature works independently of the paste functionality, which has its own mention parsing
 
 **⚠️ Performance Warning:** This feature is not enabled by default as it requires additional performance testing in production environments. The automatic conversion process runs on every space/enter key press and may impact performance with large option lists or frequent typing.
+
+---
+
+### Function Values
+
+Options can have function values that execute when selected. This is useful for actions like sending messages, clearing input, or triggering other side effects:
+
+```tsx
+<MentionInput
+  options={[
+    { label: "Send Message", value: () => console.log("Message sent!") },
+    { label: "Clear Input", value: () => setValue("") },
+    { label: "Alice", value: "alice" },
+  ]}
+/>
+```
+
+When a function value is selected:
+
+- The trigger and query text are removed from the input
+- The function is executed
+- The modal is closed
+- No mention data is added to the input
