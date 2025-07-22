@@ -1,0 +1,220 @@
+---
+title: "LLM Context"
+description: "Comprehensive context about the mentis library for AI assistants and LLMs"
+---
+
+# Mentis Library Context for LLMs
+
+This document provides comprehensive context about the `@/mentis` library for AI assistants and LLMs to understand the codebase architecture, features, and implementation details.
+
+## Overview
+
+**Mentis** is a modern React library for implementing mention/tagging functionality in text inputs. It's designed to be flexible, accessible, and highly customizable.
+
+## Core Architecture
+
+### ContentEditable-Based Foundation
+
+Unlike traditional input-based mention systems, Mentis uses a `contentEditable` div as its foundation, providing rich text capabilities and better control over mention rendering.
+
+### Hook-Based Design
+
+The library is built around several specialized hooks:
+
+- **`useContentEditableMention`** - Main orchestration hook that coordinates all functionality
+- **`useMentionState`** - State management for modal, selection, and filtering
+- **`useMentionInput`** - Input processing and mention detection
+- **`useMentionPaste`** - Paste event handling
+- **`useMentionFocus`** - Focus/blur management
+
+## Key Features
+
+### Smart Mention Detection
+
+- DOM-aware detection that distinguishes between actual text and rendered mention chips
+- Configurable trigger characters (default: `@`)
+- Intelligent boundary detection to prevent false triggers
+- Handles complex text structures with multiple mentions
+
+### Rich Text Support
+
+- Mentions can be displayed as styled "chips" with custom CSS classes
+- Maintains both display text (user-friendly) and raw text (data-friendly) representations
+- Supports complex text structures with multiple mentions
+
+### Accessibility
+
+- Full ARIA compliance with proper roles (`combobox`, `listbox`, `option`)
+- Keyboard navigation (arrow keys, enter, escape, tab)
+- Screen reader support
+- Proper focus management
+
+### Customization System
+
+- Slot-based props system for styling different components
+- Customizable CSS classes for mentions, options, modal, etc.
+- Flexible trigger characters and behavior options
+
+## Data Flow
+
+1. **Input Processing**: User types trigger character → mention detection activates
+2. **Filtering**: Options filtered based on query text
+3. **Selection**: User selects option → mention inserted into DOM
+4. **Output**: `onChange` callback receives structured data with both display and raw text
+
+## Core Types
+
+```typescript
+type MentionOption = {
+  label: string; // Display text
+  value: string; // Unique identifier
+};
+
+type MentionData = {
+  displayText: string; // Text as shown to user
+  rawText: string; // Raw text with mention values
+  mentions: Array<{
+    label: string;
+    value: string;
+    startIndex: number;
+    endIndex: number;
+  }>;
+};
+
+type MentionInputProps = {
+  defaultValue?: string;
+  options: MentionOption[];
+  slotsProps?: SlotProps;
+  keepTriggerOnSelect?: boolean;
+  trigger?: string;
+  autoConvertMentions?: boolean;
+  onChange?: (value: MentionData) => void;
+};
+```
+
+## Utility Functions
+
+The library includes sophisticated utilities for:
+
+- **Mention Detection**: `detectMentionTrigger()` - Smart trigger detection with DOM awareness
+- **Text Parsing**: `parseMentionsInText()` - Extract mentions from text
+- **DOM Manipulation**: `insertMentionIntoDOM()` - Insert mentions as chips
+- **Data Extraction**: `extractMentionData()` - Convert DOM content to structured data
+- **Text Conversion**: `convertTextToChips()` - Convert text to styled chips
+- **Option Filtering**: `filterMentionOptions()` - Filter options based on query
+
+## Technical Highlights
+
+- **Zero Dependencies**: Pure React implementation with no external dependencies
+- **TypeScript**: Full type safety throughout
+- **Modern React**: Uses React 18+ features and hooks
+- **Performance**: Efficient DOM manipulation and state management
+- **Flexibility**: Works with any styling system (CSS, Tailwind, etc.)
+
+## File Structure
+
+```
+src/
+├── components/
+│   └── MentionModal.tsx          # Dropdown modal component
+├── hooks/
+│   ├── useContentEditableMention.ts  # Main orchestration hook
+│   ├── useMentionState.ts            # State management
+│   ├── useMentionInput.ts            # Input processing
+│   ├── useMentionPaste.ts            # Paste handling
+│   └── useMentionFocus.ts            # Focus management
+├── types/
+│   ├── MentionInput.types.ts         # Core type definitions
+│   └── SlotProps.types.ts            # Customization types
+├── utils/
+│   ├── detectMentionTrigger.ts       # Smart mention detection
+│   ├── parseMentionsInText.ts        # Text parsing
+│   ├── insertMentionIntoDOM.ts       # DOM manipulation
+│   ├── extractMentionData.ts         # Data extraction
+│   ├── convertTextToChips.ts         # Chip conversion
+│   └── ... (other utility functions)
+├── MentionInput.tsx                  # Main component
+└── index.ts                          # Public exports
+```
+
+## Use Cases
+
+- Social media mention systems
+- Team collaboration tools
+- Content management systems
+- Chat applications
+- Any interface requiring user tagging/mentioning
+
+## Implementation Patterns
+
+### Mention Detection
+
+The library uses sophisticated DOM-aware detection that:
+
+- Maps text positions to determine if trigger is in actual text or chip
+- Handles cursor positioning within complex DOM structures
+- Prevents false triggers when cursor is inside mention chips
+
+### State Management
+
+Centralized state management through `useMentionState` hook:
+
+- Modal visibility and positioning
+- Highlighted option index
+- Mention query and start position
+- Filtered options list
+
+### Event Handling
+
+Comprehensive event handling for:
+
+- Input events with mention detection
+- Keyboard navigation (arrow keys, enter, escape)
+- Focus/blur management
+- Paste events with mention processing
+- Click outside to close modal
+
+## Customization Examples
+
+### Basic Usage
+
+```tsx
+<MentionInput
+  options={[
+    { label: "Alice Johnson", value: "alice" },
+    { label: "Bob Smith", value: "bob" },
+  ]}
+  onChange={(mentionData) => console.log(mentionData)}
+/>
+```
+
+### Custom Styling
+
+```tsx
+<MentionInput
+  options={options}
+  slotsProps={{
+    container: { className: "w-full max-w-lg relative" },
+    contentEditable: { className: "border rounded-lg p-3" },
+    modal: { className: "bg-white border shadow-lg" },
+    option: { className: "px-4 py-2 hover:bg-gray-100" },
+    chipClassName: "bg-blue-500 text-white",
+  }}
+/>
+```
+
+### Custom Trigger
+
+```tsx
+<MentionInput
+  trigger="#"
+  options={[
+    { label: "React", value: "react" },
+    { label: "TypeScript", value: "typescript" },
+  ]}
+/>
+```
+
+This library represents a modern, well-architected solution for mention functionality that prioritizes accessibility, customization, and developer experience.
+
+Updated 2025-07-22 - v0.1.1-alpha.11
