@@ -7,13 +7,13 @@ export const detectMentionTrigger = (
 ): { isActive: boolean; start: number; query: string } => {
   // If element is provided, we need to be more careful about chip boundaries
   if (element) {
-    return detectMentionTriggerWithDOM(
+    return detectMentionTriggerWithDOM({
       text,
       caretPosition,
       trigger,
       element,
-      chipClassName
-    );
+      chipClassName,
+    });
   }
 
   const lastTriggerIndex = text.lastIndexOf(trigger, caretPosition - 1);
@@ -36,13 +36,27 @@ export const detectMentionTrigger = (
   };
 };
 
-const detectMentionTriggerWithDOM = (
-  text: string,
-  caretPosition: number,
-  trigger: string,
-  element: HTMLElement,
-  chipClassName: string
-): { isActive: boolean; start: number; query: string } => {
+type DetectMentionTriggerWithDOMProps = {
+  text: string;
+  caretPosition: number;
+  trigger: string;
+  element: HTMLElement;
+  chipClassName: string;
+};
+
+type DetectMentionTriggerWithDOMResult = {
+  isActive: boolean;
+  start: number;
+  query: string;
+};
+
+const detectMentionTriggerWithDOM = ({
+  text,
+  caretPosition,
+  trigger,
+  element,
+  chipClassName,
+}: DetectMentionTriggerWithDOMProps): DetectMentionTriggerWithDOMResult => {
   const selection = window.getSelection();
   if (!selection || selection.rangeCount === 0) {
     return { isActive: false, start: -1, query: "" };
@@ -60,7 +74,9 @@ const detectMentionTriggerWithDOM = (
     if (
       elementAtCursor &&
       elementAtCursor.nodeType === Node.ELEMENT_NODE &&
-      (elementAtCursor as Element).classList.contains(chipClassName)
+      chipClassName
+        .split(" ")
+        .some((cls) => (elementAtCursor as Element).classList.contains(cls))
     ) {
       return { isActive: false, start: -1, query: "" };
     }
@@ -70,7 +86,11 @@ const detectMentionTriggerWithDOM = (
   if (cursorContainer.nodeType === Node.TEXT_NODE) {
     let parentElement = cursorContainer.parentElement;
     while (parentElement && parentElement !== element) {
-      if (parentElement.classList.contains(chipClassName)) {
+      if (
+        chipClassName
+          .split(" ")
+          .some((cls) => parentElement?.classList.contains(cls))
+      ) {
         return { isActive: false, start: -1, query: "" };
       }
       parentElement = parentElement.parentElement;
@@ -128,13 +148,15 @@ const buildTextPositionMap = (
     null
   );
 
-  let node;
+  let node: Node | null;
   while ((node = walker.nextNode())) {
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || "";
-      const isInChip = (node.parentElement as Element)?.classList.contains(
-        chipClassName
-      );
+      const isInChip = chipClassName
+        .split(" ")
+        .some((cls) =>
+          (node?.parentElement as Element)?.classList.contains(cls)
+        );
 
       for (let i = 0; i < textContent.length; i++) {
         map[position + i] = isInChip ? "chip" : "text";
@@ -142,7 +164,9 @@ const buildTextPositionMap = (
       position += textContent.length;
     } else if (
       node.nodeType === Node.ELEMENT_NODE &&
-      (node as Element).classList.contains(chipClassName)
+      chipClassName
+        .split(" ")
+        .some((cls) => (node as Element).classList.contains(cls))
     ) {
       // Skip processing text inside chips as they're handled by their text nodes
     }

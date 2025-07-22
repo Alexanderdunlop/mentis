@@ -27,8 +27,8 @@ importers:
         specifier: ^0.525.0
         version: 0.525.0(react@19.1.0)
       mentis:
-        specifier: 0.1.1-alpha.9
-        version: 0.1.1-alpha.9(react@19.1.0)
+        specifier: 0.1.1-alpha.10
+        version: 0.1.1-alpha.10(react@19.1.0)
       next:
         specifier: 15.3.4
         version: 15.3.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -223,6 +223,9 @@ importers:
       '@testing-library/react':
         specifier: ^16.3.0
         version: 16.3.0(@testing-library/dom@10.4.0)(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@testing-library/user-event':
+        specifier: ^14.6.1
+        version: 14.6.1(@testing-library/dom@10.4.0)
       '@types/node':
         specifier: ^24.0.13
         version: 24.0.15
@@ -1591,6 +1594,12 @@ packages:
         optional: true
       '@types/react-dom':
         optional: true
+
+  '@testing-library/user-event@14.6.1':
+    resolution: {integrity: sha512-vq7fv0rnt+QTXgPxr5Hjc210p6YKq2kmdziLgnsZGgLJ9e6VAShx1pACLuRjd/AS/sr7phAR58OIIpf0LlmQNw==}
+    engines: {node: '>=12', npm: '>=6'}
+    peerDependencies:
+      '@testing-library/dom': '>=7.21.4'
 
   '@tybys/wasm-util@0.10.0':
     resolution: {integrity: sha512-VyyPYFlOMNylG45GoAe0xDoLwWuowvf92F9kySqzYh8vmYm7D2u4iUJKa1tOUpS70Ku13ASrOkS4ScXFsTaCNQ==}
@@ -3130,6 +3139,11 @@ packages:
   mdast-util-to-string@4.0.0:
     resolution: {integrity: sha512-0H44vDimn51F0YwvxSJSm0eCDOJTRlmN0R1yBh4HLj9wiV1Dn0QoXGbvFAWj2hSItVTlCmBF1hqKlIyUBVFLPg==}
 
+  mentis@0.1.1-alpha.10:
+    resolution: {integrity: sha512-Izy0gtr3AiZpUelntLWgNRvufb/v5K3Fegtqn76Di6m8IOu/Z+CJLC+4+9gdbYa0pS/iYcy2vB/qyIfoI0QCAw==}
+    peerDependencies:
+      react: '>=18.2.0 || ^19.0.0-0'
+
   mentis@0.1.1-alpha.4:
     resolution: {integrity: sha512-bNrgEhLOv8N6CARBTdGVfRdnt5JuqDs1W4N7YgCkPMHvgj7ypFesELwqRmgN7dXc0BCjrm0EQsgQsCLbsLkf+Q==}
     peerDependencies:
@@ -3137,11 +3151,6 @@ packages:
 
   mentis@0.1.1-alpha.7:
     resolution: {integrity: sha512-GiuAOo9cic98Pn33/gUALipTrEfVWdBFaVcabGKWaL2uiS8ofLB8kDg+Jtub8PSNJQAH+OZwPgZ/7P48P3CLvQ==}
-    peerDependencies:
-      react: '>=18.2.0 || ^19.0.0-0'
-
-  mentis@0.1.1-alpha.9:
-    resolution: {integrity: sha512-6WY6x0Hnpohr0CUc8+M/SKKBCnmBrFElXxz89vWK2tgOTkxAx0pwzL86x6FmdzJuyzV0smkoiPrcsBfelOxHEg==}
     peerDependencies:
       react: '>=18.2.0 || ^19.0.0-0'
 
@@ -5409,6 +5418,10 @@ snapshots:
       '@types/react': 19.1.8
       '@types/react-dom': 19.1.6(@types/react@19.1.8)
 
+  '@testing-library/user-event@14.6.1(@testing-library/dom@10.4.0)':
+    dependencies:
+      '@testing-library/dom': 10.4.0
+
   '@tybys/wasm-util@0.10.0':
     dependencies:
       tslib: 2.8.1
@@ -7519,15 +7532,15 @@ snapshots:
     dependencies:
       '@types/mdast': 4.0.4
 
+  mentis@0.1.1-alpha.10(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+
   mentis@0.1.1-alpha.4(react@19.1.0):
     dependencies:
       react: 19.1.0
 
   mentis@0.1.1-alpha.7(react@19.1.0):
-    dependencies:
-      react: 19.1.0
-
-  mentis@0.1.1-alpha.9(react@19.1.0):
     dependencies:
       react: 19.1.0
 

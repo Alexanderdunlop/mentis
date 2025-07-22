@@ -64,14 +64,20 @@ export function useMentionInput({
     // Check if we're inside a chip element
     if (container.nodeType === Node.ELEMENT_NODE) {
       const element = container as Element;
-      if (element.classList.contains(chipClassName)) {
+      if (
+        chipClassName.split(" ").some((cls) => element.classList.contains(cls))
+      ) {
         return true;
       }
     } else if (container.nodeType === Node.TEXT_NODE) {
       // Check if the text node is inside a chip
       let parent = container.parentElement;
       while (parent && parent !== editorRef.current) {
-        if (parent.classList.contains(chipClassName)) {
+        if (
+          chipClassName
+            .split(" ")
+            .some((cls) => parent?.classList.contains(cls))
+        ) {
           return true;
         }
         parent = parent.parentElement;
@@ -97,13 +103,21 @@ export function useMentionInput({
 
         if (container.nodeType === Node.ELEMENT_NODE) {
           const element = container as Element;
-          if (element.classList.contains(chipClassName)) {
+          if (
+            chipClassName
+              .split(" ")
+              .some((cls) => element.classList.contains(cls))
+          ) {
             chipElement = element;
           }
         } else if (container.nodeType === Node.TEXT_NODE) {
           let parent = container.parentElement;
           while (parent && parent !== editorRef.current) {
-            if (parent.classList.contains(chipClassName)) {
+            if (
+              chipClassName
+                .split(" ")
+                .some((cls) => parent?.classList.contains(cls))
+            ) {
               chipElement = parent;
               break;
             }
