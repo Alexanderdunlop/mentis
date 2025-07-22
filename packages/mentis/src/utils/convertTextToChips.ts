@@ -34,7 +34,11 @@ export const convertTextToChips = ({
       while (parent && parent !== tempDiv) {
         if (parent.nodeType === Node.ELEMENT_NODE) {
           const element = parent as Element;
-          if (element.classList.contains("mention-chip")) {
+          if (
+            chipClassName
+              .split(" ")
+              .some((cls) => element.classList.contains(cls))
+          ) {
             return NodeFilter.FILTER_REJECT;
           }
         }
