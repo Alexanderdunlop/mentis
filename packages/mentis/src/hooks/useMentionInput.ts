@@ -151,6 +151,7 @@ export function useMentionInput({
       text,
       caretPos,
       trigger,
+      chipClassName,
       editorRef.current
     );
 
