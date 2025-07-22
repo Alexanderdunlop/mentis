@@ -31,7 +31,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
     keepTriggerOnSelect,
     trigger,
     autoConvertMentions,
-    chipClassName: slotsProps?.chipClassName ?? "mention-chip",
+    chipClassName: cn("mention-chip", slotsProps?.chipClassName),
     onChange,
   });
 
