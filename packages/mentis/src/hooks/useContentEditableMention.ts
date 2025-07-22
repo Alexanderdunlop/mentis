@@ -2,6 +2,7 @@ import { useRef, useEffect, type KeyboardEvent } from "react";
 import type { MentionOption, MentionData } from "../types/MentionInput.types";
 import { insertMentionIntoDOM } from "../utils/insertMentionIntoDOM";
 import { extractMentionData } from "../utils/extractMentionData";
+import { removeTriggerAndQuery } from "../utils/removeTriggerAndQuery";
 import { useMentionState } from "./useMentionState";
 import { useMentionInput } from "./useMentionInput";
 import { useMentionPaste } from "./useMentionPaste";
@@ -127,6 +128,23 @@ export function useContentEditableMention({
 
   const handleSelect = (option: MentionOption): void => {
     if (!editorRef.current) return;
+
+    // Check if value is a function and call it
+    if (typeof option.value === "function") {
+      option.value();
+
+      // Remove the trigger and any text after it
+      removeTriggerAndQuery(
+        editorRef.current,
+        trigger,
+        mentionStart,
+        mentionQuery
+      );
+
+      closeModal();
+      resetSelection();
+      return;
+    }
 
     insertMentionIntoDOM({
       element: editorRef.current,

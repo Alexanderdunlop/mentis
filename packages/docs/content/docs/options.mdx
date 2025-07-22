@@ -18,4 +18,27 @@ const options: MentionOption[] = [
 ```
 
 - **label**: The text shown in the mention dropdown.
-- **value**: A unique string identifier for the option.
+- **value**: A unique string identifier for the option, or a function that will be called when the option is selected.
+
+## Function Values
+
+You can also use functions as values for options. When a function is provided as the `value`, it will be called when the option is selected instead of inserting the mention into the input:
+
+```tsx
+import { type MentionOption } from "mentis";
+
+const options: MentionOption[] = [
+  { label: "Alice", value: "alice" },
+  { label: "Bob", value: "bob" },
+  { label: "Charlie", value: "charlie" },
+  {
+    label: "Custom Action",
+    value: () => {
+      console.log("Custom action triggered!");
+      alert("Custom action executed!");
+    },
+  },
+];
+```
+
+In this example, selecting "Custom Action" will trigger the function instead of inserting a mention chip into the input. The trigger character and any text typed after it will be automatically removed from the input.

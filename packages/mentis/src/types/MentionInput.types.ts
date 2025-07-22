@@ -2,7 +2,7 @@ import type { SlotProps } from "./SlotProps.types";
 
 export type MentionOption = {
   label: string;
-  value: string;
+  value: string | Function;
 };
 
 export type MentionData = {
