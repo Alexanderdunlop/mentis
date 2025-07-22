@@ -5,6 +5,7 @@ import { getCaretPosition } from "../utils/getCaretPosition";
 import { detectMentionTrigger } from "../utils/detectMentionTrigger";
 import { convertTextToChips } from "../utils/convertTextToChips";
 import { extractMentionData } from "../utils/extractMentionData";
+import { filterOutOptionFunctions } from "../utils/filterOutOptionFunctions";
 
 type UseMentionInputProps = {
   editorRef: React.RefObject<HTMLDivElement | null>;
@@ -141,12 +142,13 @@ export function useMentionInput({
         inputEvent?.data === " " ||
         inputEvent?.inputType === "insertParagraph"
       ) {
+        const optionsWithoutFunctions = filterOutOptionFunctions(options);
         // Use setTimeout to ensure DOM has updated before conversion
         setTimeout(
           () =>
             convertTextToChips({
               editorRef,
-              options,
+              options: optionsWithoutFunctions,
               keepTriggerOnSelect,
               trigger,
               chipClassName,
@@ -161,13 +163,13 @@ export function useMentionInput({
       onChange?.(mentionData);
     }
 
-    const mentionDetection = detectMentionTrigger(
+    const mentionDetection = detectMentionTrigger({
       text,
-      caretPos,
+      caretPosition: caretPos,
       trigger,
       chipClassName,
-      editorRef.current
-    );
+      element: editorRef.current,
+    });
 
     onMentionDetection(mentionDetection);
   };

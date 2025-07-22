@@ -1,9 +1,9 @@
-import type { MentionOption } from "../types/MentionInput.types";
 import { addSpaceIfNeeded } from "./addSpaceIfNeeded";
+import { type MentionOptionWithoutFunction } from "./filterOutOptionFunctions";
 
 type InsertMentionIntoDOMProps = {
   element: HTMLElement;
-  option: MentionOption;
+  option: MentionOptionWithoutFunction;
   mentionStart: number;
   mentionQuery: string;
   trigger: string;
@@ -20,8 +20,6 @@ export const insertMentionIntoDOM = ({
   keepTriggerOnSelect,
   chipClassName,
 }: InsertMentionIntoDOMProps): void => {
-  // If the option has a function value, don't insert it into the DOM
-  if (typeof option.value === "function") return;
   const selection = window.getSelection();
   if (!selection || selection.rangeCount === 0) return;
 

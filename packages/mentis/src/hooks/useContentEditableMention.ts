@@ -148,7 +148,10 @@ export function useContentEditableMention({
 
     insertMentionIntoDOM({
       element: editorRef.current,
-      option,
+      option: {
+        ...option,
+        value: option.value,
+      },
       mentionStart,
       mentionQuery,
       trigger,

@@ -1,9 +1,9 @@
-import type { MentionOption } from "../types/MentionInput.types";
 import { addSpaceIfNeeded } from "./addSpaceIfNeeded";
+import { type MentionOptionWithoutFunction } from "./filterOutOptionFunctions";
 
 type ParseMentionsInTextProps = {
   text: string;
-  options: MentionOption[];
+  options: MentionOptionWithoutFunction[];
   trigger: string;
   keepTriggerOnSelect: boolean;
   chipClassName: string;

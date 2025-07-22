@@ -37,7 +37,7 @@ export const MentionModal: React.FC<MentionModalProps> = ({
         <div
           {...slotsProps?.option}
           className={getOptionClassName(idx, highlightedIndex, slotsProps)}
-          key={option.value}
+          key={typeof option.value === "function" ? option.label : option.value}
           id={`mention-option-${option.value}`}
           role="option"
           aria-selected={idx === highlightedIndex}
