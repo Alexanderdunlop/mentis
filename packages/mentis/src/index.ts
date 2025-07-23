@@ -1,4 +1,4 @@
-export { MentionInput } from "./MentionInput";
+export { MentionInput } from "./components/MentionInput";
 import "./index.css";
 
 export type {

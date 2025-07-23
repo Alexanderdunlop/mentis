@@ -8,7 +8,9 @@ export type ContentEditableInputCustomProps = Omit<
   | "onFocus"
   | "onBlur"
   | "onPaste"
->;
+> & {
+  "data-placeholder"?: string;
+};
 
 export type ModalProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,

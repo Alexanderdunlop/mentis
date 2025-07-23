@@ -1,6 +1,6 @@
 import { test, expect, vi } from "vitest";
 import { screen, render } from "@testing-library/react";
-import { MentionInput } from "../src/MentionInput";
+import { MentionInput } from "../src/components/MentionInput";
 import { MentionOption } from "../src/types/MentionInput.types";
 import React from "react";
 import userEvent from "@testing-library/user-event";

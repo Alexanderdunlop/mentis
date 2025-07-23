@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { expect, test, vi, describe } from "vitest";
-import { MentionInput } from "../src/MentionInput";
+import { MentionInput } from "../src/components/MentionInput";
 import { setupTriggerState } from "./utils/setupTriggerState";
 
 describe("Accessibility", () => {
@@ -125,8 +125,8 @@ describe("Keyboard Navigation", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@John Doe");
     expect(mockOnChange).toHaveBeenLastCalledWith({
-      displayText: "@John Doe ",
-      rawText: "john ",
+      value: "@John Doe ",
+      dataValue: "john ",
       mentions: [
         {
           label: "John Doe",
@@ -162,8 +162,8 @@ describe("Keyboard Navigation", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@Jane Smith");
     expect(mockOnChange).toHaveBeenLastCalledWith({
-      displayText: "@Jane Smith ",
-      rawText: "jane ",
+      value: "@Jane Smith ",
+      dataValue: "jane ",
       mentions: [
         {
           label: "Jane Smith",
@@ -198,8 +198,8 @@ describe("Keyboard Navigation", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@");
     expect(mockOnChange).toHaveBeenCalledWith({
-      displayText: "@",
-      rawText: "@",
+      value: "@",
+      dataValue: "@",
       mentions: [],
     });
   });
@@ -262,8 +262,8 @@ describe("Chips", () => {
 
     // Check that the onChange was called with a space after the mention
     expect(mockOnChange).toHaveBeenLastCalledWith({
-      displayText: "@John Doe ",
-      rawText: "john ",
+      value: "@John Doe ",
+      dataValue: "john ",
       mentions: [
         {
           label: "John Doe",
@@ -322,8 +322,8 @@ describe("Chips", () => {
       editorElement.querySelector(".mention-chip")
     ).not.toBeInTheDocument();
     expect(mockOnChange).toHaveBeenCalledWith({
-      displayText: "@John DoeX",
-      rawText: "@John DoeX",
+      value: "@John DoeX",
+      dataValue: "@John DoeX",
       mentions: [],
     });
   });

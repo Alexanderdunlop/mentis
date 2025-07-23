@@ -58,9 +58,9 @@ function App() {
 
   return (
     <MentionInput
-      defaultValue={value}
+      value={value}
       onChange={(mentionData) => {
-        setValue(mentionData.displayText);
+        setValue(mentionData.value);
       }}
       options={[
         { label: "Alice Johnson", value: "alice" },
@@ -190,7 +190,7 @@ function AutoConvertExample() {
 | Prop                  | Type                           | Default | Description                                           |
 | --------------------- | ------------------------------ | ------- | ----------------------------------------------------- |
 | `options`             | `MentionOption[]`              | -       | Array of mention options                              |
-| `defaultValue`        | `string`                       | `""`    | Initial value of the input                            |
+| `value`               | `string`                       | `""`    | Current value of the input                            |
 | `onChange`            | `(value: MentionData) => void` | -       | Callback when value changes with mention data         |
 | `trigger`             | `string`                       | `"@"`   | Character(s) that trigger the mention dropdown        |
 | `keepTriggerOnSelect` | `boolean`                      | `true`  | Whether to keep the trigger character after selection |
@@ -210,8 +210,8 @@ type MentionOption = {
 
 ```tsx
 type MentionData = {
-  displayText: string; // Text as displayed to user (with mention labels)
-  rawText: string; // Raw text with mention values
+  value: string; // Text as displayed to user (with mention labels)
+  dataValue: string; // Text with mention values (actual data)
   mentions: Array<{
     label: string; // Display text of the mention
     value: string; // Unique identifier of the mention

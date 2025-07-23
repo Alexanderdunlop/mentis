@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import { screen, render } from "@testing-library/react";
-import { MentionInput } from "../src/MentionInput";
+import { MentionInput } from "../src/components/MentionInput";
 import { MentionOption } from "../src/types/MentionInput.types";
 import React from "react";
 import userEvent from "@testing-library/user-event";
@@ -11,12 +11,33 @@ const options: MentionOption[] = [
 ];
 
 describe("Input props", () => {
-  test("Default value should be displayed", () => {
-    const defaultValue = "Hello @john, how are you?";
-    render(<MentionInput options={options} defaultValue={defaultValue} />);
+  test("Value should be displayed", () => {
+    const value = "Hello @john, how are you?";
+    render(<MentionInput options={options} value={value} />);
 
     const editorElement = screen.getByRole("combobox");
-    expect(editorElement).toHaveTextContent(defaultValue);
+    expect(editorElement).toHaveTextContent(value);
+  });
+
+  test("Component should update when value prop changes", () => {
+    const { rerender } = render(
+      <MentionInput options={options} value="Initial text" />
+    );
+
+    let editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("Initial text");
+
+    // Update the value prop
+    rerender(<MentionInput options={options} value="Updated text" />);
+    editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("Updated text");
+
+    // Update to a value with mentions
+    rerender(
+      <MentionInput options={options} value="Hello @john, how are you?" />
+    );
+    editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("Hello @john, how are you?");
   });
 
   test("onChange should work", async () => {
@@ -29,8 +50,8 @@ describe("Input props", () => {
     await user.type(editorElement, "Hello world");
 
     expect(mockOnChange).toHaveBeenCalledWith({
-      displayText: "Hello world",
-      rawText: "Hello world",
+      value: "Hello world",
+      dataValue: "Hello world",
       mentions: [],
     });
   });
@@ -56,8 +77,8 @@ describe("Input props", () => {
 
     expect(mockOnChange).toHaveBeenCalledTimes(4);
     expect(mockOnChange).toHaveBeenLastCalledWith({
-      displayText: "@John Doe ",
-      rawText: "john ",
+      value: "@John Doe ",
+      dataValue: "john ",
       mentions: [
         { label: "John Doe", value: "john", startIndex: 0, endIndex: 9 },
       ],
@@ -95,6 +116,26 @@ describe("Input props", () => {
     expect(editorElement).toHaveAttribute(
       "data-placeholder",
       "Type ! to mention someone"
+    );
+  });
+
+  test("Should support custom data-placeholder via slotsProps", () => {
+    const customPlaceholder = "Say something...";
+    render(
+      <MentionInput
+        options={[]}
+        slotsProps={{
+          contentEditable: {
+            "data-placeholder": customPlaceholder,
+          },
+        }}
+      />
+    );
+
+    const editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveAttribute(
+      "data-placeholder",
+      customPlaceholder
     );
   });
 });
