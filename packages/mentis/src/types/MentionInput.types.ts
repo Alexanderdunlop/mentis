@@ -6,8 +6,8 @@ export type MentionOption = {
 };
 
 export type MentionData = {
-  displayText: string;
-  rawText: string;
+  value: string;
+  dataValue: string;
   mentions: Array<{
     label: string;
     value: string;

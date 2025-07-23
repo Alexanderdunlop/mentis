@@ -6,8 +6,8 @@ The `onChange` callback in Mentis provides you with both the display text and st
 
 **Key Difference:**
 
-- `displayText`: Shows mention labels (what users see, e.g., "@Alice")
-- `rawText`: Shows mention values (actual data, e.g., "user_123")
+- `value`: Shows mention labels (what users see, e.g., "@Alice")
+- `dataValue`: Shows mention values (actual data, e.g., "user_123")
 
 ## Callback Signature
 
@@ -15,8 +15,8 @@ The `onChange` callback receives a `MentionData` object:
 
 ```tsx
 type MentionData = {
-  displayText: string; // The text as displayed in the input (shows mention labels)
-  rawText: string; // The text with mention values (shows actual data)
+  value: string; // The text as displayed in the input (shows mention labels)
+  dataValue: string; // The text with mention values (shows actual data)
   mentions: Array<{
     label: string; // The display label of the mention
     value: string; // The actual value of the mention
@@ -60,11 +60,11 @@ Here's how you might use the structured data to process mentions:
 
 ```tsx
 const handleChange = (newValue: MentionData) => {
-  // displayText shows what the user sees (e.g., "Hello @Alice and @Bob")
-  console.log("Display text:", newValue.displayText);
+  // value shows what the user sees (e.g., "Hello @Alice and @Bob")
+  console.log("Display text:", newValue.value);
 
-  // rawText shows the actual values (e.g., "Hello user_123 and user_456")
-  console.log("Raw text:", newValue.rawText);
+  // dataValue shows the actual values (e.g., "Hello user_123 and user_456")
+  console.log("Data value:", newValue.dataValue);
 
   // Extract user IDs for API calls
   const userIds = newValue.mentions.map((mention) => mention.value);

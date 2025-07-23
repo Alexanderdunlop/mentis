@@ -2,16 +2,16 @@ import type { MentionData } from "../types/MentionInput.types";
 
 export const extractMentionData = (element: HTMLElement): MentionData => {
   const mentions: MentionData["mentions"] = [];
-  let displayText = "";
-  let rawText = "";
+  let value = "";
+  let dataValue = "";
   let currentIndex = 0;
 
   // Walk through all child nodes
   const walkNodes = (node: Node) => {
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || "";
-      displayText += textContent;
-      rawText += textContent;
+      value += textContent;
+      dataValue += textContent;
       currentIndex += textContent.length;
     } else if (node.nodeType === Node.ELEMENT_NODE) {
       const element = node as HTMLElement;
@@ -28,10 +28,10 @@ export const extractMentionData = (element: HTMLElement): MentionData => {
           endIndex: startIndex + chipText.length,
         });
 
-        // displayText shows the label (what user sees)
-        displayText += chipText;
-        // rawText shows the value (actual data)
-        rawText += element.dataset.value;
+        // value shows the label (what user sees)
+        value += chipText;
+        // dataValue shows the value (actual data)
+        dataValue += element.dataset.value;
         currentIndex += chipText.length;
       } else {
         // Recursively process child nodes
@@ -48,8 +48,8 @@ export const extractMentionData = (element: HTMLElement): MentionData => {
   }
 
   return {
-    displayText,
-    rawText,
+    value,
+    dataValue,
     mentions,
   };
 };

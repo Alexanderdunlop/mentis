@@ -60,7 +60,7 @@ function App() {
     <MentionInput
       defaultValue={value}
       onChange={(mentionData) => {
-        setValue(mentionData.displayText);
+        setValue(mentionData.value);
       }}
       options={[
         { label: "Alice Johnson", value: "alice" },
@@ -210,8 +210,8 @@ type MentionOption = {
 
 ```tsx
 type MentionData = {
-  displayText: string; // Text as displayed to user (with mention labels)
-  rawText: string; // Raw text with mention values
+  value: string; // Text as displayed to user (with mention labels)
+  dataValue: string; // Text with mention values (actual data)
   mentions: Array<{
     label: string; // Display text of the mention
     value: string; // Unique identifier of the mention

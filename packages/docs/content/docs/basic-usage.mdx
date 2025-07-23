@@ -12,7 +12,7 @@ function App() {
   const [value, setValue] = useState<string>("");
 
   const handleChange = (newValue: MentionData) => {
-    setValue(newValue.displayText);
+    setValue(newValue.value);
   };
 
   return (

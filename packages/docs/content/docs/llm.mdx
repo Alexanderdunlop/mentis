@@ -90,8 +90,8 @@ type MentionOption = {
 };
 
 type MentionData = {
-  displayText: string; // Text as shown to user
-  rawText: string; // Raw text with mention values
+  value: string; // Text as shown to user
+  dataValue: string; // Text with mention values (actual data)
   mentions: Array<{
     label: string;
     value: string;
@@ -239,7 +239,7 @@ When an option with a function value is selected:
     { label: "Clear Input", value: () => setValue("") },
     { label: "Alice Johnson", value: "alice" },
   ]}
-  onChange={(mentionData) => setValue(mentionData.displayText)}
+  onChange={(mentionData) => setValue(mentionData.value)}
 />
 ```
 

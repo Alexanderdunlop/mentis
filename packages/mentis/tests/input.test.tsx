@@ -29,8 +29,8 @@ describe("Input props", () => {
     await user.type(editorElement, "Hello world");
 
     expect(mockOnChange).toHaveBeenCalledWith({
-      displayText: "Hello world",
-      rawText: "Hello world",
+      value: "Hello world",
+      dataValue: "Hello world",
       mentions: [],
     });
   });
@@ -56,8 +56,8 @@ describe("Input props", () => {
 
     expect(mockOnChange).toHaveBeenCalledTimes(4);
     expect(mockOnChange).toHaveBeenLastCalledWith({
-      displayText: "@John Doe ",
-      rawText: "john ",
+      value: "@John Doe ",
+      dataValue: "john ",
       mentions: [
         { label: "John Doe", value: "john", startIndex: 0, endIndex: 9 },
       ],
