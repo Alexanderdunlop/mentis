@@ -12,6 +12,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   trigger = "@",
   autoConvertMentions = false,
   onChange,
+  onKeyDown,
 }) => {
   const {
     editorRef,
@@ -33,6 +34,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
     autoConvertMentions,
     chipClassName: cn("mention-chip", slotsProps?.chipClassName),
     onChange,
+    onKeyDown,
   });
 
   return (

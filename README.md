@@ -42,6 +42,7 @@
 - 🚀 **Function Values** - Support for executable functions as option values
 - 📋 **Advanced Paste Handling** - Intelligent mention parsing from pasted content
 - 🔄 **Auto-Conversion** - Optional automatic conversion of text mentions to chips
+- ⌨️ **Custom Keyboard Handling** - Support for custom keyboard events and form submission
 
 ## Quick Start
 
@@ -183,19 +184,80 @@ function AutoConvertExample() {
 }
 ```
 
+### Form Submission with Enter Key
+
+```tsx
+import { MentionInput } from "mentis";
+
+function FormSubmissionExample() {
+  const [value, setValue] = useState("");
+
+  const handleSubmit = () => {
+    console.log("Submitting:", value);
+    setValue("");
+  };
+
+  return (
+    <MentionInput
+      value={value}
+      onChange={(mentionData) => setValue(mentionData.value)}
+      onKeyDown={(event) => {
+        // Handle Enter key for form submission
+        if (event.key === "Enter") {
+          event.preventDefault();
+          handleSubmit();
+        }
+      }}
+      options={[
+        { label: "Alice Johnson", value: "alice" },
+        { label: "Bob Smith", value: "bob" },
+      ]}
+    />
+  );
+}
+```
+
+### Custom Keyboard Shortcuts
+
+```tsx
+import { MentionInput } from "mentis";
+
+function KeyboardShortcutsExample() {
+  return (
+    <MentionInput
+      onKeyDown={(event) => {
+        // Ctrl/Cmd + Enter to submit
+        if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+          event.preventDefault();
+          handleSubmit();
+        }
+
+        // Ctrl/Cmd + S to save
+        if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+          event.preventDefault();
+          saveContent();
+        }
+      }}
+      options={options}
+    />
+  );
+}
+```
+
 ## API Reference
 
 ### MentionInput Props
 
-| Prop                  | Type                           | Default | Description                                           |
-| --------------------- | ------------------------------ | ------- | ----------------------------------------------------- |
-| `options`             | `MentionOption[]`              | -       | Array of mention options                              |
-| `value`               | `string`                       | `""`    | Current value of the input                            |
-| `onChange`            | `(value: MentionData) => void` | -       | Callback when value changes with mention data         |
-| `trigger`             | `string`                       | `"@"`   | Character(s) that trigger the mention dropdown        |
-| `keepTriggerOnSelect` | `boolean`                      | `true`  | Whether to keep the trigger character after selection |
-| `autoConvertMentions` | `boolean`                      | `false` | Automatically convert mentions to chips               |
-| `slotsProps`          | `SlotProps`                    | -       | Customization props for different parts               |
+| Prop                  | Type                             | Default | Description                                           |
+| --------------------- | -------------------------------- | ------- | ----------------------------------------------------- |
+| `options`             | `MentionOption[]`                | -       | Array of mention options                              |
+| `value`               | `string`                         | `""`    | Current value of the input                            |
+| `onChange`            | `(value: MentionData) => void`   | -       | Callback when value changes with mention data         |
+| `trigger`             | `string`                         | `"@"`   | Character(s) that trigger the mention dropdown        |
+| `keepTriggerOnSelect` | `boolean`                        | `true`  | Whether to keep the trigger character after selection |
+| `autoConvertMentions` | `boolean`                        | `false` | Automatically convert mentions to chips               |
+| `onKeyDown`           | `(event: KeyboardEvent) => void` | -       | Custom keyboard event handler                         |
+| `slotsProps`          | `SlotProps`                      | -       | Customization props for different parts               |
 
 ### MentionOption
 
@@ -242,6 +304,16 @@ type SlotProps = {
 - **Escape**: Close mention dropdown
 - **Tab**: Navigate through options and select
 - **Backspace**: Navigate into mention chips
+
+### Custom Keyboard Handling
+
+The `onKeyDown` prop allows you to handle custom keyboard events:
+
+- **Form Submission**: Handle Enter key for form submission when the modal is closed
+- **Keyboard Shortcuts**: Implement custom shortcuts like Ctrl+S for save
+- **Event Handling**: The component's internal handling (navigation, selection) takes precedence over custom handlers
+
+**Note**: When the mention modal is open, Enter, Tab, Escape, and arrow keys are handled internally for navigation and selection.
 
 ## Advanced Features
 

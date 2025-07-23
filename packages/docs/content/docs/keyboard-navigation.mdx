@@ -18,4 +18,28 @@ When you trigger the mention modal by typing <code>@</code> (or your custom trig
 
 This allows for fast, accessible navigation and selection of mention options using only the keyboard. The contentEditable architecture provides enhanced cursor navigation, including the ability to navigate into existing mention chips with the left arrow key.
 
+## Custom Keyboard Handling
+
+You can add custom keyboard event handling using the `onKeyDown` prop. This is useful for implementing form submission, keyboard shortcuts, or other custom interactions.
+
+```tsx
+<MentionInput
+  onKeyDown={(event) => {
+    // Handle form submission with Enter
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSubmit();
+    }
+
+    // Custom keyboard shortcuts
+    if (event.ctrlKey && event.key === "s") {
+      event.preventDefault();
+      saveContent();
+    }
+  }}
+/>
+```
+
+**Note:** When the mention modal is open, the component handles Enter, Tab, Escape, and arrow keys internally for navigation and selection. Your `onKeyDown` handler will not be called for these keys when the modal is active.
+
 <MentisDemo />

@@ -1,4 +1,5 @@
 import type { SlotProps } from "./SlotProps.types";
+import type { KeyboardEvent } from "react";
 
 export type MentionOption = {
   label: string;
@@ -24,4 +25,5 @@ export type MentionInputProps = {
   trigger?: string;
   autoConvertMentions?: boolean;
   onChange?: (value: MentionData) => void;
+  onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void;
 };
