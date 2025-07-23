@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import { screen, render } from "@testing-library/react";
-import { MentionInput } from "../src/MentionInput";
+import { MentionInput } from "../src/components/MentionInput";
 import { MentionOption } from "../src/types/MentionInput.types";
 import React from "react";
 import userEvent from "@testing-library/user-event";
@@ -95,6 +95,26 @@ describe("Input props", () => {
     expect(editorElement).toHaveAttribute(
       "data-placeholder",
       "Type ! to mention someone"
+    );
+  });
+
+  test("Should support custom data-placeholder via slotsProps", () => {
+    const customPlaceholder = "Say something...";
+    render(
+      <MentionInput
+        options={[]}
+        slotsProps={{
+          contentEditable: {
+            "data-placeholder": customPlaceholder,
+          },
+        }}
+      />
+    );
+
+    const editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveAttribute(
+      "data-placeholder",
+      customPlaceholder
     );
   });
 });

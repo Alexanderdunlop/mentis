@@ -14,12 +14,13 @@ export function App() {
     <>
       <div style={{ width: "300px", height: "200px", overflowY: "auto" }}>
         <MentionInput
-          // keepTriggerOnSelect={false}
-          // autoConvertMentions={true}
+          data-placeholder="Say something..."
           defaultValue={""}
           options={options}
           slotsProps={{
-            chipClassName: "custom-chip",
+            contentEditable: {
+              "data-placeholder": "Say something...",
+            },
           }}
         />
       </div>

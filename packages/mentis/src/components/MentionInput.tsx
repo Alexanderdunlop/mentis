@@ -1,8 +1,8 @@
 import React from "react";
-import type { MentionInputProps } from "./types/MentionInput.types";
-import { useContentEditableMention } from "./hooks/useContentEditableMention";
-import { MentionModal } from "./components/MentionModal";
-import { cn } from "./utils/cn";
+import type { MentionInputProps } from "../types/MentionInput.types";
+import { useContentEditableMention } from "../hooks/useContentEditableMention";
+import { MentionModal } from "./MentionModal";
+import { cn } from "../utils/cn";
 
 export const MentionInput: React.FC<MentionInputProps> = ({
   defaultValue = "",

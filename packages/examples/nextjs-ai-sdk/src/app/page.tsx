@@ -32,6 +32,9 @@ export default function Chat() {
             container: {
               className: "fixed bottom-0 w-full mb-8 max-w-md",
             },
+            contentEditable: {
+              // "data-placeholder": "Say something...",
+            },
           }}
           options={[
             {

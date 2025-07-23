@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { expect, test, vi, describe } from "vitest";
-import { MentionInput } from "../src/MentionInput";
+import { MentionInput } from "../src/components/MentionInput";
 import { setupTriggerState } from "./utils/setupTriggerState";
 
 describe("Accessibility", () => {
