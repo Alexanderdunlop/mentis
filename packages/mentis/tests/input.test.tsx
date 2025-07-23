@@ -11,12 +11,33 @@ const options: MentionOption[] = [
 ];
 
 describe("Input props", () => {
-  test("Default value should be displayed", () => {
-    const defaultValue = "Hello @john, how are you?";
-    render(<MentionInput options={options} defaultValue={defaultValue} />);
+  test("Value should be displayed", () => {
+    const value = "Hello @john, how are you?";
+    render(<MentionInput options={options} value={value} />);
 
     const editorElement = screen.getByRole("combobox");
-    expect(editorElement).toHaveTextContent(defaultValue);
+    expect(editorElement).toHaveTextContent(value);
+  });
+
+  test("Component should update when value prop changes", () => {
+    const { rerender } = render(
+      <MentionInput options={options} value="Initial text" />
+    );
+
+    let editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("Initial text");
+
+    // Update the value prop
+    rerender(<MentionInput options={options} value="Updated text" />);
+    editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("Updated text");
+
+    // Update to a value with mentions
+    rerender(
+      <MentionInput options={options} value="Hello @john, how are you?" />
+    );
+    editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("Hello @john, how are you?");
   });
 
   test("onChange should work", async () => {

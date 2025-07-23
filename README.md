@@ -58,7 +58,7 @@ function App() {
 
   return (
     <MentionInput
-      defaultValue={value}
+      value={value}
       onChange={(mentionData) => {
         setValue(mentionData.value);
       }}
@@ -190,7 +190,7 @@ function AutoConvertExample() {
 | Prop                  | Type                           | Default | Description                                           |
 | --------------------- | ------------------------------ | ------- | ----------------------------------------------------- |
 | `options`             | `MentionOption[]`              | -       | Array of mention options                              |
-| `defaultValue`        | `string`                       | `""`    | Initial value of the input                            |
+| `value`               | `string`                       | `""`    | Current value of the input                            |
 | `onChange`            | `(value: MentionData) => void` | -       | Callback when value changes with mention data         |
 | `trigger`             | `string`                       | `"@"`   | Character(s) that trigger the mention dropdown        |
 | `keepTriggerOnSelect` | `boolean`                      | `true`  | Whether to keep the trigger character after selection |

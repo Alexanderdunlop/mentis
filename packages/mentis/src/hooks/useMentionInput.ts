@@ -14,7 +14,7 @@ type UseMentionInputProps = {
   keepTriggerOnSelect: boolean;
   autoConvertMentions: boolean;
   chipClassName: string;
-  defaultValue: string;
+  value: string;
   onChange?: (value: MentionData) => void;
   onMentionDetection: (detection: {
     isActive: boolean;
@@ -30,19 +30,15 @@ export function useMentionInput({
   keepTriggerOnSelect,
   autoConvertMentions,
   chipClassName,
-  defaultValue,
+  value,
   onChange,
   onMentionDetection,
 }: UseMentionInputProps) {
   useEffect(() => {
-    if (
-      defaultValue &&
-      editorRef.current &&
-      editorRef.current.textContent !== defaultValue
-    ) {
-      editorRef.current.textContent = defaultValue;
+    if (value && editorRef.current && editorRef.current.textContent !== value) {
+      editorRef.current.textContent = value;
     }
-  }, [defaultValue, editorRef]);
+  }, [value, editorRef]);
 
   const handleChipInput = (chip: Element): void => {
     if (!editorRef.current) return;

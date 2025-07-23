@@ -17,7 +17,7 @@ export type MentionData = {
 };
 
 export type MentionInputProps = {
-  defaultValue?: string;
+  value?: string;
   options: MentionOption[];
   slotsProps?: SlotProps;
   keepTriggerOnSelect?: boolean;

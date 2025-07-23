@@ -15,7 +15,7 @@ export function App() {
       <div style={{ width: "300px", height: "200px", overflowY: "auto" }}>
         <MentionInput
           data-placeholder="Say something..."
-          defaultValue={""}
+          value={""}
           options={options}
           slotsProps={{
             contentEditable: {

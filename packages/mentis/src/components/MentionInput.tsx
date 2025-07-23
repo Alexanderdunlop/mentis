@@ -5,7 +5,7 @@ import { MentionModal } from "./MentionModal";
 import { cn } from "../utils/cn";
 
 export const MentionInput: React.FC<MentionInputProps> = ({
-  defaultValue = "",
+  value = "",
   options,
   slotsProps,
   keepTriggerOnSelect = true,
@@ -27,7 +27,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
     handlePaste,
   } = useContentEditableMention({
     options,
-    defaultValue,
+    value,
     keepTriggerOnSelect,
     trigger,
     autoConvertMentions,
