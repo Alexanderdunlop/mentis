@@ -1,5 +1,8 @@
 import { useRef, useEffect, type KeyboardEvent } from "react";
-import type { MentionOption, MentionData } from "../types/MentionInput.types";
+import type {
+  MentionOption,
+  MentionInputProps,
+} from "../types/MentionInput.types";
 import { insertMentionIntoDOM } from "../utils/insertMentionIntoDOM";
 import { extractMentionData } from "../utils/extractMentionData";
 import { removeTriggerAndQuery } from "../utils/removeTriggerAndQuery";
@@ -15,8 +18,7 @@ type UseContentEditableMentionProps = {
   trigger: string;
   autoConvertMentions: boolean;
   chipClassName: string;
-  onChange?: (value: MentionData) => void;
-};
+} & Pick<MentionInputProps, "onChange" | "onKeyDown">;
 
 export function useContentEditableMention({
   options,
@@ -26,6 +28,7 @@ export function useContentEditableMention({
   autoConvertMentions,
   chipClassName,
   onChange,
+  onKeyDown,
 }: UseContentEditableMentionProps) {
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -121,9 +124,12 @@ export function useContentEditableMention({
         const selectedOption = getSelectedOption();
         if (selectedOption) {
           handleSelect(selectedOption);
+          return;
         }
       }
     }
+
+    onKeyDown?.(e);
   };
 
   const handleSelect = (option: MentionOption): void => {

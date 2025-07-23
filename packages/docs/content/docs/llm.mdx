@@ -108,6 +108,7 @@ type MentionInputProps = {
   trigger?: string;
   autoConvertMentions?: boolean;
   onChange?: (value: MentionData) => void;
+  onKeyDown?: (event: KeyboardEvent) => void;
 };
 
 type SlotProps = Partial<{
@@ -206,6 +207,13 @@ Comprehensive event handling for:
 - Paste events with mention processing
 - Click outside to close modal
 - Auto-conversion on space/enter
+- Custom keyboard events via `onKeyDown` prop
+
+**Keyboard Event Handling:**
+
+- When the mention modal is open, Enter, Tab, Escape, and arrow keys are handled internally for navigation and selection
+- The `onKeyDown` prop allows custom keyboard event handling for form submission, shortcuts, and other interactions
+- The component's internal handling (navigation, selection) takes precedence over custom handlers
 
 ### Function Value Handling
 
@@ -285,6 +293,34 @@ When an option with a function value is selected:
 />
 ```
 
+### Custom Keyboard Handling
+
+```tsx
+<MentionInput
+  options={options}
+  onKeyDown={(event) => {
+    // Handle form submission with Enter
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSubmit();
+    }
+
+    // Custom keyboard shortcuts
+    if (event.ctrlKey && event.key === "s") {
+      event.preventDefault();
+      saveContent();
+    }
+  }}
+/>
+```
+
+**Key Points:**
+
+- The component's internal handling (navigation, selection) takes precedence over custom handlers
+- When modal is open: Enter, Tab, Escape, Arrow keys are handled by the component
+- When modal is closed: All keys trigger your custom handler
+- Useful for form submission, keyboard shortcuts, and custom interactions
+
 ## Advanced Features
 
 ### Performance Considerations
@@ -309,4 +345,4 @@ When an option with a function value is selected:
 
 This library represents a modern, well-architected solution for mention functionality that prioritizes accessibility, customization, and developer experience with support for both traditional mentions and dynamic function execution.
 
-Updated 2025-07-22 - v0.1.1-alpha.12
+Updated 2025-07-23 - v0.2.0-alpha.2

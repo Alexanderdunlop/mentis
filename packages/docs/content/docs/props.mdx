@@ -7,15 +7,16 @@ import { MentisDemo } from "@/components";
 
 ## Props
 
-| Name                | Type                         | Required | Description                                                                                            |
-| ------------------- | ---------------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
-| value               | string                       | No       | The current value of the input.                                                                        |
-| options             | MentionOption[]              | Yes      | Array of mentionable options. See [Options](./options) for more.                                       |
-| slotsProps          | SlotProps                    | No       | Customization for internal component slots (see below).                                                |
-| keepTriggerOnSelect | boolean                      | No       | Whether to keep the trigger character (e.g. '@') when an option is selected. Defaults to true.         |
-| trigger             | string                       | No       | The character or string that triggers the mention dropdown. Defaults to '@'.                           |
-| autoConvertMentions | boolean                      | No       | Whether to automatically convert text mentions to chips when typing space or enter. Defaults to false. |
-| onChange            | (value: MentionData) => void | No       | Callback fired when the input value changes with structured mention data.                              |
+| Name                | Type                           | Required | Description                                                                                                                           |
+| ------------------- | ------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| value               | string                         | No       | The current value of the input.                                                                                                       |
+| options             | MentionOption[]                | Yes      | Array of mentionable options. See [Options](./options) for more.                                                                      |
+| slotsProps          | SlotProps                      | No       | Customization for internal component slots (see below).                                                                               |
+| keepTriggerOnSelect | boolean                        | No       | Whether to keep the trigger character (e.g. '@') when an option is selected. Defaults to true.                                        |
+| trigger             | string                         | No       | The character or string that triggers the mention dropdown. Defaults to '@'.                                                          |
+| autoConvertMentions | boolean                        | No       | Whether to automatically convert text mentions to chips when typing space or enter. Defaults to false.                                |
+| onChange            | (value: MentionData) => void   | No       | Callback fired when the input value changes with structured mention data.                                                             |
+| onKeyDown           | (event: KeyboardEvent) => void | No       | Callback fired when a key is pressed. Note: Some keys (Enter, Tab, Escape, Arrow keys) are handled internally when the modal is open. |
 
 ### MentionOption
 
@@ -120,6 +121,98 @@ When `true`, the component will automatically convert text mentions to chips whe
 - This feature works independently of the paste functionality, which has its own mention parsing
 
 **⚠️ Performance Warning:** This feature is not enabled by default as it requires additional performance testing in production environments. The automatic conversion process runs on every space/enter key press and may impact performance with large option lists or frequent typing.
+
+---
+
+### `onKeyDown`
+
+The `onKeyDown` prop allows you to handle keyboard events in the MentionInput. This is useful for implementing custom keyboard shortcuts, form submission, or other keyboard-based interactions.
+
+**Important:** When the mention modal is open, certain keys are handled internally by the component and won't trigger your `onKeyDown` callback:
+
+- `Enter` and `Tab` - Used for selecting options
+- `Escape` - Used for closing the modal
+- `ArrowUp` and `ArrowDown` - Used for navigation
+
+```tsx
+<MentionInput
+  onKeyDown={(event) => {
+    // Handle custom keyboard shortcuts
+    if (event.ctrlKey && event.key === "s") {
+      event.preventDefault();
+      saveContent();
+    }
+  }}
+/>
+```
+
+#### Form Submission Example
+
+Here's how to handle form submission when the user presses Enter (but only when the modal is closed):
+
+```tsx
+import { useState } from "react";
+import { MentionInput } from "@mentis/react";
+
+function ChatForm() {
+  const [value, setValue] = useState("");
+
+  const handleSubmit = async () => {
+    console.log("submit");
+    setValue("");
+  };
+
+  return (
+    <form onSubmit={(e) => e.preventDefault()}>
+      <MentionInput
+        value={value}
+        onChange={setValue}
+        onKeyDown={(event) => {
+          // Handle Enter key for form submission
+          if (event.key === "Enter") {
+            event.preventDefault();
+            handleSubmit();
+          }
+        }}
+        options={[
+          { label: "Alice", value: "alice" },
+          { label: "Bob", value: "bob" },
+          { label: "Charlie", value: "charlie" },
+        ]}
+      />
+    </form>
+  );
+}
+```
+
+In this example:
+
+- The `onKeyDown` handler checks if the Enter key was pressed
+- The component automatically handles Enter for mention selection when the modal is open
+- When the modal is closed, Enter will trigger the form submission
+- The component's internal handling takes precedence over custom handlers
+
+#### Keyboard Shortcuts Example
+
+You can also implement custom keyboard shortcuts:
+
+```tsx
+<MentionInput
+  onKeyDown={(event) => {
+    // Ctrl/Cmd + Enter to submit
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      event.preventDefault();
+      handleSubmit();
+    }
+
+    // Ctrl/Cmd + K to focus
+    if ((event.ctrlKey || event.metaKey) && event.key === "k") {
+      event.preventDefault();
+      inputRef.current?.focus();
+    }
+  }}
+/>
+```
 
 ---
 
