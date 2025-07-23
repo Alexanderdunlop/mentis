@@ -33,7 +33,7 @@ export default function Chat() {
               className: "fixed bottom-0 w-full mb-8 max-w-md",
             },
             contentEditable: {
-              // "data-placeholder": "Say something...",
+              "data-placeholder": "Say something...",
             },
           }}
           options={[
@@ -42,9 +42,8 @@ export default function Chat() {
               value: "john-doe",
             },
           ]}
-          // defaultValue={input}
-          onChange={(e) => setInput(e.rawText)}
-          // placeholder="Say something..."
+          value={input}
+          onChange={(e) => setInput(e.value)}
         />
       </form>
     </div>
