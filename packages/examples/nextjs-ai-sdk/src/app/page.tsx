@@ -21,8 +21,8 @@ export default function Chat() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-
       append({ role: "user", content: input });
+      setInput("");
     }
   };
 
@@ -44,6 +44,9 @@ export default function Chat() {
         slotsProps={{
           container: {
             className: "fixed bottom-0 w-full mb-8 max-w-md",
+          },
+          modal: {
+            className: "max-w-md",
           },
           contentEditable: {
             "data-placeholder":

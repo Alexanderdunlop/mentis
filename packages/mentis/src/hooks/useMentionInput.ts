@@ -35,7 +35,7 @@ export function useMentionInput({
   onMentionDetection,
 }: UseMentionInputProps) {
   useEffect(() => {
-    if (value && editorRef.current && editorRef.current.textContent !== value) {
+    if (editorRef.current && editorRef.current.textContent !== value) {
       editorRef.current.textContent = value;
     }
   }, [value, editorRef]);

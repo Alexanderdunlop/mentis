@@ -40,6 +40,20 @@ describe("Input props", () => {
     expect(editorElement).toHaveTextContent("Hello @john, how are you?");
   });
 
+  test("Component should update when value prop changes to empty string", () => {
+    const { rerender } = render(
+      <MentionInput options={options} value="Initial text" />
+    );
+
+    let editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("Initial text");
+
+    // Update to empty string
+    rerender(<MentionInput options={options} value="" />);
+    editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("");
+  });
+
   test("onChange should work", async () => {
     const mockOnChange = vi.fn();
     render(<MentionInput options={[]} onChange={mockOnChange} />);

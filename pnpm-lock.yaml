@@ -133,8 +133,8 @@ importers:
         specifier: ^4.3.19
         version: 4.3.19(react@19.1.0)(zod@4.0.5)
       mentis:
-        specifier: 0.2.0-alpha.2
-        version: 0.2.0-alpha.2(react@19.1.0)
+        specifier: 0.2.0-alpha.3
+        version: 0.2.0-alpha.3(react@19.1.0)
       next:
         specifier: 15.4.3
         version: 15.4.3(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -3329,6 +3329,11 @@ packages:
 
   mentis@0.2.0-alpha.2:
     resolution: {integrity: sha512-xadZjo3MD/jjfzci7XvT9GyGDK7OGVS06hP601DGCr5LYIJ68y4iFgNbRbZdFTgVlMeaBpcpXUs1todI+LQE7Q==}
+    peerDependencies:
+      react: '>=18.2.0 || ^19.0.0-0'
+
+  mentis@0.2.0-alpha.3:
+    resolution: {integrity: sha512-j84Bz9lXxwtQl7SZ54NJnzknuv1ztCUahiXr1F5g61VDvBkuONcvJ23z6ACw56JgXQk4IcZbFeaQbYhHsOXxKw==}
     peerDependencies:
       react: '>=18.2.0 || ^19.0.0-0'
 
@@ -7874,6 +7879,10 @@ snapshots:
       react: 19.1.0
 
   mentis@0.2.0-alpha.2(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+
+  mentis@0.2.0-alpha.3(react@19.1.0):
     dependencies:
       react: 19.1.0
 
