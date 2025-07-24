@@ -1,19 +1,33 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { MentionInput } from "mentis";
+import { MentionInput, MentionOption } from "mentis";
 import "mentis/dist/index.css";
+
+const options: MentionOption[] = [
+  {
+    label: "Translate to 🇪🇸",
+    value: "translate-to-spanish",
+  },
+  {
+    label: "Create a 🎭",
+    value: "create-story-about",
+  },
+];
 
 export default function Chat() {
   const { messages, input, setInput, append } = useChat();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    append({ role: "user", content: input });
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+
+      append({ role: "user", content: input });
+    }
   };
 
   return (
-    <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+    <div className="flex flex-col w-full max-w-lg py-24 mx-auto stretch">
       {messages.map((message) => (
         <div key={message.id} className="whitespace-pre-wrap">
           {message.role === "user" ? "User: " : "AI: "}
@@ -26,26 +40,21 @@ export default function Chat() {
         </div>
       ))}
 
-      <form onSubmit={handleSubmit}>
-        <MentionInput
-          slotsProps={{
-            container: {
-              className: "fixed bottom-0 w-full mb-8 max-w-md",
-            },
-            contentEditable: {
-              "data-placeholder": "Say something...",
-            },
-          }}
-          options={[
-            {
-              label: "John Doe",
-              value: "john-doe",
-            },
-          ]}
-          value={input}
-          onChange={(e) => setInput(e.value)}
-        />
-      </form>
+      <MentionInput
+        slotsProps={{
+          container: {
+            className: "fixed bottom-0 w-full mb-8 max-w-md",
+          },
+          contentEditable: {
+            "data-placeholder":
+              "Type @ to see AI commands, then say something...",
+          },
+        }}
+        options={options}
+        value={input}
+        onChange={(e) => setInput(e.value)}
+        onKeyDown={handleKeyDown}
+      />
     </div>
   );
 }

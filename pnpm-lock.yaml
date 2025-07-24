@@ -27,8 +27,8 @@ importers:
         specifier: ^0.525.0
         version: 0.525.0(react@19.1.0)
       mentis:
-        specifier: 0.1.1-alpha.11
-        version: 0.1.1-alpha.11(react@19.1.0)
+        specifier: 0.2.0-alpha.2
+        version: 0.2.0-alpha.2(react@19.1.0)
       next:
         specifier: 15.3.4
         version: 15.3.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -133,8 +133,8 @@ importers:
         specifier: ^4.3.19
         version: 4.3.19(react@19.1.0)(zod@4.0.5)
       mentis:
-        specifier: 0.2.0-alpha.1
-        version: 0.2.0-alpha.1(react@19.1.0)
+        specifier: 0.2.0-alpha.2
+        version: 0.2.0-alpha.2(react@19.1.0)
       next:
         specifier: 15.4.3
         version: 15.4.3(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -3322,18 +3322,8 @@ packages:
   mdast-util-to-string@4.0.0:
     resolution: {integrity: sha512-0H44vDimn51F0YwvxSJSm0eCDOJTRlmN0R1yBh4HLj9wiV1Dn0QoXGbvFAWj2hSItVTlCmBF1hqKlIyUBVFLPg==}
 
-  mentis@0.1.1-alpha.11:
-    resolution: {integrity: sha512-Vcwef/0/L7XFqn4mLoJAN6EDKPOwj+4+ZKpc2P/YGJo44hsVQ6PtMNxoUoyiVJD4Rx6MrPNi6jhwN659ArUhUA==}
-    peerDependencies:
-      react: '>=18.2.0 || ^19.0.0-0'
-
   mentis@0.1.1-alpha.4:
     resolution: {integrity: sha512-bNrgEhLOv8N6CARBTdGVfRdnt5JuqDs1W4N7YgCkPMHvgj7ypFesELwqRmgN7dXc0BCjrm0EQsgQsCLbsLkf+Q==}
-    peerDependencies:
-      react: '>=18.2.0 || ^19.0.0-0'
-
-  mentis@0.2.0-alpha.1:
-    resolution: {integrity: sha512-Wd/DlEPqwMJndy0hPXQu4qmNJYgl65zA/8CuK+6iInjoopvuzvh+L5gE8V0xz7SsaBR770gDzIP80UI/MEx2rg==}
     peerDependencies:
       react: '>=18.2.0 || ^19.0.0-0'
 
@@ -7879,15 +7869,7 @@ snapshots:
     dependencies:
       '@types/mdast': 4.0.4
 
-  mentis@0.1.1-alpha.11(react@19.1.0):
-    dependencies:
-      react: 19.1.0
-
   mentis@0.1.1-alpha.4(react@19.1.0):
-    dependencies:
-      react: 19.1.0
-
-  mentis@0.2.0-alpha.1(react@19.1.0):
     dependencies:
       react: 19.1.0
 

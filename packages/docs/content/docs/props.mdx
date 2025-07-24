@@ -77,10 +77,10 @@ type SlotProps = Partial<{
 If `true` (default), the trigger character (such as `@`) will be kept in the input when an option is selected. If `false`, the trigger character will be removed before the selected label.
 
 ```tsx
-<MentionInput keepTriggerOnSelect ... />
+<MentionInput keepTriggerOnSelect={false} ... />
 ```
 
-<MentisDemo keepTriggerOnSelect />
+<MentisDemo keepTriggerOnSelect={false} />
 
 ---
 
@@ -140,11 +140,13 @@ The `onKeyDown` prop allows you to handle keyboard events in the MentionInput. T
     // Handle custom keyboard shortcuts
     if (event.ctrlKey && event.key === "s") {
       event.preventDefault();
-      saveContent();
+      alert("Ctrl + S");
     }
   }}
 />
 ```
+
+<MentisDemo isKeyboardDemo />
 
 #### Form Submission Example
 

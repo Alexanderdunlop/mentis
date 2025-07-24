@@ -3,6 +3,8 @@ title: Options
 description: How to structure and use the options prop for mentions.
 ---
 
+import { MentisDemo } from "@/components";
+
 The `options` prop is an array of objects that define the available mention targets. Each option must have a `label` (displayed in the modal) and a `value` (unique identifier).
 
 ### Example
@@ -25,7 +27,7 @@ const options: MentionOption[] = [
 You can also use functions as values for options. When a function is provided as the `value`, it will be called when the option is selected instead of inserting the mention into the input:
 
 ```tsx
-import { type MentionOption } from "mentis";
+import { type MentionOption, MentionInput } from "mentis";
 
 const options: MentionOption[] = [
   { label: "Alice", value: "alice" },
@@ -34,11 +36,14 @@ const options: MentionOption[] = [
   {
     label: "Custom Action",
     value: () => {
-      console.log("Custom action triggered!");
       alert("Custom action executed!");
     },
   },
 ];
+
+<MentionInput options={options} />;
 ```
+
+<MentisDemo isFunctionOptionDemo />
 
 In this example, selecting "Custom Action" will trigger the function instead of inserting a mention chip into the input. The trigger character and any text typed after it will be automatically removed from the input.

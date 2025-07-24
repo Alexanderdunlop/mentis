@@ -1,9 +1,8 @@
-import { MentisDemoClient } from "./MentisDemoClient";
+import { MentisDemoClient, MentisDemoProps } from "./MentisDemoClient";
 import { DemoFallback } from "./DemoFallback";
 import { Suspense } from "react";
-import type { MentionInputProps } from "mentis";
 
-export function MentisDemo(props: Partial<MentionInputProps>) {
+export function MentisDemo(props: MentisDemoProps) {
   return (
     <Suspense fallback={<DemoFallback />}>
       <MentisDemoClient {...props} />

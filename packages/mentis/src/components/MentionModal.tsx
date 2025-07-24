@@ -1,5 +1,6 @@
 import React from "react";
 import type { MentionInputProps } from "../types/MentionInput.types";
+import { cn } from "../utils/cn";
 import { getOptionClassName } from "../utils/getOptionClassName";
 
 type MentionModalProps = {
@@ -18,8 +19,8 @@ export const MentionModal: React.FC<MentionModalProps> = ({
   handleSelect,
 }) => (
   <div
-    className="mention-modal"
     {...slotsProps?.modal}
+    className={cn("mention-modal", slotsProps?.modal?.className)}
     id="mention-modal"
     role="listbox"
     style={{
