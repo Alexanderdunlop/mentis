@@ -1,5 +1,5 @@
-import React from "react";
-import { MentionInput, type MentionOption } from "../../dist/index.js";
+import React, { useState } from "react";
+import { MentionInput, type MentionOption } from "../../src/index.js";
 import "../../dist/index.css";
 import "./style.css";
 
@@ -10,12 +10,19 @@ const options: MentionOption[] = [
 ];
 
 export function App() {
+  const [dataValue, setDataValue] = useState("2");
+
+  const handleClear = () => {
+    setDataValue("");
+  };
+
   return (
     <>
       <div style={{ width: "300px", height: "200px", overflowY: "auto" }}>
         <MentionInput
           data-placeholder="Say something..."
-          value={""}
+          dataValue={dataValue}
+          onChange={(value) => setDataValue(value.dataValue)}
           options={options}
           slotsProps={{
             contentEditable: {
@@ -23,6 +30,7 @@ export function App() {
             },
           }}
         />
+        <button onClick={handleClear}>Clear</button>
       </div>
     </>
   );

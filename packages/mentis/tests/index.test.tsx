@@ -110,7 +110,7 @@ describe("Chips", () => {
 
     // Check that the onChange was called with a space after the mention
     expect(mockOnChange).toHaveBeenLastCalledWith({
-      value: "@John Doe ",
+      displayValue: "@John Doe ",
       dataValue: "john ",
       mentions: [
         {
@@ -170,7 +170,7 @@ describe("Chips", () => {
       editorElement.querySelector(".mention-chip")
     ).not.toBeInTheDocument();
     expect(mockOnChange).toHaveBeenCalledWith({
-      value: "@John DoeX",
+      displayValue: "@John DoeX",
       dataValue: "@John DoeX",
       mentions: [],
     });

@@ -43,6 +43,7 @@
 - 📋 **Advanced Paste Handling** - Intelligent mention parsing from pasted content
 - 🔄 **Auto-Conversion** - Optional automatic conversion of text mentions to chips
 - ⌨️ **Custom Keyboard Handling** - Support for custom keyboard events and form submission
+- 💾 **Data Value Support** - Programmatic mention reconstruction from data values
 
 ## Quick Start
 
@@ -55,13 +56,13 @@ import { MentionInput } from "mentis";
 import "mentis/dist/index.css";
 
 function App() {
-  const [value, setValue] = useState("");
+  const [dataValue, setDataValue] = useState("");
 
   return (
     <MentionInput
-      value={value}
+      dataValue={dataValue}
       onChange={(mentionData) => {
-        setValue(mentionData.value);
+        setDataValue(mentionData.dataValue);
       }}
       options={[
         { label: "Alice Johnson", value: "alice" },
@@ -251,7 +252,8 @@ function KeyboardShortcutsExample() {
 | Prop                  | Type                             | Default | Description                                           |
 | --------------------- | -------------------------------- | ------- | ----------------------------------------------------- |
 | `options`             | `MentionOption[]`                | -       | Array of mention options                              |
-| `value`               | `string`                         | `""`    | Current value of the input                            |
+| `displayValue`        | `string`                         | `""`    | Current display value of the input (what user sees)   |
+| `dataValue`           | `string`                         | -       | Data value for programmatic control (mention IDs)     |
 | `onChange`            | `(value: MentionData) => void`   | -       | Callback when value changes with mention data         |
 | `trigger`             | `string`                         | `"@"`   | Character(s) that trigger the mention dropdown        |
 | `keepTriggerOnSelect` | `boolean`                        | `true`  | Whether to keep the trigger character after selection |
@@ -272,7 +274,7 @@ type MentionOption = {
 
 ```tsx
 type MentionData = {
-  value: string; // Text as displayed to user (with mention labels)
+  displayValue: string; // Text as displayed to user (with mention labels)
   dataValue: string; // Text with mention values (actual data)
   mentions: Array<{
     label: string; // Display text of the mention
@@ -316,6 +318,28 @@ The `onKeyDown` prop allows you to handle custom keyboard events:
 **Note**: When the mention modal is open, Enter, Tab, Escape, and arrow keys are handled internally for navigation and selection.
 
 ## Advanced Features
+
+### DataValue Control
+
+The `dataValue` prop enables powerful programmatic control over mention content:
+
+- **Setting Content**: Pass `dataValue="alice bob"` to programmatically load mentions
+- **Clean Data Extraction**: `onChange` provides clean data values (IDs) separate from display text
+- **Mention Reconstruction**: Automatically converts data values back to visual mentions
+- **AI Integration**: Perfect for sending clean data to APIs while showing rich UI to users
+- **Editing Support**: Load existing content with mentions for editing workflows
+
+```tsx
+// Set mentions programmatically
+setDataValue("user-123 user-456"); // Shows "@John Doe @Jane Smith"
+
+// Get clean data for APIs
+onChange={(data) => {
+  console.log(data.displayValue); // "@John Doe hello @Jane Smith"
+  console.log(data.dataValue);    // "user-123 hello user-456"
+  sendToAPI(data.dataValue);      // Send clean data to backend
+}}
+```
 
 ### Function Values
 

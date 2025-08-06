@@ -7,7 +7,7 @@ export type MentionOption = {
 };
 
 export type MentionData = {
-  value: string;
+  displayValue: string;
   dataValue: string;
   mentions: Array<{
     label: string;
@@ -18,7 +18,8 @@ export type MentionData = {
 };
 
 export type MentionInputProps = {
-  value?: string;
+  displayValue?: string;
+  dataValue?: string;
   options: MentionOption[];
   slotsProps?: SlotProps;
   keepTriggerOnSelect?: boolean;

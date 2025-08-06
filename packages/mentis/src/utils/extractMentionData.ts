@@ -2,7 +2,7 @@ import type { MentionData } from "../types/MentionInput.types";
 
 export const extractMentionData = (element: HTMLElement): MentionData => {
   const mentions: MentionData["mentions"] = [];
-  let value = "";
+  let displayValue = "";
   let dataValue = "";
   let currentIndex = 0;
 
@@ -10,7 +10,7 @@ export const extractMentionData = (element: HTMLElement): MentionData => {
   const walkNodes = (node: Node) => {
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || "";
-      value += textContent;
+      displayValue += textContent;
       dataValue += textContent;
       currentIndex += textContent.length;
     } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -28,8 +28,8 @@ export const extractMentionData = (element: HTMLElement): MentionData => {
           endIndex: startIndex + chipText.length,
         });
 
-        // value shows the label (what user sees)
-        value += chipText;
+        // displayValue shows the label (what user sees)
+        displayValue += chipText;
         // dataValue shows the value (actual data)
         dataValue += element.dataset.value;
         currentIndex += chipText.length;
@@ -48,7 +48,7 @@ export const extractMentionData = (element: HTMLElement): MentionData => {
   }
 
   return {
-    value,
+    displayValue,
     dataValue,
     mentions,
   };

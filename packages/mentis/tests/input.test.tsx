@@ -13,7 +13,7 @@ const options: MentionOption[] = [
 describe("Input props", () => {
   test("Value should be displayed", () => {
     const value = "Hello @john, how are you?";
-    render(<MentionInput options={options} value={value} />);
+    render(<MentionInput options={options} displayValue={value} />);
 
     const editorElement = screen.getByRole("combobox");
     expect(editorElement).toHaveTextContent(value);
@@ -21,23 +21,37 @@ describe("Input props", () => {
 
   test("Component should update when value prop changes", () => {
     const { rerender } = render(
-      <MentionInput options={options} value="Initial text" />
+      <MentionInput options={options} displayValue="Initial text" />
     );
 
     let editorElement = screen.getByRole("combobox");
     expect(editorElement).toHaveTextContent("Initial text");
 
     // Update the value prop
-    rerender(<MentionInput options={options} value="Updated text" />);
+    rerender(<MentionInput options={options} displayValue="Updated text" />);
     editorElement = screen.getByRole("combobox");
     expect(editorElement).toHaveTextContent("Updated text");
 
     // Update to a value with mentions
     rerender(
-      <MentionInput options={options} value="Hello @john, how are you?" />
+      <MentionInput options={options} displayValue="Hello @john, how are you?" />
     );
     editorElement = screen.getByRole("combobox");
     expect(editorElement).toHaveTextContent("Hello @john, how are you?");
+  });
+
+  test("Component should update when value prop changes to empty string", () => {
+    const { rerender } = render(
+      <MentionInput options={options} displayValue="Initial text" />
+    );
+
+    let editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("Initial text");
+
+    // Update to empty string
+    rerender(<MentionInput options={options} displayValue="" />);
+    editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("");
   });
 
   test("onChange should work", async () => {
@@ -50,7 +64,7 @@ describe("Input props", () => {
     await user.type(editorElement, "Hello world");
 
     expect(mockOnChange).toHaveBeenCalledWith({
-      value: "Hello world",
+      displayValue: "Hello world",
       dataValue: "Hello world",
       mentions: [],
     });
@@ -77,7 +91,7 @@ describe("Input props", () => {
 
     expect(mockOnChange).toHaveBeenCalledTimes(4);
     expect(mockOnChange).toHaveBeenLastCalledWith({
-      value: "@John Doe ",
+      displayValue: "@John Doe ",
       dataValue: "john ",
       mentions: [
         { label: "John Doe", value: "john", startIndex: 0, endIndex: 9 },
