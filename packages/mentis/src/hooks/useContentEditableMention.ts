@@ -13,7 +13,8 @@ import { useMentionFocus } from "./useMentionFocus";
 
 type UseContentEditableMentionProps = {
   options: MentionOption[];
-  value: string;
+  displayValue: string;
+  dataValue?: string;
   keepTriggerOnSelect: boolean;
   trigger: string;
   autoConvertMentions: boolean;
@@ -22,7 +23,8 @@ type UseContentEditableMentionProps = {
 
 export function useContentEditableMention({
   options,
-  value,
+  displayValue,
+  dataValue,
   keepTriggerOnSelect,
   trigger,
   autoConvertMentions,
@@ -71,7 +73,8 @@ export function useContentEditableMention({
     keepTriggerOnSelect,
     autoConvertMentions,
     chipClassName,
-    value,
+    displayValue,
+    dataValue,
     onChange,
     onMentionDetection: (detection) => {
       if (!detection.isActive) {

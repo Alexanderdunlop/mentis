@@ -6,6 +6,7 @@ import { detectMentionTrigger } from "../utils/detectMentionTrigger";
 import { convertTextToChips } from "../utils/convertTextToChips";
 import { extractMentionData } from "../utils/extractMentionData";
 import { filterOutOptionFunctions } from "../utils/filterOutOptionFunctions";
+import { reconstructFromDataValue } from "../utils/reconstructFromDataValue";
 
 type UseMentionInputProps = {
   editorRef: React.RefObject<HTMLDivElement | null>;
@@ -14,7 +15,8 @@ type UseMentionInputProps = {
   keepTriggerOnSelect: boolean;
   autoConvertMentions: boolean;
   chipClassName: string;
-  value: string;
+  displayValue: string;
+  dataValue?: string;
   onChange?: (value: MentionData) => void;
   onMentionDetection: (detection: {
     isActive: boolean;
@@ -30,15 +32,54 @@ export function useMentionInput({
   keepTriggerOnSelect,
   autoConvertMentions,
   chipClassName,
-  value,
+  displayValue,
+  dataValue,
   onChange,
   onMentionDetection,
 }: UseMentionInputProps) {
   useEffect(() => {
-    if (editorRef.current && editorRef.current.textContent !== value) {
-      editorRef.current.textContent = value;
+    if (editorRef.current) {
+      // Prioritize dataValue reconstruction over plain value
+      if (dataValue !== undefined) {
+        const currentData = extractMentionData(editorRef.current);
+        if (currentData.dataValue !== dataValue) {
+          if (dataValue === "") {
+            // Clear all content including mention chips
+            editorRef.current.innerHTML = "";
+          } else {
+            // Reconstruct content from dataValue
+            const reconstructedHTML = reconstructFromDataValue({
+              dataValue,
+              options,
+              trigger,
+              keepTriggerOnSelect,
+              chipClassName,
+            });
+            editorRef.current.innerHTML = reconstructedHTML;
+          }
+        }
+      } else if (displayValue !== undefined) {
+        const currentText = getTextContent(editorRef.current);
+        if (currentText !== displayValue) {
+          if (displayValue === "") {
+            // Clear all content including mention chips
+            editorRef.current.innerHTML = "";
+          } else {
+            // Update text content
+            editorRef.current.textContent = displayValue;
+          }
+        }
+      }
     }
-  }, [value, editorRef]);
+  }, [
+    displayValue,
+    dataValue,
+    options,
+    trigger,
+    keepTriggerOnSelect,
+    chipClassName,
+    editorRef,
+  ]);
 
   const handleChipInput = (chip: Element): void => {
     if (!editorRef.current) return;

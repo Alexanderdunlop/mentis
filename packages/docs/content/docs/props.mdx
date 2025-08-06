@@ -9,7 +9,8 @@ import { MentisDemo } from "@/components";
 
 | Name                | Type                           | Required | Description                                                                                                                           |
 | ------------------- | ------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| value               | string                         | No       | The current value of the input.                                                                                                       |
+| displayValue        | string                         | No       | The current display value of the input (what user sees).                                                                              |
+| dataValue           | string                         | No       | Data value for programmatic control (mention IDs). When provided, reconstructs mentions from data values.                             |
 | options             | MentionOption[]                | Yes      | Array of mentionable options. See [Options](./options) for more.                                                                      |
 | slotsProps          | SlotProps                      | No       | Customization for internal component slots (see below).                                                                               |
 | keepTriggerOnSelect | boolean                        | No       | Whether to keep the trigger character (e.g. '@') when an option is selected. Defaults to true.                                        |

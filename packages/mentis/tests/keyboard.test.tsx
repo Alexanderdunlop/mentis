@@ -195,7 +195,7 @@ describe("Keyboard functionality", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@John Doe");
     expect(mockOnChange).toHaveBeenLastCalledWith({
-      value: "@John Doe ",
+      displayValue: "@John Doe ",
       dataValue: "john ",
       mentions: [
         {
@@ -232,7 +232,7 @@ describe("Keyboard functionality", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@Jane Smith");
     expect(mockOnChange).toHaveBeenLastCalledWith({
-      value: "@Jane Smith ",
+      displayValue: "@Jane Smith ",
       dataValue: "jane ",
       mentions: [
         {
@@ -268,7 +268,7 @@ describe("Keyboard functionality", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(editorElement).toHaveTextContent("@");
     expect(mockOnChange).toHaveBeenCalledWith({
-      value: "@",
+      displayValue: "@",
       dataValue: "@",
       mentions: [],
     });

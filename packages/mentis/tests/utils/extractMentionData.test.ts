@@ -9,7 +9,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "Hello world",
+      displayValue: "Hello world",
       dataValue: "Hello world",
       mentions: [],
     });
@@ -27,7 +27,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "@John Doe",
+      displayValue: "@John Doe",
       dataValue: "john",
       mentions: [
         {
@@ -62,7 +62,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "@John Doe and @Jane Smith",
+      displayValue: "@John Doe and @Jane Smith",
       dataValue: "john and jane",
       mentions: [
         {
@@ -98,7 +98,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "Hello @John Doe, how are you?",
+      displayValue: "Hello @John Doe, how are you?",
       dataValue: "Hello john, how are you?",
       mentions: [
         {
@@ -132,7 +132,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "Hello @John Doe!",
+      displayValue: "Hello @John Doe!",
       dataValue: "Hello john!",
       mentions: [
         {
@@ -163,7 +163,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "Hello@John Doe",
+      displayValue: "Hello@John Doe",
       dataValue: "Hellojohn",
       mentions: [
         {
@@ -182,7 +182,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "",
+      displayValue: "",
       dataValue: "",
       mentions: [],
     });
@@ -195,7 +195,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "   \n\t  ",
+      displayValue: "   \n\t  ",
       dataValue: "   \n\t  ",
       mentions: [],
     });
@@ -213,7 +213,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "",
+      displayValue: "",
       dataValue: "john",
       mentions: [
         {
@@ -257,7 +257,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "Hello @John Doe and @Jane Smith!",
+      displayValue: "Hello @John Doe and @Jane Smith!",
       dataValue: "Hello john and jane!",
       mentions: [
         {
@@ -298,7 +298,7 @@ describe("extractMentionData", () => {
     const result = extractMentionData(element);
 
     expect(result).toEqual({
-      value: "#John Doe and !Jane Smith",
+      displayValue: "#John Doe and !Jane Smith",
       dataValue: "john and jane",
       mentions: [
         {

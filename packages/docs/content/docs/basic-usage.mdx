@@ -9,10 +9,10 @@ import { MentionInput, type MentionData } from "mentis";
 import "mentis/dist/index.css";
 
 function App() {
-  const [value, setValue] = useState<string>("");
+  const [dataValue, setDataValue] = useState<string>("");
 
   const handleChange = (newValue: MentionData) => {
-    setValue(newValue.value);
+    setDataValue(newValue.dataValue);
   };
 
   return (
@@ -22,7 +22,7 @@ function App() {
         { label: "Bob", value: "bob" },
         { label: "Charlie", value: "charlie" },
       ]}
-      value={value}
+      dataValue={dataValue}
       onChange={handleChange}
     />
   );
