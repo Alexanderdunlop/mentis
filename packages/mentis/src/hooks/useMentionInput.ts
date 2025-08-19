@@ -44,8 +44,9 @@ export function useMentionInput({
         const currentData = extractMentionData(editorRef.current);
         if (currentData.dataValue !== dataValue) {
           if (dataValue === "") {
-            // Clear all content including mention chips
+            // Clear all content including mention chips and ensure truly empty for CSS :empty
             editorRef.current.innerHTML = "";
+            editorRef.current.textContent = "";
           } else {
             // Reconstruct content from dataValue
             const reconstructedHTML = reconstructFromDataValue({
@@ -62,8 +63,9 @@ export function useMentionInput({
         const currentText = getTextContent(editorRef.current);
         if (currentText !== displayValue) {
           if (displayValue === "") {
-            // Clear all content including mention chips
+            // Clear all content including mention chips and ensure truly empty for CSS :empty
             editorRef.current.innerHTML = "";
+            editorRef.current.textContent = "";
           } else {
             // Update text content
             editorRef.current.textContent = displayValue;

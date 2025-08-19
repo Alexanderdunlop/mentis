@@ -15,6 +15,11 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   onChange,
   onKeyDown,
 }) => {
+  // Get the custom placeholder or fall back to default
+  const placeholder =
+    slotsProps?.contentEditable?.["data-placeholder"] ||
+    `Type ${trigger} to mention someone`;
+
   const {
     editorRef,
     showModal,
@@ -42,7 +47,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   return (
     <div className="mention-input-container" {...slotsProps?.container}>
       <div
-        data-placeholder={`Type ${trigger} to mention someone`}
+        data-placeholder={placeholder}
         role="combobox"
         aria-autocomplete="list"
         aria-expanded={showModal}
