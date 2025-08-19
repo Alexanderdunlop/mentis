@@ -9,6 +9,22 @@ type ParseMentionsInTextProps = {
   chipClassName: string;
 };
 
+// Helper function to add text with newlines converted to <br> elements
+const addTextWithNewlines = (
+  fragment: DocumentFragment,
+  text: string
+): void => {
+  const parts = text.split("\n");
+  for (let i = 0; i < parts.length; i++) {
+    if (i > 0) {
+      fragment.appendChild(document.createElement("br"));
+    }
+    if (parts[i]) {
+      fragment.appendChild(document.createTextNode(parts[i]));
+    }
+  }
+};
+
 export const parseMentionsInText = ({
   text,
   options,
@@ -71,44 +87,44 @@ export const parseMentionsInText = ({
     // Add text before the mention
     if (startIndex > lastIndex) {
       const beforeText = text.substring(lastIndex, startIndex);
-      fragment.appendChild(document.createTextNode(beforeText));
-    }
-
-    // Find matching option
-    const matchingOption = options.find(
-      (option) =>
-        option.label.toLowerCase() === mentionText.toLowerCase() ||
-        option.value.toLowerCase() === mentionText.toLowerCase()
-    );
-
-    if (matchingOption) {
-      // Create mention chip
-      const mentionElement = document.createElement("span");
-      mentionElement.className = chipClassName;
-      mentionElement.contentEditable = "true";
-      mentionElement.dataset.value = matchingOption.value;
-      mentionElement.dataset.label = matchingOption.label;
-      mentionElement.textContent = keepTriggerOnSelect
-        ? `${trigger}${matchingOption.label}`
-        : matchingOption.label;
-
-      fragment.appendChild(mentionElement);
-
-      const spaceNeeded = addSpaceIfNeeded({
-        text,
-        startIndex,
-        matchLength: match[0].length,
-      });
-
-      if (spaceNeeded) {
-        fragment.appendChild(document.createTextNode(" "));
-      }
+      addTextWithNewlines(fragment, beforeText);
     } else {
-      // If no matching option, keep as plain text
-      fragment.appendChild(document.createTextNode(match[0]));
-    }
+      // Find matching option
+      const matchingOption = options.find(
+        (option) =>
+          option.label.toLowerCase() === mentionText.toLowerCase() ||
+          option.value.toLowerCase() === mentionText.toLowerCase()
+      );
 
-    lastIndex = startIndex + match[0].length;
+      if (matchingOption) {
+        // Create mention chip
+        const mentionElement = document.createElement("span");
+        mentionElement.className = chipClassName;
+        mentionElement.contentEditable = "true";
+        mentionElement.dataset.value = matchingOption.value;
+        mentionElement.dataset.label = matchingOption.label;
+        mentionElement.textContent = keepTriggerOnSelect
+          ? `${trigger}${matchingOption.label}`
+          : matchingOption.label;
+
+        fragment.appendChild(mentionElement);
+
+        const spaceNeeded = addSpaceIfNeeded({
+          text,
+          startIndex,
+          matchLength: match[0].length,
+        });
+
+        if (spaceNeeded) {
+          fragment.appendChild(document.createTextNode(" "));
+        }
+      } else {
+        // If no matching option, keep as plain text
+        fragment.appendChild(document.createTextNode(match[0]));
+      }
+
+      lastIndex = startIndex + match[0].length;
+    }
   }
 
   // Add remaining text after the last mention
