@@ -34,7 +34,10 @@ describe("Input props", () => {
 
     // Update to a value with mentions
     rerender(
-      <MentionInput options={options} displayValue="Hello @john, how are you?" />
+      <MentionInput
+        options={options}
+        displayValue="Hello @john, how are you?"
+      />
     );
     editorElement = screen.getByRole("combobox");
     expect(editorElement).toHaveTextContent("Hello @john, how are you?");
@@ -151,5 +154,43 @@ describe("Input props", () => {
       "data-placeholder",
       customPlaceholder
     );
+  });
+
+  test("Placeholder should reappear after content is added and then removed", async () => {
+    const customPlaceholder = "Type your message here...";
+    const { rerender } = render(
+      <MentionInput
+        options={[]}
+        slotsProps={{
+          contentEditable: {
+            "data-placeholder": customPlaceholder,
+          },
+        }}
+      />
+    );
+
+    const user = userEvent.setup();
+    const editorElement = screen.getByRole("combobox");
+
+    // Add some content
+    await user.type(editorElement, "Hello world");
+    expect(editorElement).toHaveTextContent("Hello world");
+
+    // Clear the content by setting displayValue to empty string
+    rerender(
+      <MentionInput
+        options={[]}
+        displayValue=""
+        slotsProps={{
+          contentEditable: {
+            "data-placeholder": customPlaceholder,
+          },
+        }}
+      />
+    );
+
+    // Element should be empty and placeholder should be visible via CSS
+    expect(editorElement).toHaveTextContent("");
+    expect(editorElement.innerHTML).toBe("");
   });
 });
