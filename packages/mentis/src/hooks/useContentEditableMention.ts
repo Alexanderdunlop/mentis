@@ -120,7 +120,7 @@ export function useContentEditableMention({
       return;
     }
 
-    // Handle selection
+    // Handle selection when modal is open with options
     if (showModal && filteredOptions.length > 0) {
       if (key === "Enter" || key === "Tab") {
         e.preventDefault();

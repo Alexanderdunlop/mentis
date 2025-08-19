@@ -77,11 +77,17 @@ export const reconstructFromDataValue = ({
     }
   }
 
+  // Helper function to convert newlines to HTML
+  const convertNewlinesToHTML = (text: string): string => {
+    return text.replace(/\n/g, '<br>');
+  };
+
   // Build the HTML content
   for (const match of filteredMatches) {
     // Add any text before this mention
     if (match.index > currentIndex) {
-      result += dataValue.slice(currentIndex, match.index);
+      const textBeforeMention = dataValue.slice(currentIndex, match.index);
+      result += convertNewlinesToHTML(textBeforeMention);
     }
 
     // Add the mention chip
@@ -91,7 +97,7 @@ export const reconstructFromDataValue = ({
       result += `<span class="${chipClassName}" data-value="${match.value}" data-label="${currentLabel}" contenteditable="false">${chipContent}</span>`;
     } else {
       // If we can't find the option, just add the value as plain text
-      result += match.value;
+      result += convertNewlinesToHTML(match.value);
     }
 
     currentIndex = match.index + match.length;
@@ -99,7 +105,8 @@ export const reconstructFromDataValue = ({
 
   // Add any remaining text after the last mention
   if (currentIndex < dataValue.length) {
-    result += dataValue.slice(currentIndex);
+    const remainingText = dataValue.slice(currentIndex);
+    result += convertNewlinesToHTML(remainingText);
   }
 
   return result;
