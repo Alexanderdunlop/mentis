@@ -4,6 +4,44 @@ import { parseMentionsInText } from "../utils/parseMentionsInText";
 import { extractMentionData } from "../utils/extractMentionData";
 import { filterOutOptionFunctions } from "../utils/filterOutOptionFunctions";
 
+type CreateAndInsertFragmentProps = {
+  text: string;
+  options: MentionOption[];
+  trigger: string;
+  keepTriggerOnSelect: boolean;
+  chipClassName: string;
+  selection: Selection;
+  range: Range;
+};
+
+const splitTextIntoLines = (text: string): string[] => {
+  return text.split("\n");
+};
+
+const createAndInsertFragment = ({
+  text,
+  options,
+  trigger,
+  keepTriggerOnSelect,
+  chipClassName,
+  selection,
+  range,
+}: CreateAndInsertFragmentProps): DocumentFragment => {
+  const optionsWithoutFunctions = filterOutOptionFunctions(options);
+  const fragment = parseMentionsInText({
+    text,
+    options: optionsWithoutFunctions,
+    trigger,
+    keepTriggerOnSelect,
+    chipClassName,
+  });
+  range.insertNode(fragment);
+  range.collapse(false);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  return fragment;
+};
+
 type UseMentionPasteProps = {
   editorRef: React.RefObject<HTMLDivElement | null>;
   options: MentionOption[];
@@ -33,22 +71,19 @@ export function useMentionPaste({
     const range = selection.getRangeAt(0);
     range.deleteContents();
 
-    const optionsWithoutFunctions = filterOutOptionFunctions(options);
+    const lines = splitTextIntoLines(text);
 
-    // Parse the text and convert mentions to chips
-    const fragment = parseMentionsInText({
-      text,
-      options: optionsWithoutFunctions,
-      trigger,
-      keepTriggerOnSelect,
-      chipClassName,
-    });
-    range.insertNode(fragment);
-
-    // Move cursor to the end of the inserted content
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    for (const line of lines) {
+      createAndInsertFragment({
+        text: line,
+        options,
+        trigger,
+        keepTriggerOnSelect,
+        chipClassName,
+        selection,
+        range,
+      });
+    }
 
     const mentionData = extractMentionData(editorRef.current);
     onChange?.(mentionData);

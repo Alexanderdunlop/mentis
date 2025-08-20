@@ -119,18 +119,30 @@ export const parseMentionsInText = ({
           fragment.appendChild(document.createTextNode(" "));
         }
       } else {
-        // If no matching option, keep as plain text
-        fragment.appendChild(document.createTextNode(match[0]));
+        // If no matching option, keep as div node
+        const div = document.createElement("div");
+        div.textContent = match[0];
+        fragment.appendChild(div);
       }
 
       lastIndex = startIndex + match[0].length;
     }
   }
 
+  if (text === "") {
+    const div = document.createElement("div");
+    const br = document.createElement("br");
+    div.appendChild(br);
+    fragment.appendChild(div);
+    return fragment;
+  }
+
   // Add remaining text after the last mention
   if (lastIndex < text.length) {
     const remainingText = text.substring(lastIndex);
-    fragment.appendChild(document.createTextNode(remainingText));
+    const div = document.createElement("div");
+    div.textContent = remainingText;
+    fragment.appendChild(div);
   }
 
   return fragment;
