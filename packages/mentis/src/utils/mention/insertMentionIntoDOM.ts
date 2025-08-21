@@ -1,5 +1,5 @@
-import { addSpaceIfNeeded } from "./addSpaceIfNeeded";
-import { type MentionOptionWithoutFunction } from "./filterOutOptionFunctions";
+import { addSpaceIfNeeded } from "../addSpaceIfNeeded";
+import { type MentionOptionWithoutFunction } from "../filterOutOptionFunctions";
 
 type InsertMentionIntoDOMProps = {
   element: HTMLElement;
@@ -20,9 +20,6 @@ export const insertMentionIntoDOM = ({
   keepTriggerOnSelect,
   chipClassName,
 }: InsertMentionIntoDOMProps): void => {
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0) return;
-
   // Find the text content and calculate the actual character positions
   const text = element.textContent || "";
   const triggerIndex = text.lastIndexOf(
@@ -95,11 +92,15 @@ export const insertMentionIntoDOM = ({
   // Replace the text node with the fragment
   textNode.parentNode?.replaceChild(fragment, textNode);
 
+  const selection = window.getSelection();
+  if (!selection) return;
+
   // Set cursor position immediately after the space
   const newRange = document.createRange();
-  newRange.setStart(spaceNeeded ? spaceNode : mentionElement, 1);
-  newRange.collapse(true);
-
   selection.removeAllRanges();
+
+  newRange.setStart(spaceNeeded ? spaceNode : mentionElement, 1);
+  newRange.setEnd(spaceNeeded ? spaceNode : mentionElement, 1);
+  newRange.collapse(true);
   selection.addRange(newRange);
 };

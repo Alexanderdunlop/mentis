@@ -3,6 +3,7 @@ import type { MentionOption, MentionData } from "../types/MentionInput.types";
 import { parseMentionsInText } from "../utils/parseMentionsInText";
 import { extractMentionData } from "../utils/extractMentionData";
 import { filterOutOptionFunctions } from "../utils/filterOutOptionFunctions";
+import { processPaste } from "../utils/paste/processPaste";
 
 type CreateAndInsertFragmentProps = {
   text: string;
@@ -61,32 +62,37 @@ export function useMentionPaste({
 }: UseMentionPasteProps) {
   const handlePaste = (e: ClipboardEvent<HTMLDivElement>): void => {
     e.preventDefault();
-    const text = e.clipboardData.getData("text/plain");
+    processPaste({
+      editorRef: editorRef.current,
+      clipboardData: e.clipboardData,
+      options,
+      trigger,
+      keepTriggerOnSelect,
+      chipClassName,
+    });
+    // const text = e.clipboardData.getData("text/plain");
+    // if (!editorRef.current) return;
 
-    if (!editorRef.current) return;
-
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    const range = selection.getRangeAt(0);
-    range.deleteContents();
-
-    const lines = splitTextIntoLines(text);
-
-    for (const line of lines) {
-      createAndInsertFragment({
-        text: line,
-        options,
-        trigger,
-        keepTriggerOnSelect,
-        chipClassName,
-        selection,
-        range,
-      });
-    }
-
-    const mentionData = extractMentionData(editorRef.current);
-    onChange?.(mentionData);
+    // console.log("text", text);
+    // const selection = window.getSelection();
+    // if (!selection || selection.rangeCount === 0) return;
+    // const range = selection.getRangeAt(0);
+    // range.deleteContents();
+    // const lines = splitTextIntoLines(text);
+    // console.log("lines", lines);
+    // for (const line of lines) {
+    // createAndInsertFragment({
+    //   text: line,
+    //   options,
+    //   trigger,
+    //   keepTriggerOnSelect,
+    //   chipClassName,
+    //   selection,
+    //   range,
+    // });
+    // }
+    // const mentionData = extractMentionData(editorRef.current);
+    // onChange?.(mentionData);
   };
 
   return {

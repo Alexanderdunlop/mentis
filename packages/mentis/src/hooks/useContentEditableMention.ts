@@ -3,7 +3,7 @@ import type {
   MentionOption,
   MentionInputProps,
 } from "../types/MentionInput.types";
-import { insertMentionIntoDOM } from "../utils/insertMentionIntoDOM";
+import { insertMentionIntoDOM } from "../utils/mention/insertMentionIntoDOM";
 import { extractMentionData } from "../utils/extractMentionData";
 import { removeTriggerAndQuery } from "../utils/removeTriggerAndQuery";
 import { useMentionState } from "./useMentionState";
@@ -66,7 +66,7 @@ export function useContentEditableMention({
   }, [closeModal]);
 
   // Input processing
-  const { processInput } = useMentionInput({
+  const { handleInput } = useMentionInput({
     editorRef,
     options,
     trigger,
@@ -104,10 +104,6 @@ export function useContentEditableMention({
   });
 
   // Event handlers
-  const handleInput = (e?: Event): void => {
-    processInput(e);
-  };
-
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>): void => {
     const key = e.key;
 

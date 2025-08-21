@@ -7,6 +7,9 @@ import { convertTextToChips } from "../utils/convertTextToChips";
 import { extractMentionData } from "../utils/extractMentionData";
 import { filterOutOptionFunctions } from "../utils/filterOutOptionFunctions";
 import { reconstructFromDataValue } from "../utils/reconstructFromDataValue";
+import { processInput } from "../utils/input/processInput";
+import { handlePropDisplayValueChange } from "../utils/input/handlePropDisplayValueChange";
+import { handlePropDataValueChange } from "../utils/input/handlePropDataValueChange";
 
 type UseMentionInputProps = {
   editorRef: React.RefObject<HTMLDivElement | null>;
@@ -38,40 +41,18 @@ export function useMentionInput({
   onMentionDetection,
 }: UseMentionInputProps) {
   useEffect(() => {
-    if (editorRef.current) {
-      // Prioritize dataValue reconstruction over plain value
-      if (dataValue !== undefined) {
-        const currentData = extractMentionData(editorRef.current);
-        if (currentData.dataValue !== dataValue) {
-          if (dataValue === "") {
-            // Clear all content including mention chips and ensure truly empty for CSS :empty
-            editorRef.current.innerHTML = "";
-            editorRef.current.textContent = "";
-          } else {
-            // Reconstruct content from dataValue
-            const reconstructedHTML = reconstructFromDataValue({
-              dataValue,
-              options,
-              trigger,
-              keepTriggerOnSelect,
-              chipClassName,
-            });
-            editorRef.current.innerHTML = reconstructedHTML;
-          }
-        }
-      } else if (displayValue !== undefined) {
-        const currentText = getTextContent(editorRef.current);
-        if (currentText !== displayValue) {
-          if (displayValue === "") {
-            // Clear all content including mention chips and ensure truly empty for CSS :empty
-            editorRef.current.innerHTML = "";
-            editorRef.current.textContent = "";
-          } else {
-            // Update text content
-            editorRef.current.textContent = displayValue;
-          }
-        }
-      }
+    if (!editorRef.current) {
+      return;
+    }
+    // Prioritize dataValue reconstruction over plain value
+    if (dataValue !== undefined) {
+      handlePropDataValueChange(editorRef.current, dataValue);
+      return;
+    }
+
+    if (displayValue !== undefined) {
+      handlePropDisplayValueChange(editorRef.current, displayValue);
+      return;
     }
   }, [
     displayValue,
@@ -83,11 +64,18 @@ export function useMentionInput({
     editorRef,
   ]);
 
-  const handleChipInput = (chip: Element): void => {
+  const handleInputInsideChip = (chip: Element): void => {
     if (!editorRef.current) return;
 
     // Remove the chip element
     chip.remove();
+
+    // Fix for empty text content
+    if (editorRef.current.textContent === "") {
+      editorRef.current.innerHTML = "";
+      editorRef.current.textContent = "";
+      return;
+    }
 
     // Trigger onChange with updated data
     const mentionData = extractMentionData(editorRef.current);
@@ -127,7 +115,7 @@ export function useMentionInput({
     return false;
   };
 
-  const processInput = (e?: Event): void => {
+  const handleInput = (e?: Event): void => {
     if (!editorRef.current) return;
 
     const inputEvent = e as InputEvent;
@@ -166,7 +154,7 @@ export function useMentionInput({
         }
 
         if (chipElement) {
-          handleChipInput(chipElement);
+          handleInputInsideChip(chipElement);
           return;
         }
       }
@@ -197,6 +185,8 @@ export function useMentionInput({
       }
     }
 
+    processInput(editorRef.current);
+
     if (editorRef.current) {
       const mentionData = extractMentionData(editorRef.current);
       onChange?.(mentionData);
@@ -214,8 +204,8 @@ export function useMentionInput({
   };
 
   return {
-    processInput,
-    handleChipInput,
+    handleInput,
+    handleInputInsideChip,
     isInsideChip,
   };
 }
