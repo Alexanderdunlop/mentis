@@ -9,7 +9,7 @@ export interface ContentEditableAPI {
   // focus(): void;
   // blur(): void;
   addEventListener(event: string, callback: Function): void;
-  // removeEventListener(event: string, callback: Function): void;
+  removeEventListener(event: string, callback: Function): void;
 }
 
 export interface ContentEditableElement {

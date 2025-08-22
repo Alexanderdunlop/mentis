@@ -40,6 +40,23 @@ describe("processInput", () => {
     });
   });
 
+  it("should handle insertParagraph input type", async () => {
+    const result = await processInput({
+      inputType: "insertParagraph",
+      text: "",
+      currentText: "hello world",
+      currentPosition: 6,
+      selectionRange: { startIndex: 6, endIndex: 6 },
+    });
+
+    expect(result).toEqual({
+      newText: "\n",
+      startIndex: 6,
+      endIndex: 6,
+      type: "INSERT",
+    });
+  });
+
   it("should handle deleteContentBackward input type", async () => {
     const result = await processInput({
       inputType: "deleteContentBackward",

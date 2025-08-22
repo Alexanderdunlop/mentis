@@ -103,10 +103,9 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
       if (!contentEditableRef.current) {
         return;
       }
-      const element = contentEditableRef.current.element;
-      element.removeEventListener("beforeinput", handleInputEvent);
-      element.removeEventListener("focus", handleFocus);
-      element.removeEventListener("blur", handleBlur);
+      contentEditable.api.removeEventListener("beforeinput", handleInputEvent);
+      contentEditable.api.removeEventListener("focus", handleFocus);
+      contentEditable.api.removeEventListener("blur", handleBlur);
     };
   }, []);
 

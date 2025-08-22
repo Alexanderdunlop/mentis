@@ -41,6 +41,15 @@ export const processInput = async ({
         endIndex,
         type: insertTextType,
       };
+    case "insertParagraph":
+      const insertParagraphType =
+        startIndex === endIndex ? "INSERT" : "REPLACE";
+      return {
+        newText: "\n",
+        startIndex,
+        endIndex,
+        type: insertParagraphType,
+      };
     case "deleteContentBackward":
       const deleteBackwardText = currentText.slice(
         currentPosition - 1,

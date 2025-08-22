@@ -13,7 +13,12 @@ const createContentEditableAPI = (
 
   const setText = (text: string): void => {
     const htmlText = text.replace(/ /g, "&nbsp;");
+
     element.innerHTML = htmlText;
+
+    if (text.endsWith("\n")) {
+      element.appendChild(document.createElement("br"));
+    }
   };
 
   const getCursorPosition = (): number => {
@@ -84,6 +89,10 @@ const createContentEditableAPI = (
     element.addEventListener(event, callback as EventListener);
   };
 
+  const removeEventListener = (event: string, callback: Function): void => {
+    element.removeEventListener(event, callback as EventListener);
+  };
+
   return {
     getText,
     setText,
@@ -91,6 +100,7 @@ const createContentEditableAPI = (
     setCursorPosition,
     getSelectionRange,
     addEventListener,
+    removeEventListener,
   };
 };
 
@@ -122,6 +132,7 @@ export const createContentEditable = ({
   if (style) {
     Object.assign(element.style, style);
   }
+  element.style.whiteSpace = "pre-wrap";
   // Set placeholder
   if (placeholder) {
     element.setAttribute("data-placeholder", placeholder);
