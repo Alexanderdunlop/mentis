@@ -1,3 +1,4 @@
+import { processTextWithMentions } from "./processTextWithMentions";
 import type {
   ContentEditableAPI,
   ContentEditableElement,
@@ -14,11 +15,28 @@ const createContentEditableAPI = (
   const setText = (text: string): void => {
     const htmlText = text.replace(/ /g, "&nbsp;");
 
-    element.innerHTML = htmlText;
+    const textWithMentions = processTextWithMentions({
+      trigger: "@",
+      text: htmlText,
+      options: [
+        {
+          label: "Alice",
+          value: "1",
+        },
+        {
+          label: "Bob",
+          value: "2",
+        },
+      ],
+    });
+
+    element.innerHTML = textWithMentions;
 
     if (text.endsWith("\n")) {
       element.appendChild(document.createElement("br"));
     }
+
+    console.log(element);
   };
 
   const getCursorPosition = (): number => {
