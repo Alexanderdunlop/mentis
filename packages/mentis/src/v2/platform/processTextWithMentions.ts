@@ -1,9 +1,5 @@
 import { replaceMentionItem } from "./replaceMentionItem";
-
-export type MentionItem = {
-  label: string;
-  value: string;
-};
+import type { MentionItem } from "./types";
 
 type ProcessTextWithMentionsProps = {
   trigger: string;

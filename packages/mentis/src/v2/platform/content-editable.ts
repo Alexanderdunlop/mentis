@@ -2,12 +2,21 @@ import { processTextWithMentions } from "./processTextWithMentions";
 import type {
   ContentEditableAPI,
   ContentEditableElement,
+  MentionItem,
   SelectionRange,
 } from "./types";
 
-const createContentEditableAPI = (
-  element: HTMLDivElement
-): ContentEditableAPI => {
+type CreateContentEditableAPIProps = {
+  element: HTMLDivElement;
+  trigger: string;
+  options: MentionItem[];
+};
+
+const createContentEditableAPI = ({
+  element,
+  trigger,
+  options,
+}: CreateContentEditableAPIProps): ContentEditableAPI => {
   const getText = (): string => {
     return element.textContent || "";
   };
@@ -16,18 +25,9 @@ const createContentEditableAPI = (
     const htmlText = text.replace(/ /g, "&nbsp;");
 
     const textWithMentions = processTextWithMentions({
-      trigger: "@",
+      trigger,
       text: htmlText,
-      options: [
-        {
-          label: "Alice",
-          value: "1",
-        },
-        {
-          label: "Bob",
-          value: "2",
-        },
-      ],
+      options,
     });
 
     element.innerHTML = textWithMentions;
@@ -127,6 +127,8 @@ type CreateContentEditableProps = {
   className?: string;
   style?: React.CSSProperties;
   placeholder?: string;
+  trigger?: string;
+  options: MentionItem[];
 };
 
 export const createContentEditable = ({
@@ -134,6 +136,8 @@ export const createContentEditable = ({
   className,
   style,
   placeholder,
+  trigger = "@",
+  options,
 }: CreateContentEditableProps): ContentEditableElement => {
   // Check and remove existing element
   const existingElement = container.querySelector("div");
@@ -159,6 +163,6 @@ export const createContentEditable = ({
 
   return {
     element,
-    api: createContentEditableAPI(element),
+    api: createContentEditableAPI({ element, trigger, options }),
   };
 };

@@ -21,3 +21,8 @@ export type SelectionRange = {
   startIndex: number;
   endIndex: number;
 };
+
+export type MentionItem = {
+  label: string;
+  value: string;
+};

@@ -2,19 +2,13 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { handleInput } from "../input/handle-input";
 import { createContentEditable } from "../platform/content-editable";
 import type { MentionCoreAPI, StateChangedEvent } from "../core/types";
-import type { ContentEditableElement } from "../platform/types";
+import type { ContentEditableElement, MentionItem } from "../platform/types";
 import { createMentionCore } from "../core/mention-core";
 import { cn } from "../helpers/cn";
 
 // export type OldMentionInputProps = {
-//     displayValue?: string;
 //     dataValue?: string;
-//     options: MentionOption[];
 //     slotsProps?: SlotProps;
-//     keepTriggerOnSelect?: boolean;
-//     trigger?: string;
-//     autoConvertMentions?: boolean;
-//     onChange?: (value: MentionData) => void;
 //     onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void;
 //   };
 
@@ -23,6 +17,8 @@ type MentionInputProps = {
   className?: string;
   style?: React.CSSProperties;
   placeholder?: string;
+  trigger?: string;
+  options: MentionItem[];
   onChange?: (value: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -33,6 +29,8 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
   className,
   style,
   placeholder,
+  trigger,
+  options,
   onChange,
   onFocus,
   onBlur,
@@ -71,6 +69,8 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
       placeholder,
       className: cn("content-editable-input", className),
       style,
+      trigger,
+      options,
     });
 
     const core = mentionCoreRef.current;

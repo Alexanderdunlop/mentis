@@ -13,6 +13,13 @@ const options: MentionOption[] = [
   { label: "Charlie", value: () => alert("Charlie") },
 ];
 
+// TODO: Add type for optionsV2
+const optionsV2: any[] = [
+  { label: "Alice", value: "1" },
+  { label: "Bob", value: "2" },
+  { label: "Charlie", value: "3" },
+];
+
 export function App() {
   const [dataValue, setDataValue] = useState("");
   const [displayValue, setDisplayValue] = useState("");
@@ -26,13 +33,22 @@ export function App() {
     setDisplayValue(value);
   };
 
-  // console.log("displayValue", displayValue);
+  // displayValue = "",
+  // dataValue,
+  // options,
+  // slotsProps,
+  // keepTriggerOnSelect = true, REMOVED
+  // trigger = "@", DONE
+  // autoConvertMentions = false, REMOVED
+  // onChange,
+  // onKeyDown,
 
   return (
     <>
       <div style={{ width: "300px", height: "200px", overflowY: "auto" }}>
         <MentionInputV2
           value={value}
+          options={optionsV2}
           placeholder="Say something..."
           onChange={(value) => {
             console.log("onChange", value);

@@ -1,4 +1,4 @@
-import type { MentionItem } from "./processTextWithMentions";
+import type { MentionItem } from "./types";
 
 type ReplaceMentionItemProps = {
   trigger: string;
