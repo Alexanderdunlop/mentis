@@ -6,12 +6,6 @@ import type { ContentEditableElement, MentionItem } from "../platform/types";
 import { createMentionCore } from "../core/mention-core";
 import { cn } from "../helpers/cn";
 
-// export type OldMentionInputProps = {
-//     dataValue?: string;
-//     slotsProps?: SlotProps;
-//     onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void;
-//   };
-
 type MentionInputProps = {
   value?: string | undefined;
   className?: string;
@@ -50,14 +44,18 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
     onBlur?.();
   }, [onBlur]);
 
-  const handleInputEvent = useCallback((e: Event) => {
-    if (!contentEditableRef.current || !mentionCoreRef.current) return;
-    handleInput({
-      e,
-      contentEditable: contentEditableRef.current,
-      core: mentionCoreRef.current,
-    });
-  }, []);
+  const handleInputEvent = useCallback(
+    (e: Event) => {
+      if (!contentEditableRef.current || !mentionCoreRef.current) return;
+      // TODO: Should trigger be passed here?
+      handleInput({
+        e,
+        contentEditable: contentEditableRef.current,
+        core: mentionCoreRef.current,
+      });
+    },
+    [trigger]
+  );
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -78,9 +76,9 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
 
     contentEditable.api.setText(initialValue);
 
-    const unsubscribeStateChanged = core.subscribe(
-      "stateChanged",
-      (event: StateChangedEvent) => {
+    const unsubscribeStateChanged = core.subscribe({
+      event: "stateChanged",
+      callback: (event: StateChangedEvent) => {
         const { newState } = event;
 
         if (isProgrammaticUpdateRef.current) {
@@ -91,12 +89,24 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
         contentEditable.api.setCursorPosition(newState.cursorPosition);
 
         onChange?.(newState.text);
-      }
-    );
+      },
+    });
 
     contentEditable.api.addEventListener("beforeinput", handleInputEvent);
     contentEditable.api.addEventListener("focus", handleFocus);
     contentEditable.api.addEventListener("blur", handleBlur);
+    contentEditable.api.addEventListener(
+      "mentionQueryDetected",
+      (event: any) => {
+        console.log("mentionQueryDetected", event);
+      }
+    );
+    contentEditable.api.addEventListener(
+      "mentionQueryCleared",
+      (event: any) => {
+        console.log("mentionQueryCleared", event);
+      }
+    );
 
     return () => {
       unsubscribeStateChanged();
@@ -106,6 +116,8 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
       contentEditable.api.removeEventListener("beforeinput", handleInputEvent);
       contentEditable.api.removeEventListener("focus", handleFocus);
       contentEditable.api.removeEventListener("blur", handleBlur);
+      // contentEditable.api.removeEventListener("mentionQueryDetected", handleMentionQueryDetected);
+      // contentEditable.api.removeEventListener("mentionQueryCleared", handleMentionQueryCleared);
     };
   }, []);
 

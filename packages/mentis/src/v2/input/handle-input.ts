@@ -30,14 +30,14 @@ export const handleInput = async ({
 
   switch (type) {
     case "INSERT":
-      core.insertText(newText, startIndex);
+      core.insertText({ text: newText, position: startIndex });
       break;
     case "DELETE":
-      core.deleteText(startIndex, endIndex);
+      core.deleteText({ start: startIndex, end: endIndex });
       break;
     case "REPLACE":
-      core.deleteText(startIndex, endIndex);
-      core.insertText(newText, startIndex);
+      core.deleteText({ start: startIndex, end: endIndex });
+      core.insertText({ text: newText, position: startIndex });
       break;
     default:
       // Fallback: sync everything
@@ -50,14 +50,23 @@ export const handleInput = async ({
   contentEditable.api.setText(updatedState.text);
   contentEditable.api.setCursorPosition(updatedState.cursorPosition);
 
-  //   TODO: Add mention triggers
-  //     // Check for mention triggers after the change
-  //     const query = core.detectMentionQuery(position, triggers);
-  //     if (query) {
-  //       // Emit trigger detected event for UI layer to handle
-  //       core.emit('mentionTriggerDetected', query);
-  //     }
-};
+  const queryResult = core.detectMentionQuery({
+    trigger: contentEditable.api.getTrigger(),
+    position: updatedState.cursorPosition,
+  });
 
-// const handleInput = useCallback((e: Event) => {
-//   }, [triggers]);
+  if (queryResult.shouldShowModal && queryResult.query) {
+    core.emit({
+      event: "mentionQueryDetected",
+      data: {
+        query: queryResult.query,
+        cursorPosition: updatedState.cursorPosition,
+      },
+    });
+  } else {
+    core.emit({
+      event: "mentionQueryCleared",
+      data: {},
+    });
+  }
+};

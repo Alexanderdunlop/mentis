@@ -103,6 +103,10 @@ const createContentEditableAPI = ({
     return { startIndex, endIndex };
   };
 
+  const getTrigger = (): string => {
+    return trigger;
+  };
+
   const addEventListener = (event: string, callback: Function): void => {
     element.addEventListener(event, callback as EventListener);
   };
@@ -117,6 +121,7 @@ const createContentEditableAPI = ({
     getCursorPosition,
     setCursorPosition,
     getSelectionRange,
+    getTrigger,
     addEventListener,
     removeEventListener,
   };

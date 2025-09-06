@@ -4,6 +4,7 @@ export interface ContentEditableAPI {
   getCursorPosition(): number;
   setCursorPosition(position: number): void;
   getSelectionRange(): SelectionRange;
+  getTrigger(): string;
   // insertText(text: string, position?: number): void;
   // replaceText(start: number, end: number, text: string): void;
   // focus(): void;
