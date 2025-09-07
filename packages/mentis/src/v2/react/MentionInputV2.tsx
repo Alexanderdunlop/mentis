@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { handleInput } from "../input/handle-input";
 import { createContentEditable } from "../platform/content-editable";
 import type { MentionCoreAPI, StateChangedEvent } from "../core/types";
 import type { ContentEditableElement, MentionItem } from "../platform/types";
 import { createMentionCore } from "../core/mention-core";
 import { cn } from "../helpers/cn";
+import { MentionModal } from "./MentionModal";
 
 type MentionInputProps = {
   value?: string | undefined;
@@ -18,6 +19,12 @@ type MentionInputProps = {
   onBlur?: () => void;
 };
 
+type MentionModalState =
+  | {
+      query: string;
+    }
+  | false;
+
 export const MentionInputV2: React.FC<MentionInputProps> = ({
   value,
   className,
@@ -29,6 +36,7 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
   onFocus,
   onBlur,
 }: MentionInputProps) => {
+  const [modalState, setModalState] = useState<MentionModalState>(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const mentionCoreRef = useRef<MentionCoreAPI | null>(null);
   const contentEditableRef = useRef<ContentEditableElement | null>(null);
@@ -92,32 +100,35 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
       },
     });
 
+    const unsubscribeMentionQueryDetected = core.subscribe({
+      event: "mentionQueryDetected",
+      callback: (event: any) => {
+        setModalState({
+          query: event.query,
+        });
+      },
+    });
+    const unsubscribeMentionQueryCleared = core.subscribe({
+      event: "mentionQueryCleared",
+      callback: () => {
+        setModalState(false);
+      },
+    });
+
     contentEditable.api.addEventListener("beforeinput", handleInputEvent);
     contentEditable.api.addEventListener("focus", handleFocus);
     contentEditable.api.addEventListener("blur", handleBlur);
-    contentEditable.api.addEventListener(
-      "mentionQueryDetected",
-      (event: any) => {
-        console.log("mentionQueryDetected", event);
-      }
-    );
-    contentEditable.api.addEventListener(
-      "mentionQueryCleared",
-      (event: any) => {
-        console.log("mentionQueryCleared", event);
-      }
-    );
 
     return () => {
       unsubscribeStateChanged();
+      unsubscribeMentionQueryDetected();
+      unsubscribeMentionQueryCleared();
       if (!contentEditableRef.current) {
         return;
       }
       contentEditable.api.removeEventListener("beforeinput", handleInputEvent);
       contentEditable.api.removeEventListener("focus", handleFocus);
       contentEditable.api.removeEventListener("blur", handleBlur);
-      // contentEditable.api.removeEventListener("mentionQueryDetected", handleMentionQueryDetected);
-      // contentEditable.api.removeEventListener("mentionQueryCleared", handleMentionQueryCleared);
     };
   }, []);
 
@@ -151,5 +162,9 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
     });
   }, [value, isControlled]);
 
-  return <div ref={containerRef} />;
+  return (
+    <div ref={containerRef} style={{ position: "relative" }}>
+      <MentionModal options={options} modalState={modalState} />
+    </div>
+  );
 };

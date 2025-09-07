@@ -59,7 +59,8 @@ export const handleInput = async ({
     core.emit({
       event: "mentionQueryDetected",
       data: {
-        query: queryResult.query,
+        query: queryResult.query.query,
+        startIndex: queryResult.query.startIndex,
         cursorPosition: updatedState.cursorPosition,
       },
     });

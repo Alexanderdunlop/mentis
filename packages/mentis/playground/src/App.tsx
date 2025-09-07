@@ -46,15 +46,6 @@ export function App() {
   return (
     <>
       <div style={{ width: "300px", height: "200px", overflowY: "auto" }}>
-        <MentionInputV2
-          value={value}
-          options={optionsV2}
-          placeholder="Say something..."
-          onChange={(value) => {
-            console.log("onChange", value);
-            setValue(value);
-          }}
-        />
         <MentionInput
           data-placeholder="Say something..."
           dataValue={dataValue}
@@ -88,6 +79,15 @@ export function App() {
           Set Display Value
         </button>
         <button onClick={() => setValue("Alice Bob")}>Set Value</button>
+        <MentionInputV2
+          value={value}
+          options={optionsV2}
+          placeholder="Say something..."
+          onChange={(value) => {
+            console.log("onChange", value);
+            setValue(value);
+          }}
+        />
       </div>
     </>
   );
