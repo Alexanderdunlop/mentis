@@ -50,6 +50,7 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
 
   const handleBlur = useCallback(() => {
     onBlur?.();
+    setModalState(false);
   }, [onBlur]);
 
   const handleInputEvent = useCallback(
@@ -131,6 +132,45 @@ export const MentionInputV2: React.FC<MentionInputProps> = ({
       contentEditable.api.removeEventListener("blur", handleBlur);
     };
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (modalState === false) {
+        return;
+      }
+
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          // moveHighlight("down");
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          // moveHighlight("up");
+          break;
+        case "Enter":
+        case "Tab":
+          e.preventDefault();
+          // const selectedOption = getHighlightedOption();
+          // if (selectedOption) {
+          //   handleMentionSelect(selectedOption);
+          // }
+          break;
+        case "Escape":
+          e.preventDefault();
+          setModalState(false);
+          // closeModal();
+          break;
+      }
+    };
+    console.log("modalState", modalState);
+    const contentEditable = contentEditableRef.current;
+    if (!contentEditable) return;
+    contentEditable.api.addEventListener("keydown", handleKeyDown);
+    return () => {
+      contentEditable.api.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [modalState]);
 
   useEffect(() => {
     if (
