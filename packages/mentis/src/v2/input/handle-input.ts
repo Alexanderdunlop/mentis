@@ -8,6 +8,12 @@ type HandleInputProps = {
   core: MentionCoreAPI;
 };
 
+export type MentionQueryDetectedEvent = {
+  query: string;
+  startIndex: number;
+  cursorPosition: number;
+};
+
 export const handleInput = async ({
   e,
   contentEditable,
@@ -56,13 +62,15 @@ export const handleInput = async ({
   });
 
   if (queryResult.shouldShowModal && queryResult.query) {
+    const data: MentionQueryDetectedEvent = {
+      query: queryResult.query.query,
+      startIndex: queryResult.query.startIndex,
+      cursorPosition: updatedState.cursorPosition,
+    };
+
     core.emit({
       event: "mentionQueryDetected",
-      data: {
-        query: queryResult.query.query,
-        startIndex: queryResult.query.startIndex,
-        cursorPosition: updatedState.cursorPosition,
-      },
+      data,
     });
   } else {
     core.emit({

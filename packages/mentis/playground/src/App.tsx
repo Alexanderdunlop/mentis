@@ -45,7 +45,7 @@ export function App() {
 
   return (
     <>
-      <div style={{ width: "300px", height: "200px", overflowY: "auto" }}>
+      <div style={{ width: "300px", height: "600px", overflowY: "auto" }}>
         <MentionInput
           data-placeholder="Say something..."
           dataValue={dataValue}

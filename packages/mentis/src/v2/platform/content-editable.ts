@@ -21,9 +21,21 @@ const createContentEditableAPI = ({
     return element.textContent || "";
   };
 
+  // Just been thinking this setText works really well, it shouldn't handle much more.
+  // Instead we should store the mentions in a array with their position and value.
+  // Then we use the array to determine which value to use in the span.
+  // This solves the issue around equal labels but different values.
+  // NEED to make a note that copying and pasting will not be able to determine which value it used, as it'll go based off the label.
+  // Could have an option for users to copy the value instead of the label.
   const setText = (text: string): void => {
     const htmlText = text.replace(/ /g, "&nbsp;");
 
+    // TODO: Convert values to mentions
+    // ISSUE is it needs to update the text
+    // Also it needs to update the cursor position
+    // Also it needs to emit the stateChanged event after they are all done
+
+    // NOTE: Converts labels to mentions
     const textWithMentions = processTextWithMentions({
       trigger,
       text: htmlText,
@@ -35,6 +47,9 @@ const createContentEditableAPI = ({
     if (text.endsWith("\n")) {
       element.appendChild(document.createElement("br"));
     }
+
+    // NOTE: What happens here when the labels are the same but the values are different?
+    // TODO: Could add an event when user selects a mention?
 
     console.log(element);
   };
