@@ -245,6 +245,48 @@ describe("Keyboard functionality", () => {
     });
   });
 
+  test("Should call onKeyDown for Tab when modal is closed", async () => {
+    const mockOnKeyDown = vi.fn();
+    render(<MentionInput options={options} onKeyDown={mockOnKeyDown} />);
+
+    const user = userEvent.setup();
+    const editorElement = screen.getByRole("combobox");
+
+    await user.click(editorElement);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+
+    await user.keyboard("{Tab}");
+
+    // Tab must fall through to the consumer when there is nothing to select
+    expect(mockOnKeyDown).toHaveBeenCalledWith(
+      expect.objectContaining({
+        key: "Tab",
+        defaultPrevented: false,
+      })
+    );
+  });
+
+  test("Should call onKeyDown for Tab when modal is open with no matching options", async () => {
+    const mockOnKeyDown = vi.fn();
+    render(<MentionInput options={options} onKeyDown={mockOnKeyDown} />);
+
+    const user = userEvent.setup();
+    const editorElement = screen.getByRole("combobox");
+
+    // Open the modal with a query that matches none of the options
+    await user.type(editorElement, "@zzz");
+    mockOnKeyDown.mockClear();
+
+    await user.keyboard("{Tab}");
+
+    expect(mockOnKeyDown).toHaveBeenCalledWith(
+      expect.objectContaining({
+        key: "Tab",
+        defaultPrevented: false,
+      })
+    );
+  });
+
   test("Should close modal with Escape", async () => {
     const options = [
       { label: "John Doe", value: "john" },

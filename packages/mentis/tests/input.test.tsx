@@ -10,6 +10,32 @@ const options: MentionOption[] = [
   { label: "Jane Smith", value: "jane" },
 ];
 
+// Mirrors the usual consumer setup: dataValue is owned by the parent and fed
+// back through onChange, with an external control that resets it to "".
+const ControlledMentionInput = ({
+  initialDataValue,
+}: {
+  initialDataValue: string;
+}) => {
+  const [dataValue, setDataValue] = React.useState(initialDataValue);
+
+  return (
+    <>
+      <MentionInput
+        options={options}
+        dataValue={dataValue}
+        onChange={(value) => setDataValue(value.dataValue)}
+        slotsProps={{
+          contentEditable: {
+            "data-placeholder": "Say something...",
+          },
+        }}
+      />
+      <button onClick={() => setDataValue("")}>Clear</button>
+    </>
+  );
+};
+
 describe("Input props", () => {
   test("Value should be displayed", () => {
     const value = "Hello @john, how are you?";
@@ -190,6 +216,71 @@ describe("Input props", () => {
     );
 
     // Element should be empty and placeholder should be visible via CSS
+    expect(editorElement).toHaveTextContent("");
+    expect(editorElement.innerHTML).toBe("");
+  });
+
+  test("Placeholder should reappear when a dataValue mention is cleared", async () => {
+    const customPlaceholder = "Say something...";
+    const { rerender } = render(
+      <MentionInput
+        options={options}
+        dataValue="john"
+        slotsProps={{
+          contentEditable: {
+            "data-placeholder": customPlaceholder,
+          },
+        }}
+      />
+    );
+
+    const editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("@John Doe");
+
+    // Clear the content by setting dataValue back to an empty string
+    rerender(
+      <MentionInput
+        options={options}
+        dataValue=""
+        slotsProps={{
+          contentEditable: {
+            "data-placeholder": customPlaceholder,
+          },
+        }}
+      />
+    );
+
+    // Element must be truly empty for the :empty::before placeholder to render
+    expect(editorElement).toHaveTextContent("");
+    expect(editorElement.innerHTML).toBe("");
+  });
+
+  test("Placeholder should reappear when a controlled mention dataValue is cleared", async () => {
+    render(<ControlledMentionInput initialDataValue="john" />);
+
+    const user = userEvent.setup();
+    const editorElement = screen.getByRole("combobox");
+    expect(editorElement).toHaveTextContent("@John Doe");
+
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+
+    // Element must be truly empty for the :empty::before placeholder to render
+    expect(editorElement).toHaveTextContent("");
+    expect(editorElement.innerHTML).toBe("");
+  });
+
+  test("Placeholder should reappear when controlled typed content is cleared", async () => {
+    render(<ControlledMentionInput initialDataValue="" />);
+
+    const user = userEvent.setup();
+    const editorElement = screen.getByRole("combobox");
+
+    await user.type(editorElement, "Hello world");
+    expect(editorElement).toHaveTextContent("Hello world");
+
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+
+    // Element must be truly empty for the :empty::before placeholder to render
     expect(editorElement).toHaveTextContent("");
     expect(editorElement.innerHTML).toBe("");
   });
