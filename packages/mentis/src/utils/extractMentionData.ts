@@ -6,88 +6,82 @@ export const extractMentionData = (element: HTMLElement): MentionData => {
   let dataValue = "";
   let currentIndex = 0;
 
+  const BLOCK_ELEMENTS = ["div", "p", "h1", "h2", "h3", "h4", "h5", "h6"];
+
+  const addNewline = () => {
+    displayValue += "\n";
+    dataValue += "\n";
+    currentIndex += 1;
+  };
+
+  const walkChildNodes = (node: Node) => {
+    for (const child of Array.from(node.childNodes)) {
+      walkNodes(child);
+    }
+  };
+
   // Walk through all child nodes
   const walkNodes = (node: Node) => {
-    let shouldAddNewline = true;
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || "";
       displayValue += textContent;
       dataValue += textContent;
       currentIndex += textContent.length;
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      const childElement = node as HTMLElement;
-      const tagName = childElement.tagName.toLowerCase();
+      return;
+    }
 
-      // Check if this is a mention chip
-      if (childElement.dataset.value && childElement.dataset.label) {
-        const chipText = childElement.textContent || "";
-        const startIndex = currentIndex;
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
 
-        mentions.push({
-          label: childElement.dataset.label,
-          value: childElement.dataset.value,
-          startIndex,
-          endIndex: startIndex + chipText.length,
-        });
+    const childElement = node as HTMLElement;
+    const tagName = childElement.tagName.toLowerCase();
 
-        // displayValue shows the label (what user sees)
-        displayValue += chipText;
-        // dataValue shows the value (actual data)
-        dataValue += childElement.dataset.value;
-        currentIndex += chipText.length;
-      } else if (tagName === "br" && shouldAddNewline) {
-        // Handle <br> elements as newlines
-        displayValue += "\n";
-        dataValue += "\n";
-        currentIndex += 1;
-        shouldAddNewline = false;
-      } else if (
-        tagName === "div" &&
-        element.childNodes.length === 0 &&
-        shouldAddNewline
-      ) {
-        // Handle empty <div> elements as newlines (contentEditable creates these for Enter)
-        displayValue += "\n";
-        dataValue += "\n";
-        currentIndex += 1;
-        shouldAddNewline = false;
-      } else {
-        // Handle <div> with content and other block elements that should add newlines
-        const isBlockElement = [
-          "div",
-          "p",
-          "h1",
-          "h2",
-          "h3",
-          "h4",
-          "h5",
-          "h6",
-        ].includes(tagName);
-        const hasContent = childElement.childNodes.length > 0;
+    // Check if this is a mention chip
+    if (childElement.dataset.value && childElement.dataset.label) {
+      const chipText = childElement.textContent || "";
+      const startIndex = currentIndex;
 
-        // Add newline before block element (except for the first element)
-        // Add newline after block element (except for the last element in the container)
-        if (
-          isBlockElement &&
-          hasContent &&
-          (displayValue.length > 0 ||
-            dataValue.length > 0 ||
-            childElement.nextSibling) &&
-          shouldAddNewline
-        ) {
-          displayValue += "\n";
-          dataValue += "\n";
-          currentIndex += 1;
-          shouldAddNewline = false;
-        }
+      mentions.push({
+        label: childElement.dataset.label,
+        value: childElement.dataset.value,
+        startIndex,
+        endIndex: startIndex + chipText.length,
+      });
+
+      // displayValue shows the label (what user sees)
+      displayValue += chipText;
+      // dataValue shows the value (actual data)
+      dataValue += childElement.dataset.value;
+      currentIndex += chipText.length;
+      return;
+    }
+
+    // Handle <br> elements as newlines
+    if (tagName === "br") {
+      addNewline();
+      return;
+    }
+
+    if (BLOCK_ELEMENTS.includes(tagName)) {
+      // Handle empty block elements as newlines (contentEditable creates these
+      // for Enter)
+      if (childElement.childNodes.length === 0) {
+        addNewline();
+        return;
+      }
+
+      // A block element starts a new line, unless it opens the content
+      if (displayValue.length > 0 || dataValue.length > 0) {
+        addNewline();
       }
     }
+
+    // Inline wrappers such as <strong> carry no meaning of their own, and
+    // block elements have already contributed their newline, so in both cases
+    // keep walking to reach the text and chips inside
+    walkChildNodes(childElement);
   };
 
-  // Process all child nodes
-  for (const child of Array.from(element.childNodes)) {
-    walkNodes(child);
-  }
+  walkChildNodes(element);
 
   // Remove the <br> element if it's the only child of the parent element
   if (

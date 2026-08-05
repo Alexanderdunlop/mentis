@@ -276,6 +276,53 @@ describe("extractMentionData", () => {
     });
   });
 
+  test("should treat a block element with content as a new line", () => {
+    const element = document.createElement("div");
+    element.innerHTML = "First line<div>Second line</div>";
+
+    const result = extractMentionData(element);
+
+    expect(result).toEqual({
+      displayValue: "First line\nSecond line",
+      dataValue: "First line\nSecond line",
+      mentions: [],
+    });
+  });
+
+  test("should not start with a newline when a block element opens the content", () => {
+    const element = document.createElement("div");
+    element.innerHTML = "<div>First line</div><div>Second line</div>";
+
+    const result = extractMentionData(element);
+
+    expect(result).toEqual({
+      displayValue: "First line\nSecond line",
+      dataValue: "First line\nSecond line",
+      mentions: [],
+    });
+  });
+
+  test("should find mention chips nested inside block elements", () => {
+    const element = document.createElement("div");
+    element.innerHTML =
+      'Hello<div>there <span class="mention-chip" data-value="john" data-label="John Doe">@John Doe</span>!</div>';
+
+    const result = extractMentionData(element);
+
+    expect(result).toEqual({
+      displayValue: "Hello\nthere @John Doe!",
+      dataValue: "Hello\nthere john!",
+      mentions: [
+        {
+          label: "John Doe",
+          value: "john",
+          startIndex: 12,
+          endIndex: 21,
+        },
+      ],
+    });
+  });
+
   test("should handle mention chips with different trigger characters", () => {
     const element = document.createElement("div");
 
