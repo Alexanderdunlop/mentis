@@ -6,6 +6,7 @@ import type {
 import { insertMentionIntoDOM } from "../utils/insertMentionIntoDOM";
 import { extractMentionData } from "../utils/extractMentionData";
 import { removeTriggerAndQuery } from "../utils/removeTriggerAndQuery";
+import { insertNewlineAtCaret } from "../utils/insertNewlineAtCaret";
 import { useMentionState } from "./useMentionState";
 import { useMentionInput } from "./useMentionInput";
 import { useMentionPaste } from "./useMentionPaste";
@@ -137,7 +138,9 @@ export function useContentEditableMention({
           return;
         }
       }
-      document.execCommand("insertText", false, "\n");
+      if (editorRef.current) {
+        insertNewlineAtCaret(editorRef.current);
+      }
       return;
     }
 
