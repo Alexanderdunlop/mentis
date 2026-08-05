@@ -32,6 +32,38 @@ describe("Newline handling", () => {
     );
   });
 
+  test("Should insert a single line break per Enter press", async () => {
+    render(<MentionInput options={options} />);
+
+    const user = userEvent.setup();
+    const editorElement = screen.getByRole("combobox");
+
+    await user.type(editorElement, "First line{enter}Second line");
+
+    // One break, not the doubled-up block element contentEditable defaults to
+    expect(editorElement.querySelectorAll("br")).toHaveLength(1);
+    expect(editorElement.querySelectorAll("div")).toHaveLength(0);
+  });
+
+  test("Should insert a newline when Enter is pressed with no matching options", async () => {
+    const mockOnChange = vi.fn();
+    render(<MentionInput options={options} onChange={mockOnChange} />);
+
+    const user = userEvent.setup();
+    const editorElement = screen.getByRole("combobox");
+
+    // Open the modal with a query that matches none of the options
+    await user.type(editorElement, "@zzz");
+    await user.type(editorElement, "{enter}after");
+
+    expect(mockOnChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        dataValue: "@zzz\nafter",
+        mentions: [],
+      })
+    );
+  });
+
   test("Should extract newlines correctly from contentEditable with <br> elements", () => {
     // Create a test element with <br> tags
     const testElement = document.createElement("div");
