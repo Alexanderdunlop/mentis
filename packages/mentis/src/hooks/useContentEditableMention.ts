@@ -65,6 +65,13 @@ export function useContentEditableMention({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeModal]);
 
+  // Clear editor when dataValue is explicitly empty to ensure placeholder shows
+  useEffect(() => {
+    if (editorRef.current && dataValue === "") {
+      editorRef.current.innerHTML = "";
+    }
+  }, [dataValue]);
+
   // Input processing
   const { processInput } = useMentionInput({
     editorRef,
@@ -120,9 +127,23 @@ export function useContentEditableMention({
       return;
     }
 
-    // Handle selection when modal is open with options
+    // Handle Enter key to prevent multiple lines and select option if modal is open
+    if (key === "Enter") {
+      e.preventDefault();
+      if (showModal && filteredOptions.length > 0) {
+        const selectedOption = getSelectedOption();
+        if (selectedOption) {
+          handleSelect(selectedOption);
+          return;
+        }
+      }
+      document.execCommand("insertText", false, "\n");
+      return;
+    }
+
+    // Handle Tab key for selection when modal is open
     if (showModal && filteredOptions.length > 0) {
-      if (key === "Enter" || key === "Tab") {
+      if (key === "Tab") {
         e.preventDefault();
         const selectedOption = getSelectedOption();
         if (selectedOption) {
