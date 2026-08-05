@@ -46,7 +46,6 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "prepack": "./scripts/prepack.sh",
-    "release": "bumpp && pnpm publish",
     "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
@@ -57,7 +56,6 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
-    "bumpp": "^10.2.0",
     "happy-dom": "^18.0.1",
     "react-dom": "^19.1.0",
     "tsdown": "^0.12.9",
