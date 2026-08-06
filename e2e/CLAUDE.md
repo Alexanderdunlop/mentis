@@ -1,0 +1,15 @@
+# mentis e2e — Playwright suite for a contentEditable library
+
+- **Never modify `packages/mentis/src/` from this directory.** A spec that reveals a library bug gets `test.fixme()` and a one-line comment naming the cause, not a fix. This layer's only job is to be a trustworthy observer; editing source so specs pass repeats commit `a6fcfd0`, where production code was bent to satisfy the test environment.
+- **`test.fixme` bodies assert what *should* happen, not what currently does.** Un-fixme the spec in the same commit as the fix and it becomes the regression test for free.
+- **Caret, native editing and clipboard are asserted here and nowhere else.** A caret assertion in `packages/mentis/tests/` (vitest + happy-dom) is either wrong or accidentally passing. The converse also binds: a bug needing none of the three belongs in vitest — push it down and say that is what you did rather than reaching for a browser.
+- **`textContent` and `displayValue` are allowed to disagree.** `getText()` reads the DOM, `getDisplayValue()` reads the library's model, and several known bugs live only in the gap between them. Assert both; do not tidy a spec by dropping one.
+- **Caret offsets are not portable across a newline.** Firefox inserts a literal `"\n"` that counts in `textContent`; Chromium and WebKit end the line with a block boundary that does not. Use `expectCaretAtEnd()` once content contains a newline — a hard-coded offset there fails on one engine and reads as a library bug.
+- **Firefox drops `clipboardData` from a constructed `ClipboardEvent`.** `pasteText`/`pasteHTML` cannot run there at all; use `pasteByCopying()` for any paste spec that should cover the matrix. This is a limit of the test path, not a library defect — do not report it as one.
+- **Never assert against the demo playground** (`packages/mentis/playground/src/App.tsx`). It is a scratchpad that changes freely. Specs drive `playground/e2e.html` only.
+- **Harness cases are asserted against by id.** Add a case plus its entry in the `CaseId` union rather than bending an existing one to fit a new spec — other specs depend on its current shape.
+- **The harness serves on port 5273, not vite's 5173**, so a suite run can never attach to a demo playground left open during development. Keep it off the default port.
+- **`e2e/spec/` mirrors `packages/docs/content/docs/`, one file per page** — the docs are the spec, which is what makes documentation drift fail the build. Change documented behaviour and the matching spec changes in the same commit.
+- **`_template.spec.ts` is excluded from runs deliberately** and covered by `pnpm typecheck:e2e` instead. It exists to be copied; do not "fix" it by adding it to the suite.
+- **"Add an e2e test to prevent this in future" has exactly one outcome:** one file at `e2e/regressions/<symptom-slug>.spec.ts`, one test, reproduced through user actions only, asserting state *and* caret. Confirm it goes red against the pre-fix code before trusting it.
+- Full recipe, fixture API and the current `test.fixme` backlog are in `e2e/README.md`. Read it before adding a spec.
