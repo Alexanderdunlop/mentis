@@ -1,45 +1,71 @@
 import { docText } from "../model/doc-text";
-import type { Doc } from "../model/types";
+import { isAtom } from "../model/nodes";
+import type { Doc, InlineNode } from "../model/types";
+import {
+  createAtomElement,
+  isAtomElement,
+  updateAtomElement,
+} from "./atom-element";
 
 /**
  * Reconcile the DOM to the document. Never assigns `innerHTML`.
  *
- * Text nodes are patched in place by assigning `.data`, so the node identity a live
- * `Range` points at survives the update. Replacing the subtree instead — as mentis v1
- * and the abandoned v2 branch both did — destroys the selection on every keystroke and
- * makes caret restoration a permanent tax.
+ * Invariant the rest of the view depends on: **`doc.nodes[i]` renders as
+ * `root.childNodes[i]`**, one for one, in order. Position mapping is index arithmetic
+ * because of it.
  *
- * The engine renders line breaks as `\n` inside a text node, relying on
- * `white-space: pre-wrap`, rather than emitting `<br>`. That is what keeps the DOM
- * consistent across browsers that disagree about Enter — see ADR 0002.
+ * Nodes are patched in place where the kind already matches, so the node identity a live
+ * `Range` points at survives an update. Replacing the subtree instead — as mentis v1 and
+ * the abandoned v2 branch both did — destroys the selection on every keystroke and makes
+ * caret restoration a permanent tax.
+ *
+ * Line breaks render as `\n` inside a text node under `white-space: pre-wrap`, never as
+ * `<br>`; see ADR 0002.
  */
+const renderNode = (
+  root: HTMLElement,
+  node: InlineNode,
+  index: number
+): void => {
+  const existing = root.childNodes[index] ?? null;
+
+  if (isAtom(node)) {
+    if (existing && isAtomElement(existing)) {
+      updateAtomElement(existing, node);
+      return;
+    }
+    root.insertBefore(createAtomElement(node), existing);
+    if (existing) existing.remove();
+    return;
+  }
+
+  if (existing && existing.nodeType === Node.TEXT_NODE) {
+    const text = existing as Text;
+    if (text.data !== node.text) text.data = node.text;
+    return;
+  }
+
+  root.insertBefore(document.createTextNode(node.text), existing);
+  if (existing) existing.remove();
+};
+
 export const render = (root: HTMLElement, doc: Doc): void => {
-  let index = 0;
+  doc.nodes.forEach((node, index) => renderNode(root, node, index));
 
-  for (const node of doc.nodes) {
-    const existing = root.childNodes[index];
+  let expected = doc.nodes.length;
 
-    if (existing && existing.nodeType === Node.TEXT_NODE) {
-      const text = existing as Text;
-      if (text.data !== node.text) text.data = node.text;
-    } else {
-      root.insertBefore(document.createTextNode(node.text), existing ?? null);
-    }
-    index += 1;
-  }
-
-  // A document ending in a newline needs a trailing <br>, or the browser gives the
-  // caret nowhere to sit on the final empty line. It carries no model content.
-  const needsTrailingBreak = docText(doc).endsWith("\n");
-  if (needsTrailingBreak) {
-    const existing = root.childNodes[index];
+  // A document ending in a newline needs a trailing <br>, or the browser gives the caret
+  // nowhere to sit on the final empty line. It carries no model content and must never be
+  // counted by position mapping — see ADR 0002.
+  if (docText(doc).endsWith("\n")) {
+    const existing = root.childNodes[expected] ?? null;
     if (!existing || existing.nodeName !== "BR") {
-      root.insertBefore(document.createElement("br"), existing ?? null);
+      root.insertBefore(document.createElement("br"), existing);
     }
-    index += 1;
+    expected += 1;
   }
 
-  while (root.childNodes.length > index) {
+  while (root.childNodes.length > expected) {
     root.lastChild?.remove();
   }
 };

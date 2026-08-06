@@ -1,11 +1,11 @@
-import { replaceRange, type Transaction } from "../model/transaction";
+import { replaceWithText, type Transaction } from "../model/transaction";
 import type { InputIntent } from "./types";
 
 /**
  * Translate one input event into a transaction. Pure: no DOM, no engine state.
  *
  * This is the entire vocabulary of edits the engine understands. An `inputType` absent
- * from these sets returns null, which the caller logs rather than guesses at — silently
+ * from these sets returns null, which the caller reports rather than guesses at — silently
  * mishandling an unknown inputType is how editors corrupt documents on platforms the
  * author never tested.
  */
@@ -50,11 +50,8 @@ const collapsedAt = (position: number): Transaction["selection"] => ({
   head: position,
 });
 
-const replacement = (
-  { range }: InputIntent,
-  text: string
-): Transaction => ({
-  steps: replaceRange(range.from, range.to, text),
+const insertion = ({ range }: InputIntent, text: string): Transaction => ({
+  steps: replaceWithText(range.from, range.to, text),
   selection: collapsedAt(range.from + text.length),
   origin: "user",
 });
@@ -68,16 +65,17 @@ const deletion = (from: number, to: number): Transaction => ({
 export const transactionFor = (intent: InputIntent): Transaction | null => {
   const { inputType, text, range, rangeFromBrowser, docLength } = intent;
 
-  if (INSERT_TEXT.has(inputType)) return replacement(intent, text ?? "");
-  if (INSERT_NEWLINE.has(inputType)) return replacement(intent, "\n");
+  if (INSERT_TEXT.has(inputType)) return insertion(intent, text ?? "");
+  if (INSERT_NEWLINE.has(inputType)) return insertion(intent, "\n");
   if (DELETE_EXACT.has(inputType)) return deletion(range.from, range.to);
 
   if (DELETE_BACKWARD.has(inputType)) {
     if (range.from !== range.to) return deletion(range.from, range.to);
-    // Collapsed and the browser told us nothing: guess one code unit. Wrong for
-    // grapheme clusters and word deletes alike, which is precisely why
-    // getTargetRanges() is preferred — see ADR 0004. M6 owns the real fix.
+    // A collapsed range from the browser means "delete nothing" — that is information,
+    // not an omission, and widening it turns a word delete into a character delete.
     if (rangeFromBrowser) return deletion(range.from, range.to);
+    // Our own fallback: guess one position. Correct for an atom, which is one position
+    // wide, but wrong for a grapheme cluster — see ADR 0004. M6 owns the real fix.
     return deletion(Math.max(0, range.from - 1), range.from);
   }
 

@@ -412,3 +412,20 @@ code {
   font-size: 11px;
   color: var(--key);
 }
+
+/* ---------- mention atoms ---------- */
+
+/*
+ * `user-select: none` matters: without it a drag can start a selection inside the chip,
+ * and while `domToModel` snaps such a position to an edge, the visible caret would flicker
+ * somewhere the model has no position for.
+ */
+.editor .mention {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #2b2340;
+  color: var(--atomic);
+  border: 1px solid #3d3157;
+  user-select: none;
+  cursor: default;
+}

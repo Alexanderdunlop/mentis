@@ -76,6 +76,24 @@
         </section>
 
         <section class="panel">
+          <header class="panel-head">
+            <span>Mentions</span>
+            <span class="panel-extra legend"
+              >two @Alex differ only by value — v1 cannot tell them apart</span
+            >
+          </header>
+          <div class="panel-body">
+            <div id="mentions" class="chips"></div>
+            <p class="hint">
+              Inserted at the caret as an atomic node. One
+              <kbd>&larr;</kbd>/<kbd>&rarr;</kbd> steps over the whole chip and one
+              <kbd>&#9003;</kbd> removes it — behaviour inherited from
+              <code>contenteditable=false</code>, not implemented.
+            </p>
+          </div>
+        </section>
+
+        <section class="panel">
           <header class="panel-head"><span>Content presets</span></header>
           <div class="panel-body">
             <div id="presets" class="chips"></div>

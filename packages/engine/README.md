@@ -9,11 +9,24 @@ pnpm --filter @mentis/engine test
 pnpm --filter @mentis/engine typecheck
 ```
 
-## Current state: M1 — model, view, input
+## Current state: M2 — atomic nodes, so mentions exist
 
 The editor is engine-driven: `beforeinput` is intercepted, a transaction is applied to
 the document, and the DOM is patched to match. **The DOM is a projection of the model,
 never a source.**
+
+Mentions are **atomic inline nodes**, one position wide however long the label
+([ADR 0005](docs/adr/0005-an-atom-is-one-position-wide.md)). A `value` distinct from the
+`label` is stored on the node, so two mentions sharing a label stay distinct — the thing
+v1 cannot do, because it re-derives mentions from rendered text.
+
+That width choice means **there is no position inside a mention**, which closes the
+selection-correction debt ADR 0003 recorded rather than paying it. Arrow traversal and
+whole-chip deletion are inherited from `contenteditable="false"` rather than implemented.
+
+The cost is two coordinate spaces that must never be mixed: **position space**
+(`docLength`) and **visible text** (`docText`). They diverge for any document holding a
+mention.
 
 Caret movement is still the browser's — the engine intercepts `beforeinput` and nothing
 else ([ADR 0003](docs/adr/0003-own-editing-not-navigation.md)). Uncheck **engine
@@ -22,10 +35,11 @@ that is the fastest way to tell "the engine is wrong" apart from "the browser do
 too".
 
 ```
-src/model/     doc, positions, steps, transactions   — pure, no DOM
+src/model/     doc, positions, slices, steps, transactions   — pure, no DOM
 src/view/      render (patches, never innerHTML) + position mapping both ways
-src/input/     beforeinput -> transaction            — transaction-for.ts is pure
-src/editor/    the wiring that ties the three together
+src/input/     beforeinput -> transaction                    — transaction-for.ts is pure
+src/commands/  higher-level edits, e.g. insertMention        — pure, returns transactions
+src/editor/    the wiring that ties them together
 ```
 
 Three decisions came out of building it, each with alternatives and a revisit trigger:
@@ -35,8 +49,13 @@ navigation is not; [0004](docs/adr/0004-take-edit-ranges-from-the-browser.md) ed
 come from `getTargetRanges()`, which supplies correct grapheme and word boundaries for
 free.
 
-Steps are invertible from the start, so M3's undo is a matter of storing transactions
-rather than snapshotting documents.
+Steps carry a **slice** — a list of inline nodes — rather than a string, so undoing a
+deleted mention restores the mention rather than its label text. They are invertible from
+the start, so M3's undo is a matter of storing transactions rather than snapshotting
+documents.
+
+**Not yet built:** trigger detection and the dropdown. Typing `@al` does nothing — insert
+a mention from the harness's Mentions panel instead.
 
 ## The instrument panel (M0)
 

@@ -120,6 +120,21 @@ eating a whole atom, and why every serious editor eventually invents a gap curso
 values just work — which v1 cannot do, and which the old branch's own code comment in
 `v2/platform/content-editable.ts` was reaching for.
 
+> **Built** — atoms in the model, view, input and commands.
+> [ADR 0005](adr/0005-an-atom-is-one-position-wide.md): an atom is **one position wide**,
+> which makes a position inside it unrepresentable and therefore **closes the selection
+> correction debt ADR 0003 recorded** rather than paying it. The cost is two coordinate
+> spaces — position space (`docLength`) and visible text (`docText`) — which diverge for
+> any document containing a mention and must never be mixed.
+>
+> Steps now carry a *slice* rather than a string, so undoing a deleted mention restores
+> the mention and not its label text. Arrow traversal and whole-chip delete come from
+> `contenteditable="false"` rather than from our code.
+>
+> **Still unclaimed:** trigger detection and the dropdown. Typing `@al` does nothing yet —
+> no milestone owns it, and it should get its own slot rather than being smuggled into
+> M3. `v2/mention-query/*` on the archived branch is the salvage material.
+
 ### M3 — Undo stack
 
 Taking over `beforeinput` kills native Ctrl+Z, so you own it now.
@@ -251,7 +266,7 @@ pnpm install          # worktrees don't share node_modules
 
 - [x] M0 — instrument panel
 - [x] M1 — model + text-only editor
-- [ ] M2 — atomic nodes / mentions
+- [x] M2 — atomic nodes / mentions
 - [ ] M3 — undo stack
 - [ ] M4 — IME / composition
 - [ ] M5 — clipboard
