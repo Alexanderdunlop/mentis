@@ -168,6 +168,24 @@ Taking over `beforeinput` kills native Ctrl+Z, so you own it now.
 **Done when:** undo/redo survives a mixed session of typing, chip insertion, deletion,
 and paste.
 
+> **Built** — `src/history/`, all pure: the stack never reads a clock, timestamps are
+> passed in.
+>
+> The inversion work was already done in M1, so this milestone was a stack plus a merge
+> rule.
+>
+> [ADR 0008](adr/0008-undo-granularity-is-word-based.md): granularity follows **words, not
+> typing speed**. The first rule used a 600ms per-keystroke gap, and testing the harness
+> caught it immediately — `Alex` undid as one step typed fast and as `Al` + `ex` with a
+> hesitation. Beyond being unpredictable for the user, that made undo a function of machine
+> timing and so untestable. Whitespace now closes a group; timing survives only as a 3s
+> idle signal.
+>
+> [ADR 0007](adr/0007-the-engine-owns-the-undo-shortcut.md) **amends ADR 0003**: the engine
+> now watches one keyboard shortcut. Preventing every `beforeinput` leaves the browser's
+> undo stack empty, so ⌘Z fires *nothing at all* — waiting for `historyUndo` would mean
+> undo silently never working. Both routes are honoured; neither is a fallback.
+
 ### M4 — IME / composition (the boss fight)
 
 `compositionstart` / `compositionupdate` / `compositionend`, and the counterintuitive
@@ -290,7 +308,7 @@ pnpm install          # worktrees don't share node_modules
 - [x] M1 — model + text-only editor
 - [x] M2 — atomic nodes / mentions
 - [x] M2.5 — trigger detection + dropdown
-- [ ] M3 — undo stack
+- [x] M3 — undo stack
 - [ ] M4 — IME / composition
 - [ ] M5 — clipboard
 - [ ] M6 — nasty-input gauntlet

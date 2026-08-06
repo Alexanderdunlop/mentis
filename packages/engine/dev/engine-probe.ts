@@ -1,4 +1,5 @@
 import type { Editor } from "../src/editor/types";
+import { docLength } from "../src/model/doc-length";
 import { docText } from "../src/model/doc-text";
 import { domToModel } from "../src/view/dom-to-model";
 import type { ModelProbe } from "../src/devtools/index";
@@ -21,7 +22,15 @@ export const engineProbe = (getEditor: () => Editor | null): ModelProbe => ({
 
     const { doc, selection } = editor.getState();
     const text = docText(doc);
-    return { text, length: text.length, selection, nodes: doc.nodes };
+    return {
+      text,
+      // Visible characters vs positions — these differ once a mention exists (ADR 0005).
+      characters: text.length,
+      positions: docLength(doc),
+      selection,
+      history: editor.getHistory(),
+      nodes: doc.nodes,
+    };
   },
 
   domToModel: (node, offset) => {

@@ -2,7 +2,7 @@ import { nodeLength } from "../model/node-length";
 import { isText } from "../model/nodes";
 import { resolvePosition } from "../model/resolve-position";
 import type { Doc, ModelSelection } from "../model/types";
-import { isWhitespace } from "./is-whitespace";
+import { isWhitespace } from "../model/is-whitespace";
 import type { MentionQuery, MentionQueryOptions } from "./types";
 
 interface Options extends MentionQueryOptions {
