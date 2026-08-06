@@ -10,3 +10,10 @@ CLAUDE.md
 
 packages/mentis/README.md
 packages/mentis/LICENSE
+
+# Playwright — reports, traces and downloaded browser binaries
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.playwright/

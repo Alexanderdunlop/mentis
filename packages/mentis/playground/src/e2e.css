@@ -1,0 +1,121 @@
+/*
+ * Styling for the e2e harness page. Kept separate from `style.css` (the demo
+ * playground's) so changes to the demo cannot move the harness underneath the
+ * Playwright suite.
+ *
+ * The classes prefixed `harness-` in the "styled" case are asserted against by
+ * e2e/spec/styling.spec.ts — their declared values are part of the contract.
+ */
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: system-ui, sans-serif;
+  background: #fff;
+  color: #111;
+}
+
+.harness > h1 {
+  font-size: 18px;
+}
+
+/*
+ * The modal is absolutely positioned below its input and is out of flow, so each
+ * case needs enough trailing space that an open modal cannot cover the *next*
+ * case's input. Overlap would make clicks land on the wrong element.
+ */
+.harness-case {
+  width: 320px;
+  margin: 0 0 280px;
+}
+
+.harness-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.harness-title code {
+  font-weight: 400;
+  color: #666;
+}
+
+/*
+ * Click target for click-outside tests. Sits above the input because the modal
+ * opens downwards — a target below the input would be covered by the modal, and
+ * the "outside" click would select an option instead.
+ */
+.harness-outside {
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px dashed #bbb;
+  color: #666;
+  font-size: 12px;
+}
+
+.harness-controls {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.harness-log,
+.harness-datavalue {
+  margin: 8px 0 0;
+  padding: 4px;
+  max-width: 320px;
+  overflow-x: auto;
+  background: #f6f6f6;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* --- the "styled" case: every slot overridden ---------------------------- */
+
+/*
+ * `position: relative` is restated here because `slotsProps.container.className`
+ * *replaces* `mention-input-container` rather than merging with it (the spread
+ * lands after the className), which would otherwise drop the containing block
+ * the modal positions against. Pinned by e2e/spec/styling.spec.ts.
+ */
+.harness-container {
+  position: relative;
+  width: 100%;
+}
+
+.harness-input {
+  padding: 10px;
+  border: 2px solid rgb(0, 0, 255);
+  border-radius: 0;
+  outline: none;
+  white-space: pre-wrap;
+}
+
+.harness-modal {
+  position: absolute;
+  width: 100%;
+  background: rgb(255, 255, 240);
+  border: 1px solid #333;
+}
+
+.harness-option {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.harness-option-highlighted {
+  background: rgb(255, 0, 0);
+}
+
+.harness-no-options {
+  padding: 6px;
+  color: rgb(128, 128, 128);
+}
+
+.harness-chip {
+  background: rgb(0, 128, 0);
+  color: rgb(255, 255, 255);
+  border-radius: 999px;
+  padding: 0 6px;
+}
