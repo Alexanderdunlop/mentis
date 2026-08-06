@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { renderDomTree } from "../dom-tree";
-import { textLength } from "../format";
+import { renderDomTree } from "../render-tree";
 
 /**
  * Smoke coverage for the inspector's renderers: they must not throw, and must
@@ -89,27 +88,5 @@ describe("renderDomTree", () => {
 
   it("does not throw on an empty editor", () => {
     expect(() => setup("")).not.toThrow();
-  });
-});
-
-describe("textLength", () => {
-  it("counts text characters", () => {
-    editor.innerHTML = "hello";
-    expect(textLength(editor)).toBe(5);
-  });
-
-  it("counts a br as one newline, unlike Range.toString()", () => {
-    editor.innerHTML = "one<br>two";
-    expect(textLength(editor)).toBe(7);
-  });
-
-  it("descends into nested elements", () => {
-    editor.innerHTML = 'a<span class="chip">bc</span>d';
-    expect(textLength(editor)).toBe(4);
-  });
-
-  it("is zero for an empty editor", () => {
-    editor.innerHTML = "";
-    expect(textLength(editor)).toBe(0);
   });
 });

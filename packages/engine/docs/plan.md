@@ -189,8 +189,8 @@ have to already be in the file.
 | Kind | Home | Example |
 |---|---|---|
 | Local "don't break this" | comment at the line | the whitespace map is 1:1 so offsets stay valid |
-| A commitment future work inherits | `docs/adr/NNNN-*.md` | a line break is one `\n` ([0001](../adr/0001-line-breaks-as-newline-characters.md)) |
-| Platform behaviour that will bite again | [`docs/notes/contenteditable-traps.md`](../notes/contenteditable-traps.md) | nbsp is not a space; untrusted events can't edit |
+| A commitment future work inherits | `docs/adr/NNNN-*.md` | a line break is one `\n` ([0001](adr/0001-line-breaks-as-newline-characters.md)) |
+| Platform behaviour that will bite again | [`docs/notes/contenteditable-traps.md`](notes/contenteditable-traps.md) | nbsp is not a space; untrusted events can't edit |
 
 ADRs are short and dated, and record the alternatives plus a **revisit-when** trigger —
 the point is to make overturning a decision deliberate rather than accidental. The

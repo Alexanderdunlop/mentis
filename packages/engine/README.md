@@ -1,7 +1,7 @@
 # @mentis/engine
 
 Model-first inline contenteditable engine. Private, unpublished — see
-[`docs/plans/engine.md`](../../docs/plans/engine.md) for what this is and why.
+[`docs/plan.md`](docs/plan.md) for what this is and why.
 
 ```sh
 pnpm --filter @mentis/engine dev         # inspector at http://localhost:5180
@@ -32,11 +32,11 @@ Two details worth knowing, both explained in full elsewhere rather than duplicat
 
 - **nbsp is rendered differently from a space on purpose** — they look identical but
   `char === " "` is false for nbsp, so identical glyphs would hide the bug.
-  → [contenteditable traps](../../docs/notes/contenteditable-traps.md)
+  → [contenteditable traps](docs/notes/contenteditable-traps.md)
 - **`textLength` counts a `<br>` as one newline**, unlike `Range.toString()`, which
   ignores `<br>` and would make every offset after a line break wrong. This is a
   modelling commitment M1 inherits, not just a measurement detail.
-  → [ADR 0001](../../docs/adr/0001-line-breaks-as-newline-characters.md)
+  → [ADR 0001](docs/adr/0001-line-breaks-as-newline-characters.md)
 
 ### Controls
 
@@ -95,18 +95,35 @@ Two vitest projects, and the split is deliberate:
 
 ## Layout
 
+One idea per file, so a reviewer never has to hold two concepts at once. Tests sit in a
+`tests/` folder beside the code they cover.
+
 ```
 src/devtools/
-  index.ts           createInspector — wires the panels, rAF-coalesced refresh
-  selection-probe.ts DOM boundary → char offset, selection snapshots
-  dom-tree.ts        the tree renderer, with selection glyphs spliced in
-  event-log.ts       event capture, summaries, JSON export
-  replay.ts          script parser (pure) + playback (browser)
-  scenarios.ts       preset scripts, each chosen to expose something specific
-  model-probe.ts     the seam M1 plugs into
-  format.ts          whitespace glyphs, escaping, node paths, textLength
-dev/                 the harness page — plain DOM, no framework
+  index.ts             public exports, nothing else
+
+  text/                visible-whitespace · escape-html · truncate
+  dom/                 text-length (ADR 0001) · node-path
+  selection/           char-offset · read-selection · types
+  tree/                markers · attrs · render-tree
+  log/                 summarise · describe-event · render-row · create-event-log · types
+  replay/              parse-script · aliases · types
+                       dispatch-key · edit-primitives · native-action · caret · run-script
+  inspector/           panel · render-selection · create-inspector
+
+  model-probe.ts       the seam M1 plugs into
+  scenarios.ts         preset scripts, each chosen to expose something specific
+
+dev/                   the harness page — plain DOM, no framework
 ```
 
-`src/devtools/` is dev-only and will not ship in the engine's public entry point. The
-`replay.ts` parser is intentionally pure so the Playwright suite can share it.
+Two boundaries are deliberate rather than cosmetic:
+
+- **`log/describe-event.ts` is separate from `log/create-event-log.ts`.** The interesting
+  part — what actually gets reported about an event — is a set of plain functions taking
+  an event and returning `{ summary, detail }`, so it's readable and testable without
+  attaching to a live editor. The other file is only listener wiring.
+- **`replay/parse-script.ts` holds no browser code.** It's pure so it unit-tests in the
+  `node` project and so the Playwright suite can share the same script syntax.
+
+`src/devtools/` is dev-only and will not ship in the engine's public entry point.

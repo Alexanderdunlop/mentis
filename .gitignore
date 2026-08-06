@@ -6,7 +6,6 @@ dist/
 .DS_Store
 .eslintcache
 
-CLAUDE.md
 
 packages/mentis/README.md
 packages/mentis/LICENSE

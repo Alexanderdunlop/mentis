@@ -2,7 +2,7 @@
   "name": "@mentis/engine",
   "version": "0.0.0",
   "private": true,
-  "description": "Model-first inline contenteditable engine. Not published — see docs/plans/engine.md.",
+  "description": "Model-first inline contenteditable engine. Not published — see docs/plan.md.",
   "type": "module",
   "license": "MIT",
   "scripts": {

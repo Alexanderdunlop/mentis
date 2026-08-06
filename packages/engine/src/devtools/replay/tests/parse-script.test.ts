@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { parseScript, ReplayParseError, type ReplayStep } from "../replay";
+import { parseScript, ReplayParseError } from "../parse-script";
+import type { ReplayStep } from "../types";
 
 const text = (chars: string): ReplayStep[] =>
   [...chars].map((char) => ({ kind: "text", char }) as ReplayStep);
