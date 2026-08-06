@@ -209,6 +209,20 @@ export function E2EHarness() {
     <main className="harness">
       <h1>mentis e2e harness</h1>
 
+      {/*
+        Copy source for the real-clipboard tests. A spec fills this in, selects
+        it and presses the copy shortcut, which puts content on the actual OS
+        clipboard with both text/plain and text/html flavours — the only way to
+        exercise a genuine paste in browsers that will not let Playwright grant
+        clipboard permissions or fake a ClipboardEvent.
+      */}
+      <div
+        className="harness-clipboard"
+        contentEditable
+        suppressContentEditableWarning
+        data-testid="clipboard-source"
+      />
+
       <Case id="default" title="defaults">
         {(record) => <MentionInput options={OPTIONS} onChange={record} />}
       </Case>

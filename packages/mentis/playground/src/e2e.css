@@ -53,6 +53,18 @@ body {
   font-size: 12px;
 }
 
+/* Copy source for the real-clipboard tests. Visible and focusable — a hidden or
+ * zero-size element cannot be selected and copied from. */
+.harness-clipboard {
+  width: 320px;
+  min-height: 20px;
+  margin-bottom: 24px;
+  padding: 4px;
+  border: 1px dotted #999;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
 .harness-controls {
   margin-top: 8px;
   display: flex;

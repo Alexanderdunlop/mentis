@@ -503,7 +503,8 @@ export class MentionCase {
    * press the paste shortcut so the browser builds the event itself.
    *
    * Requires clipboard permissions, which only Chromium grants through
-   * Playwright — guard calls with `test.skip(browserName !== "chromium")`.
+   * Playwright — guard calls with `test.skip(browserName !== "chromium")`. Use
+   * `pasteByCopying` for a real paste that works in every browser.
    */
   async pasteFromSystemClipboard(text: string): Promise<void> {
     await this.ensureFocused();
@@ -511,6 +512,32 @@ export class MentionCase {
       (text) => navigator.clipboard.writeText(text),
       text
     );
+    await this.page.keyboard.press(`${MODIFIER}+v`);
+  }
+
+  /**
+   * Paste by actually copying: fill the harness's copy-source element, select
+   * it, press copy, then press paste in this editor.
+   *
+   * Slower than the other two paths but the most faithful and the only one that
+   * works in every browser — it needs no permissions and no synthetic event, so
+   * the clipboard carries both `text/plain` and `text/html` exactly as it would
+   * for a user. This is the path to reach for when a paste spec should run on the
+   * full matrix.
+   */
+  async pasteByCopying(content: { text?: string; html?: string }): Promise<void> {
+    const source = this.page.getByTestId("clipboard-source");
+
+    await source.evaluate((element, { text, html }) => {
+      if (html !== undefined) element.innerHTML = html;
+      else element.textContent = text ?? "";
+    }, content);
+
+    await source.click();
+    await this.page.keyboard.press(`${MODIFIER}+a`);
+    await this.page.keyboard.press(`${MODIFIER}+c`);
+
+    await this.focus();
     await this.page.keyboard.press(`${MODIFIER}+v`);
   }
 
@@ -554,6 +581,33 @@ export class MentionCase {
         message: `${this.id}: caret offset into textContent`,
       })
       .toBe(offset);
+  }
+
+  /**
+   * Assert the caret sits at the very end of the content, without naming an
+   * offset.
+   *
+   * Use this instead of `expectCaretOffset` whenever the content contains a
+   * newline. Browsers do not agree on how a newline is represented in the DOM —
+   * Chromium and WebKit end the line with a block boundary that contributes
+   * nothing to `textContent`, while Firefox inserts a literal "\n" character
+   * that does. The caret is in the same visible place in both, but its offset
+   * into `textContent` differs by one per newline, so a hard-coded offset would
+   * be asserting a browser quirk rather than the library's behaviour.
+   */
+  async expectCaretAtEnd(): Promise<void> {
+    await expect
+      .poll(
+        async () => {
+          const [caret, text] = await Promise.all([
+            this.getCaretOffset(),
+            this.getText(),
+          ]);
+          return caret === null ? null : caret - text.length;
+        },
+        { message: `${this.id}: caret distance from the end of textContent` }
+      )
+      .toBe(0);
   }
 
   /** Assert the modal is open and listing exactly these option labels, in order. */
