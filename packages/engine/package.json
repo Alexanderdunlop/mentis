@@ -1,0 +1,21 @@
+{
+  "name": "@mentis/engine",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Model-first inline contenteditable engine. Not published — see docs/plans/engine.md.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite --config vite.config.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.13",
+    "happy-dom": "^18.0.1",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.4",
+    "vitest": "^3.2.4"
+  }
+}

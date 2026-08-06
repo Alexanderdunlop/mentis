@@ -75,6 +75,11 @@ A dev page with the editor plus a live debug panel:
 **Done when:** you can watch what Chrome, Safari, and Gboard actually emit, and
 replay a keystroke script with one keypress.
 
+> **Built** — `packages/engine`, `pnpm --filter @mentis/engine dev`. See that package's
+> README for the panels, the replay syntax, and the fidelity caveat (playback models
+> the browser via `execCommand`; it cannot fake IME or mobile autocorrect, so those
+> still need real input by hand).
+
 Do this first. One hour with this panel teaches more than a week of reading specs,
 and the replay box is both the debugger and (later) the test primitive. It is also
 what makes the hard milestones tractable rather than soul-destroying.
@@ -205,7 +210,7 @@ pnpm install          # worktrees don't share node_modules
 
 ## Status
 
-- [ ] M0 — instrument panel
+- [x] M0 — instrument panel
 - [ ] M1 — model + text-only editor
 - [ ] M2 — atomic nodes / mentions
 - [ ] M3 — undo stack

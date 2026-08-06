@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mentis engine · M0 inspector</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>mentis engine <span class="dim">· M0 inspector</span></h1>
+      <div class="controls">
+        <label><input type="checkbox" id="pause" /> pause</label>
+        <label><input type="checkbox" id="autoscroll" checked /> autoscroll</label>
+        <label><input type="checkbox" id="selectionchange" /> log selectionchange</label>
+        <button id="clear">clear log</button>
+        <button id="copy">copy JSON</button>
+        <button id="download">download JSON</button>
+      </div>
+      <span class="ua" id="ua"></span>
+    </header>
+
+    <main class="cols">
+      <div class="col">
+        <section class="panel">
+          <header class="panel-head">
+            <span>Editor</span>
+            <span class="panel-extra">
+              <label
+                title="preventDefault every beforeinput, in capture phase — previews what M1 does"
+                ><input type="checkbox" id="intercept" /> intercept all
+                beforeinput</label
+              >
+            </span>
+          </header>
+          <div class="panel-body">
+            <div id="editor" class="editor" contenteditable="true"></div>
+            <p class="hint">
+              A bare <code>contenteditable</code> — there is no model yet, that
+              arrives in M1. Type, paste, switch to a Japanese IME, try
+              <kbd>⌘Z</kbd>, then read the panels on the right.
+            </p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header class="panel-head">
+            <span>Replay</span>
+            <span class="panel-extra legend"
+              >literal text · {Enter} · {Ctrl+z} · {Backspace x3} · {wait 250}</span
+            >
+          </header>
+          <div class="panel-body">
+            <div class="row">
+              <input
+                id="script"
+                class="script"
+                value="Hey @al{ArrowDown}{Enter} how are you?"
+                spellcheck="false"
+              />
+              <button id="run" class="primary">Run</button>
+              <button id="stop">Stop</button>
+            </div>
+            <div class="row">
+              <label class="delay"
+                >delay
+                <input type="range" id="delay" min="0" max="200" value="8" />
+                <span id="delay-out" class="dim">8ms</span>
+              </label>
+            </div>
+            <div id="scenarios" class="chips"></div>
+            <p class="hint" id="scenario-note"></p>
+            <p class="error" id="script-error"></p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header class="panel-head"><span>Content presets</span></header>
+          <div class="panel-body">
+            <div id="presets" class="chips"></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="col" id="inspector"></div>
+    </main>
+
+    <script type="module" src="/main.ts"></script>
+  </body>
+</html>
