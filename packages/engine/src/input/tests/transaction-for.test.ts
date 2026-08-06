@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { textNode } from "../../model/nodes";
 import { transactionFor } from "../transaction-for";
 import type { InputIntent } from "../types";
 
@@ -17,7 +18,7 @@ describe("transactionFor — insertion", () => {
       intent({ inputType: "insertText", text: "a", range: { from: 3, to: 3 } })
     );
     expect(transaction).toEqual({
-      steps: [{ type: "insert", at: 3, text: "a" }],
+      steps: [{ type: "insert", at: 3, slice: [textNode("a")] }],
       selection: { anchor: 4, head: 4 },
       origin: "user",
     });
@@ -29,7 +30,7 @@ describe("transactionFor — insertion", () => {
     );
     expect(transaction?.steps).toEqual([
       { type: "delete", from: 2, to: 5 },
-      { type: "insert", at: 2, text: "X" },
+      { type: "insert", at: 2, slice: [textNode("X")] },
     ]);
     expect(transaction?.selection).toEqual({ anchor: 3, head: 3 });
   });
@@ -40,7 +41,7 @@ describe("transactionFor — insertion", () => {
         intent({ inputType, range: { from: 3, to: 3 } })
       );
       expect(transaction?.steps).toEqual([
-        { type: "insert", at: 3, text: "\n" },
+        { type: "insert", at: 3, slice: [textNode("\n")] },
       ]);
       expect(transaction?.selection).toEqual({ anchor: 4, head: 4 });
     }
@@ -58,7 +59,7 @@ describe("transactionFor — insertion", () => {
       );
       expect(transaction?.steps).toEqual([
         { type: "delete", from: 1, to: 4 },
-        { type: "insert", at: 1, text: "hi" },
+        { type: "insert", at: 1, slice: [textNode("hi")] },
       ]);
     }
   });

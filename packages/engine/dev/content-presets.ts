@@ -1,6 +1,6 @@
 import type { Editor } from "../src/editor/types";
 import { docLength } from "../src/model/doc-length";
-import { replaceRange } from "../src/model/transaction";
+import { replaceWithText } from "../src/model/transaction";
 import { need } from "./need";
 
 const NBSP = String.fromCodePoint(0x00a0);
@@ -74,7 +74,7 @@ export const bindContentPresets = ({
       if (editor) {
         const { doc } = editor.getState();
         editor.dispatch({
-          steps: replaceRange(0, docLength(doc), preset.text),
+          steps: replaceWithText(0, docLength(doc), preset.text),
           selection: { anchor: preset.text.length, head: preset.text.length },
           origin: "program",
         });

@@ -1,10 +1,12 @@
-import { clampPosition } from "./resolve-position";
-import { docText } from "./doc-text";
+import { sliceBetween, sliceText } from "./slice-between";
 import type { Doc } from "./types";
 
-/** The text in a range, used to build the inverse of a delete step. */
-export const textBetween = (doc: Doc, from: number, to: number): string => {
-  const start = clampPosition(doc, Math.min(from, to));
-  const end = clampPosition(doc, Math.max(from, to));
-  return docText(doc).slice(start, end);
-};
+/**
+ * Visible text in a range.
+ *
+ * Goes through `sliceBetween` rather than slicing `docText`, because `from`/`to` are
+ * positions and `docText` is characters — the two coordinate spaces diverge as soon as
+ * the document contains an atom.
+ */
+export const textBetween = (doc: Doc, from: number, to: number): string =>
+  sliceText(sliceBetween(doc, from, to));

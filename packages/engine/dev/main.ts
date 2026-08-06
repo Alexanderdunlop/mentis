@@ -4,6 +4,7 @@ import { bindContentPresets } from "./content-presets";
 import { engineProbe } from "./engine-probe";
 import { bindEngineToggle } from "./engine-toggle";
 import { bindLogControls } from "./log-controls";
+import { bindMentionControls } from "./mention-controls";
 import { need } from "./need";
 import { bindReplayControls } from "./replay-controls";
 import "./styles.css";
@@ -24,11 +25,15 @@ const presets = bindContentPresets({
   onApplied: inspector.refresh,
 });
 
+const mentionControls = bindMentionControls(() => editor);
+
 need("#ua").textContent = `${navigator.userAgent} · ${navigator.platform}`;
 
 bindEngineToggle(element, (next) => {
   editor = next;
   presets.syncAvailability(next !== null);
+  // Mentions are model nodes, so there is nothing to insert them into when detached.
+  mentionControls.setEnabled(next !== null);
   inspector.refresh();
 });
 

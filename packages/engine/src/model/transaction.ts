@@ -1,6 +1,8 @@
+import { textNode } from "./nodes";
+import { sliceLength } from "./slice-between";
 import { applyStep } from "./steps/apply-step";
 import type { Step } from "./steps/types";
-import type { Doc, ModelSelection } from "./types";
+import type { Doc, ModelSelection, Slice } from "./types";
 
 /**
  * A unit of change. Steps apply in order; the selection is where the caret ends up.
@@ -43,14 +45,21 @@ export const applyTransaction = (
   };
 };
 
-/** Replace a range with text — the shape almost every input event reduces to. */
+/** Replace a range with a slice — the shape almost every edit reduces to. */
 export const replaceRange = (
   from: number,
   to: number,
-  text: string
+  slice: Slice
 ): Step[] => {
   const steps: Step[] = [];
   if (to > from) steps.push({ type: "delete", from, to });
-  if (text !== "") steps.push({ type: "insert", at: from, text });
+  if (sliceLength(slice) > 0) steps.push({ type: "insert", at: from, slice });
   return steps;
 };
+
+/** Convenience for the overwhelmingly common case: replacing a range with plain text. */
+export const replaceWithText = (
+  from: number,
+  to: number,
+  text: string
+): Step[] => replaceRange(from, to, text === "" ? [] : [textNode(text)]);
