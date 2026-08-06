@@ -9,7 +9,7 @@ pnpm --filter @mentis/engine test
 pnpm --filter @mentis/engine typecheck
 ```
 
-## Current state: M2 — atomic nodes, so mentions exist
+## Current state: M2.5 — mentions can be typed
 
 The editor is engine-driven: `beforeinput` is intercepted, a transaction is applied to
 the document, and the DOM is patched to match. **The DOM is a projection of the model,
@@ -38,6 +38,7 @@ too".
 src/model/     doc, positions, slices, steps, transactions   — pure, no DOM
 src/view/      render (patches, never innerHTML) + position mapping both ways
 src/input/     beforeinput -> transaction                    — transaction-for.ts is pure
+src/query/     trigger detection                             — pure, no DOM
 src/commands/  higher-level edits, e.g. insertMention        — pure, returns transactions
 src/editor/    the wiring that ties them together
 ```
@@ -54,8 +55,13 @@ deleted mention restores the mention rather than its label text. They are invert
 the start, so M3's undo is a matter of storing transactions rather than snapshotting
 documents.
 
-**Not yet built:** trigger detection and the dropdown. Typing `@al` does nothing — insert
-a mention from the harness's Mentions panel instead.
+Typing `@al` opens a filtered dropdown; arrows move, Enter or Tab inserts, Escape
+dismisses. The query is a **pure function of (doc, selection)** — derived, never stored, so
+there is no open/closed flag to go stale ([ADR 0006](docs/adr/0006-the-mention-query-is-derived-state.md)).
+
+The dropdown and its key handling live in `dev/`, not `src/`: the engine is headless, and
+ADR 0003 confines it to `beforeinput`, so Arrow/Enter/Escape/Tab are the consumer's. That
+makes the harness a rehearsal for the M7 adapters.
 
 ## The instrument panel (M0)
 
