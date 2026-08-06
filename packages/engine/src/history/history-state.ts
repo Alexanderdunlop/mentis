@@ -6,7 +6,8 @@ export const DEFAULT_MAX_DEPTH = 200;
 
 interface RecordOptions {
   maxDepth?: number;
-  maxGapMs?: number;
+  maxIdleMs?: number;
+  maxGroupSize?: number;
 }
 
 /**
@@ -20,11 +21,11 @@ export const record = (
   state: HistoryState,
   entry: HistoryEntry,
   shape: EditShape,
-  { maxDepth = DEFAULT_MAX_DEPTH, maxGapMs }: RecordOptions = {}
+  { maxDepth = DEFAULT_MAX_DEPTH, maxIdleMs, maxGroupSize }: RecordOptions = {}
 ): HistoryState => {
   const previous = state.done[state.done.length - 1];
 
-  const done = canCoalesce(previous, shape, entry.at, { maxGapMs })
+  const done = canCoalesce(previous, shape, entry.at, { maxIdleMs, maxGroupSize })
     ? [...state.done.slice(0, -1), mergeEntries(previous!, entry)]
     : [...state.done, entry];
 

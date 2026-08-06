@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createDoc, emptyDoc } from "../../model/create-doc";
 import { atomNode, textNode } from "../../model/nodes";
 import type { Doc } from "../../model/types";
-import { isWhitespace } from "../is-whitespace";
+import { isWhitespace } from "../../model/is-whitespace";
 import { mentionQuery } from "../mention-query";
 
 const NBSP = String.fromCodePoint(0x00a0);

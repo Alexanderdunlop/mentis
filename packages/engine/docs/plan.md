@@ -172,10 +172,14 @@ and paste.
 > passed in.
 >
 > The inversion work was already done in M1, so this milestone was a stack plus a merge
-> rule. Coalescing joins an edit to the previous entry only when the kind matches, it began
-> exactly where the last one ended, and it happened within 600ms — so typing then deleting
-> is two steps, moving the caret starts a step, and a pause lands an undo boundary where
-> the user paused.
+> rule.
+>
+> [ADR 0008](adr/0008-undo-granularity-is-word-based.md): granularity follows **words, not
+> typing speed**. The first rule used a 600ms per-keystroke gap, and testing the harness
+> caught it immediately — `Alex` undid as one step typed fast and as `Al` + `ex` with a
+> hesitation. Beyond being unpredictable for the user, that made undo a function of machine
+> timing and so untestable. Whitespace now closes a group; timing survives only as a 3s
+> idle signal.
 >
 > [ADR 0007](adr/0007-the-engine-owns-the-undo-shortcut.md) **amends ADR 0003**: the engine
 > now watches one keyboard shortcut. Preventing every `beforeinput` leaves the browser's

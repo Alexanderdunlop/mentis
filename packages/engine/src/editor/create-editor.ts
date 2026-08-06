@@ -76,6 +76,8 @@ export const createEditor = ({
           selectionAfter: state.selection,
           kind: shape.kind,
           endedAt: shape.endedAt,
+          size: shape.size,
+          char: shape.char,
           at: now(),
         },
         shape

@@ -18,6 +18,10 @@ export interface EditShape {
   kind: EditKind;
   startedAt: number;
   endedAt: number;
+  /** Positions this edit changed, so a very long run still breaks into steps. */
+  size: number;
+  /** The single character typed, when there is one. Drives word-boundary grouping. */
+  char?: string;
 }
 
 export interface HistoryEntry {
@@ -29,6 +33,10 @@ export interface HistoryEntry {
   selectionAfter: ModelSelection | null;
   kind: EditKind;
   endedAt: number;
+  /** Positions changed across the whole group, after coalescing. */
+  size: number;
+  /** Last character this group typed, for word-boundary grouping. */
+  char?: string;
   /** Caller-supplied timestamp; the history layer never reads a clock itself. */
   at: number;
 }

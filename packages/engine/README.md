@@ -57,8 +57,9 @@ deleted mention restores the mention rather than its label text.
 Undo (<kbd>⌘Z</kbd> / <kbd>⌘⇧Z</kbd> / <kbd>Ctrl+Y</kbd>) is the engine's, since preventing
 every `beforeinput` empties the browser's own stack — see
 [ADR 0007](docs/adr/0007-the-engine-owns-the-undo-shortcut.md), which amends ADR 0003 for
-that one shortcut. A typing run is one undo step; a pause, a newline, or switching to
-deleting starts another.
+that one shortcut. Granularity follows **word boundaries, not typing speed**
+([ADR 0008](docs/adr/0008-undo-granularity-is-word-based.md)) — so the same keystrokes
+always give the same undo steps.
 
 Typing `@al` opens a filtered dropdown; arrows move, Enter or Tab inserts, Escape
 dismisses. The query is a **pure function of (doc, selection)** — derived, never stored, so

@@ -33,7 +33,7 @@ export type {
 } from "./model/types";
 
 export { mentionQuery } from "./query/mention-query";
-export { isWhitespace } from "./query/is-whitespace";
+export { isWhitespace } from "./model/is-whitespace";
 export type { MentionQuery, MentionQueryOptions } from "./query/types";
 
 export { transactionFor } from "./input/transaction-for";

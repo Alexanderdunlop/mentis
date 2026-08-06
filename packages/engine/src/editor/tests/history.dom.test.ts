@@ -71,6 +71,43 @@ describe("undo and redo", () => {
     expect(text()).toBe("");
   });
 
+  it("undoes a word in one step regardless of typing speed", () => {
+    // Reported from the harness: typing A-l-e-x and pressing undo removed only some of
+    // the letters. The cause was a 600ms per-keystroke rule, so an ordinary hesitation
+    // split the word and undo depended on how fast you typed.
+    const groupsFor = (msPerKey: number): number => {
+      editor = setup();
+      for (const char of "Alex") {
+        type(char);
+        clock += msPerKey;
+      }
+      return editor.getHistory().depth;
+    };
+
+    expect(groupsFor(40)).toBe(1);
+    expect(groupsFor(900)).toBe(1);
+
+    editor = setup();
+    for (const char of "Alex") {
+      type(char);
+      clock += 900;
+    }
+    expect(editor.undo()).toBe(true);
+    expect(text()).toBe("");
+  });
+
+  it("gives each word its own undo step", () => {
+    typeAll("Alex Bob");
+    expect(editor.getHistory().depth).toBe(2);
+
+    editor.undo();
+    // The space belongs to the word it follows, so the first step ends after it.
+    expect(text()).toBe("Alex ");
+
+    editor.undo();
+    expect(text()).toBe("");
+  });
+
   it("splits the run at a pause", () => {
     typeAll("hello");
     clock += 5000;

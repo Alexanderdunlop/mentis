@@ -38,6 +38,8 @@ const entry = (
       selectionAfter: transaction.selection ?? null,
       kind: shape.kind,
       endedAt: shape.endedAt,
+      size: shape.size,
+      char: shape.char,
       at,
     },
   };
@@ -45,7 +47,7 @@ const entry = (
 
 const add = (state: HistoryState, transaction: Transaction, at: number) => {
   const { entry: next, shape } = entry(transaction, at);
-  return record(state, next, shape, { maxGapMs: 600 });
+  return record(state, next, shape);
 };
 
 describe("editShapeOf", () => {
@@ -54,6 +56,8 @@ describe("editShapeOf", () => {
       kind: "type",
       startedAt: 3,
       endedAt: 4,
+      size: 1,
+      char: "a",
     });
   });
 
@@ -62,6 +66,7 @@ describe("editShapeOf", () => {
       kind: "delete",
       startedAt: 3,
       endedAt: 2,
+      size: 1,
     });
   });
 
@@ -97,8 +102,28 @@ describe("canCoalesce", () => {
     expect(canCoalesce(previous, editShapeOf(typed(4)), 1100)).toBe(true);
   });
 
-  it("refuses across a pause", () => {
-    expect(canCoalesce(previous, editShapeOf(typed(4)), 2000)).toBe(false);
+  it("refuses after going idle", () => {
+    expect(canCoalesce(previous, editShapeOf(typed(4)), 9000)).toBe(false);
+  });
+
+  it("still joins across an ordinary typing hesitation", () => {
+    // The bug this replaced: a 600ms rule split `Alex` into `Al` + `ex` whenever the
+    // typist paused before the `e`, so undo depended on typing speed.
+    expect(canCoalesce(previous, editShapeOf(typed(4)), 2500)).toBe(true);
+  });
+
+  it("closes the group after whitespace, so the next word is its own step", () => {
+    const afterSpace = entry(typed(3, " "), 1000).entry;
+    expect(canCoalesce(afterSpace, editShapeOf(typed(4)), 1100)).toBe(false);
+  });
+
+  it("joins the whitespace itself onto the word before it", () => {
+    expect(canCoalesce(previous, editShapeOf(typed(4, " ")), 1100)).toBe(true);
+  });
+
+  it("refuses once the group is oversized", () => {
+    const big = { ...previous, size: 80 };
+    expect(canCoalesce(big, editShapeOf(typed(4)), 1100)).toBe(false);
   });
 
   it("refuses when the caret moved elsewhere", () => {
@@ -161,14 +186,44 @@ describe("record", () => {
     state = add(state, typed(1, "e"), 1050);
     state = add(state, typed(2, "y"), 1100);
 
+
     expect(state.done).toHaveLength(1);
   });
 
-  it("splits a typing run at a pause", () => {
+  it("splits a typing run after going idle", () => {
     let state = emptyHistory();
     state = add(state, typed(0), 1000);
-    state = add(state, typed(1), 5000);
+    state = add(state, typed(1), 9000);
     expect(state.done).toHaveLength(2);
+  });
+
+  it("groups the same keystrokes identically at any typing speed", () => {
+    // The property that was broken: undo must be a function of what was typed, not of
+    // how fast. Otherwise a Playwright assertion about undo depends on machine timing.
+    const grouping = (perKeystrokeMs: number): number => {
+      let state = emptyHistory();
+      let clock = 1000;
+      "Alex world".split("").forEach((char, index) => {
+        state = add(state, typed(index, char), clock);
+        clock += perKeystrokeMs;
+      });
+      return state.done.length;
+    };
+
+    // "Alex" + " " is one group, "world" is another — at 30ms/char or 900ms/char alike.
+    expect(grouping(30)).toBe(2);
+    expect(grouping(900)).toBe(2);
+    expect(grouping(30)).toBe(grouping(900));
+  });
+
+  it("starts a new group per word", () => {
+    let state = emptyHistory();
+    let clock = 1000;
+    "one two three".split("").forEach((char, index) => {
+      state = add(state, typed(index, char), clock);
+      clock += 40;
+    });
+    expect(state.done).toHaveLength(3);
   });
 
   it("splits typing from deleting", () => {
@@ -191,7 +246,7 @@ describe("record", () => {
     let state = emptyHistory();
     for (let i = 0; i < 12; i += 1) {
       // Non-adjacent and far apart, so nothing coalesces.
-      state = add(state, typed(i * 10), i * 5000);
+      state = add(state, typed(i * 10), i * 9000);
     }
     state = record(state, entry(typed(500), 99999).entry, editShapeOf(typed(500)), {
       maxDepth: 5,
@@ -229,7 +284,7 @@ describe("undo and redo", () => {
   it("unwinds several entries in reverse order", () => {
     let state = emptyHistory();
     state = add(state, typed(0, "a"), 1000);
-    state = add(state, typed(5, "b"), 9000);
+    state = add(state, typed(5, "b"), 20000);
 
     const first = undo(state)!;
     expect(first.entry.redoSteps).toEqual(typed(5, "b").steps);
