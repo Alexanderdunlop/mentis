@@ -21,6 +21,9 @@ export default defineConfig({
   testDir: "./e2e",
   // Both spec/ and regressions/ live under testDir; nothing else there is a test.
   testMatch: /.*\.spec\.ts/,
+  // `_template.spec.ts` exists to be copied, not run. It is still typechecked by
+  // `pnpm typecheck:e2e`, so it cannot rot unnoticed.
+  testIgnore: "**/_*.spec.ts",
 
   // The suite drives a contentEditable through real key events. Nothing here is
   // allowed to depend on test order or on a shared server-side state.
