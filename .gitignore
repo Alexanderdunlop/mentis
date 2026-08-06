@@ -6,6 +6,22 @@ dist/
 .DS_Store
 .eslintcache
 
+# Matches at any depth, so the root CLAUDE.md stays personal and local.
+CLAUDE.md
+# ...but the e2e one is a shared instruction file: it carries the "pin bugs with
+# test.fixme, never edit packages/mentis/src" constraint that anyone's agent
+# needs before touching a spec.
+!e2e/CLAUDE.md
+# Same reasoning for the engine: it is the only place the one-idea-per-file rule
+# and the nbsp / Range.toString() footguns are written down as instructions.
+!packages/engine/CLAUDE.md
 
 packages/mentis/README.md
 packages/mentis/LICENSE
+
+# Playwright — reports, traces and downloaded browser binaries
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.playwright/

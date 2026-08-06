@@ -43,6 +43,7 @@
     "build": "tsdown",
     "dev": "tsdown --watch",
     "playground": "vite --config playground/vite.config.ts",
+    "playground:e2e": "vite --config playground/vite.config.ts --port 5273 --strictPort",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "prepack": "./scripts/prepack.sh",

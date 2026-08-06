@@ -67,6 +67,13 @@ Good:
 
 Costs and risks:
 
+- **Browsers do not agree on what a line break costs in `textContent`.** Evidence from
+  the Playwright suite landed in #80: Firefox inserts a literal `"\n"` that counts,
+  while Chromium and WebKit end the line with a block boundary that doesn't. The
+  decision above is therefore *not* free — it obliges the DOM→model step to normalise
+  explicitly rather than read `textContent` through. Treat any offset arithmetic
+  spanning a newline as unproven until M1 implements and tests that conversion on all
+  three engines.
 - No way to distinguish `insertParagraph` from `insertLineBreak` at the model level.
   Both collapse to `\n`. Browsers produce genuinely different DOM for Enter vs
   Shift+Enter (see the "shift+enter line break" scenario), and this decision discards
@@ -79,6 +86,8 @@ Costs and risks:
 ## Revisit when
 
 - M1 finds it needs paragraph-vs-line-break as a modelled distinction, **or**
-- the non-goal "inline only, flat document" is ever relaxed.
+- the non-goal "inline only, flat document" is ever relaxed, **or**
+- normalising the three engines' line-break DOM into one `\n` turns out to cost more
+  than modelling breaks structurally would have.
 
-Either of those invalidates the reasoning above rather than merely inconveniencing it.
+Any of those invalidates the reasoning above rather than merely inconveniencing it.

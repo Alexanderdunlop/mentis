@@ -64,6 +64,50 @@ one newline. The reasoning and its consequences are
 
 ---
 
+## Browsers disagree about whether a line break costs a character
+
+**Symptom.** A caret assertion that spans a newline passes on one engine and fails on
+another, and reads as a library bug in whichever one you didn't develop against.
+
+**Mechanism.** Pressing Enter produces different DOM per engine, and the results are
+not equivalent under `textContent`:
+
+- **Firefox** inserts a literal `"\n"`, which *does* count in `textContent`.
+- **Chromium and WebKit** end the line with a block boundary, which does *not*.
+
+So the same visible content yields different `textContent.length`, and every offset
+after the break shifts by one depending on the browser.
+
+**What to do.** Don't hard-code a character offset past a newline. Normalise line
+breaks at the DOM boundary rather than trusting `textContent` — the engine's model
+counts one `\n` per break
+([ADR 0001](../adr/0001-line-breaks-as-newline-characters.md)), so the DOM→model step
+owes an explicit conversion, not a pass-through.
+
+**Where it shows up here.** Discovered by the Playwright suite in `e2e/`, which is why
+it has `expectCaretAtEnd()` instead of an offset assertion once content contains a
+newline. See `e2e/CLAUDE.md`. This is the first piece of real cross-browser evidence
+bearing on ADR 0001 and it arrived from the test layer, not from reading specs.
+
+---
+
+## Firefox drops `clipboardData` from a constructed `ClipboardEvent`
+
+**Symptom.** A paste test that works in Chromium does nothing at all in Firefox — no
+error, no insertion.
+
+**Mechanism.** Firefox refuses to carry a `DataTransfer` on a `ClipboardEvent` built in
+script, so the handler receives an event with nothing attached.
+
+**What to do.** Drive paste through a real copy where the matrix matters, rather than
+synthesising the event. Note this is a limit of the *test path*, not a library defect —
+don't file it as one.
+
+**Where it shows up here.** `e2e/fixtures/harness.ts` exposes `pasteByCopying()` for
+exactly this reason.
+
+---
+
 ## Script-created events cannot cause editing
 
 **Symptom.** You dispatch a `KeyboardEvent` to simulate typing. Your listeners fire.

@@ -154,9 +154,19 @@ paste event's `clipboardData` gives it to you synchronously with neither problem
 - RTL / bidi selection
 - iOS autocorrect + dictation, Android word-level replacement, spellcheck corrections
 
-**This is when the real Playwright cross-browser matrix gets built** — because now
-it's actually needed. (Separately, `test/e2e-harness` is adding Playwright to
-*v1/main*; see `docs/prompts/e2e-harness.md` on that branch. Steal its harness here.)
+**This is when the engine gets its own cross-browser matrix** — because now it's
+actually needed.
+
+It won't start from nothing: #80 landed a Playwright layer for v1 on main (`e2e/`,
+config at the repo root, fixtures in `e2e/fixtures/harness.ts`, `e2e/CLAUDE.md` for the
+conventions). Reuse its harness shape and its browser-matrix CI rather than inventing a
+second one — and note that `replay/parse-script.ts` is pure precisely so both layers
+can share one script syntax.
+
+That suite has already paid into this plan: it established that Firefox counts a line
+break in `textContent` while Chromium and WebKit don't, which is the first real
+evidence bearing on [ADR 0001](adr/0001-line-breaks-as-newline-characters.md). Expect
+more of the engine's design constraints to arrive from that direction.
 
 ### M7 — Adapters, as the victory lap
 

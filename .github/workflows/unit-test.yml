@@ -23,7 +23,7 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm install --filter mentis --frozen-lockfile
+        run: pnpm install --filter mentis --filter @mentis/engine --frozen-lockfile
 
       - name: Build
         run: pnpm run build --filter mentis
@@ -33,3 +33,11 @@ jobs:
 
       - name: Test
         run: pnpm run test --filter mentis
+
+      # @mentis/engine is private and never built, but it still needs checking or it
+      # rots unnoticed — nothing else in CI touches it.
+      - name: Typecheck engine
+        run: pnpm run typecheck --filter @mentis/engine
+
+      - name: Test engine
+        run: pnpm run test --filter @mentis/engine

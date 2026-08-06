@@ -16,8 +16,8 @@ export default defineConfig({
       {
         // happy-dom is trusted for "does this throw" and coarse structure ONLY.
         // Caret semantics, native editing, composition and clipboard are all
-        // approximations here — those belong in Playwright. See
-        // docs/prompts/e2e-harness.md for why this line is drawn so firmly.
+        // approximations here — those belong in Playwright. The repo's e2e layer
+        // states the same boundary from the other side; see e2e/CLAUDE.md.
         test: {
           name: "dom-smoke",
           environment: "happy-dom",
