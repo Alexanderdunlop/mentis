@@ -96,6 +96,15 @@ Deliberately cut the feature the library is named after, so nothing can be faked
 **Done when:** type, delete, arrow, select-and-replace all work and the model and DOM
 never disagree.
 
+> **Built** — `src/model/`, `src/view/`, `src/input/`, `src/editor/`. The Model panel in
+> the harness is live, and the `engine attached` checkbox detaches it for A/B against a
+> bare contentEditable. Three ADRs came out of it: [0002](adr/0002-render-newlines-as-text-not-br.md)
+> (newlines render as `\n`, never `<br>`), [0003](adr/0003-own-editing-not-navigation.md)
+> (intercept `beforeinput` only; navigation stays the browser's), and
+> [0004](adr/0004-take-edit-ranges-from-the-browser.md) (edit ranges come from
+> `getTargetRanges()`, which hands us correct grapheme and word boundaries for free).
+> Still unverified in a real browser.
+
 This is the intellectual core of the whole project. Good questions waiting here: what
 is a position? do you patch the text node or rebuild the line? what about the trailing
 `<br>` browsers demand in an empty block?
@@ -241,7 +250,7 @@ pnpm install          # worktrees don't share node_modules
 ## Status
 
 - [x] M0 — instrument panel
-- [ ] M1 — model + text-only editor
+- [x] M1 — model + text-only editor
 - [ ] M2 — atomic nodes / mentions
 - [ ] M3 — undo stack
 - [ ] M4 — IME / composition

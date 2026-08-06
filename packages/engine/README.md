@@ -9,11 +9,36 @@ pnpm --filter @mentis/engine test
 pnpm --filter @mentis/engine typecheck
 ```
 
-## Current state: M0 — the instrument panel
+## Current state: M1 — model, view, input
 
-**There is no engine yet.** The editor on the dev page is a bare `contenteditable`
-div. M0 exists to build the instrument you'll debug M1 through, and to spend some time
-watching what browsers actually do to an unmanaged editable region.
+The editor is engine-driven: `beforeinput` is intercepted, a transaction is applied to
+the document, and the DOM is patched to match. **The DOM is a projection of the model,
+never a source.**
+
+Caret movement is still the browser's — the engine intercepts `beforeinput` and nothing
+else ([ADR 0003](docs/adr/0003-own-editing-not-navigation.md)). Uncheck **engine
+attached** in the harness to detach it and compare against a bare `contenteditable`;
+that is the fastest way to tell "the engine is wrong" apart from "the browser does that
+too".
+
+```
+src/model/     doc, positions, steps, transactions   — pure, no DOM
+src/view/      render (patches, never innerHTML) + position mapping both ways
+src/input/     beforeinput -> transaction            — transaction-for.ts is pure
+src/editor/    the wiring that ties the three together
+```
+
+Three decisions came out of building it, each with alternatives and a revisit trigger:
+[0002](docs/adr/0002-render-newlines-as-text-not-br.md) newlines render as `\n` and
+never `<br>`; [0003](docs/adr/0003-own-editing-not-navigation.md) editing is owned,
+navigation is not; [0004](docs/adr/0004-take-edit-ranges-from-the-browser.md) edit ranges
+come from `getTargetRanges()`, which supplies correct grapheme and word boundaries for
+free.
+
+Steps are invertible from the start, so M3's undo is a matter of storing transactions
+rather than snapshotting documents.
+
+## The instrument panel (M0)
 
 Everything here is framework-free plain DOM, including the inspector itself. The rule
 from the plan — nothing below `adapters/` imports a framework — applies to the tooling
@@ -25,7 +50,7 @@ too, from day one.
 |---|---|
 | **Selection** | char offset (or range + selected count), collapsed, editor length, and the anchor/focus DOM paths with offsets |
 | **DOM** | the live tree, with `▮` caret / `⟦⟧` range spliced in, `·` space, `⍽` **nbsp**, `⏎` newline, `⇥` tab, `⌀` zero-width. Empty text nodes are flagged `EMPTY`, `<br>` is highlighted, and `contenteditable=false` elements render in a distinct colour |
-| **Model** | empty at M0. `ModelProbe` in `src/devtools/model-probe.ts` is the seam M1 plugs into |
+| **Model** | the live document: text, length, selection and nodes. Empty when the engine is detached |
 | **Events** | every `keydown`, `beforeinput`, `input`, `composition*`, `paste`/`copy`/`cut`/`drop`, focus/blur — with `inputType`, `data`, `getTargetRanges()` mapped to char offsets, `isComposing`, and whether the event was `PREVENTED` |
 
 Two details worth knowing, both explained in full elsewhere rather than duplicated here:
