@@ -2,6 +2,7 @@ import { createInspector } from "../src/devtools/index";
 import type { Editor } from "../src/editor/types";
 import { bindContentPresets } from "./content-presets";
 import { engineProbe } from "./engine-probe";
+import { bindHistoryControls } from "./history-controls";
 import { bindEngineToggle } from "./engine-toggle";
 import { bindLogControls } from "./log-controls";
 import { bindMentionControls } from "./mention-controls";
@@ -28,6 +29,7 @@ const presets = bindContentPresets({
 
 const mentionControls = bindMentionControls(() => editor);
 const mentionFlow = bindMentionFlow(element);
+const historyControls = bindHistoryControls(() => editor);
 
 need("#ua").textContent = `${navigator.userAgent} · ${navigator.platform}`;
 
@@ -37,6 +39,8 @@ bindEngineToggle(element, (next) => {
   // Mentions are model nodes, so there is nothing to insert them into when detached.
   mentionControls.setEnabled(next !== null);
   mentionFlow.onEditorChanged(next);
+  historyControls.refresh();
+  next?.subscribe(historyControls.refresh);
   inspector.refresh();
 });
 

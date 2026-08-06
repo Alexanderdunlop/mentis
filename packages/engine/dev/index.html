@@ -100,6 +100,26 @@
         </section>
 
         <section class="panel">
+          <header class="panel-head">
+            <span>History</span>
+            <span class="panel-extra legend" id="history-depth"></span>
+          </header>
+          <div class="panel-body">
+            <div class="chips">
+              <button id="undo">Undo</button>
+              <button id="redo">Redo</button>
+            </div>
+            <p class="hint">
+              <kbd>&#8984;Z</kbd> / <kbd>&#8984;&#8679;Z</kbd> (or <kbd>Ctrl+Y</kbd>)
+              work in the editor. Native undo is gone — the engine prevents every
+              <code>beforeinput</code>, so the browser's own stack is empty. A run of
+              typing is one step; a pause, a newline, or switching to deleting starts
+              another.
+            </p>
+          </div>
+        </section>
+
+        <section class="panel">
           <header class="panel-head"><span>Content presets</span></header>
           <div class="panel-body">
             <div id="presets" class="chips"></div>

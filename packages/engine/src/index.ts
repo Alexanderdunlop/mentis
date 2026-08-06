@@ -1,7 +1,12 @@
 export { createEditor } from "./editor/create-editor";
-export type { Editor, EditorState } from "./editor/types";
+export type { Editor, EditorState, HistoryInfo } from "./editor/types";
 
 export { insertMention } from "./commands/insert-mention";
+
+export { emptyHistory } from "./history/types";
+export type { EditKind, HistoryEntry, HistoryState } from "./history/types";
+export { historyShortcut } from "./input/history-shortcut";
+export type { HistoryCommand } from "./input/history-shortcut";
 
 export { createDoc, emptyDoc } from "./model/create-doc";
 export { docLength } from "./model/doc-length";

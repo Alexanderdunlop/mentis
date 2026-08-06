@@ -9,7 +9,7 @@ pnpm --filter @mentis/engine test
 pnpm --filter @mentis/engine typecheck
 ```
 
-## Current state: M2.5 — mentions can be typed
+## Current state: M3 — undo
 
 The editor is engine-driven: `beforeinput` is intercepted, a transaction is applied to
 the document, and the DOM is patched to match. **The DOM is a projection of the model,
@@ -39,6 +39,7 @@ src/model/     doc, positions, slices, steps, transactions   — pure, no DOM
 src/view/      render (patches, never innerHTML) + position mapping both ways
 src/input/     beforeinput -> transaction                    — transaction-for.ts is pure
 src/query/     trigger detection                             — pure, no DOM
+src/history/   undo stack, coalescing                        — pure, no DOM, no clock
 src/commands/  higher-level edits, e.g. insertMention        — pure, returns transactions
 src/editor/    the wiring that ties them together
 ```
@@ -51,9 +52,13 @@ come from `getTargetRanges()`, which supplies correct grapheme and word boundari
 free.
 
 Steps carry a **slice** — a list of inline nodes — rather than a string, so undoing a
-deleted mention restores the mention rather than its label text. They are invertible from
-the start, so M3's undo is a matter of storing transactions rather than snapshotting
-documents.
+deleted mention restores the mention rather than its label text.
+
+Undo (<kbd>⌘Z</kbd> / <kbd>⌘⇧Z</kbd> / <kbd>Ctrl+Y</kbd>) is the engine's, since preventing
+every `beforeinput` empties the browser's own stack — see
+[ADR 0007](docs/adr/0007-the-engine-owns-the-undo-shortcut.md), which amends ADR 0003 for
+that one shortcut. A typing run is one undo step; a pause, a newline, or switching to
+deleting starts another.
 
 Typing `@al` opens a filtered dropdown; arrows move, Enter or Tab inserts, Escape
 dismisses. The query is a **pure function of (doc, selection)** — derived, never stored, so
