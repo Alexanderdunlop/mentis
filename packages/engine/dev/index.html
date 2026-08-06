@@ -26,18 +26,20 @@
             <span>Editor</span>
             <span class="panel-extra">
               <label
-                title="preventDefault every beforeinput, in capture phase — previews what M1 does"
-                ><input type="checkbox" id="intercept" /> intercept all
-                beforeinput</label
+                title="Uncheck to detach the engine and compare against a bare contentEditable"
+                ><input type="checkbox" id="engine" checked /> engine
+                attached</label
               >
             </span>
           </header>
           <div class="panel-body">
             <div id="editor" class="editor" contenteditable="true"></div>
             <p class="hint">
-              A bare <code>contenteditable</code> — there is no model yet, that
-              arrives in M1. Type, paste, switch to a Japanese IME, try
-              <kbd>⌘Z</kbd>, then read the panels on the right.
+              The engine owns <code>beforeinput</code>; the DOM is a projection of
+              the model. Caret movement is still the browser's. Uncheck
+              <strong>engine attached</strong> to fall back to a bare
+              <code>contenteditable</code> and compare — the Model panel goes empty
+              when detached.
             </p>
           </div>
         </section>

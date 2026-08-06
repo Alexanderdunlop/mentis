@@ -1,19 +1,38 @@
 import { createInspector } from "../src/devtools/index";
+import type { Editor } from "../src/editor/types";
 import { bindContentPresets } from "./content-presets";
-import { bindIntercept } from "./intercept";
+import { engineProbe } from "./engine-probe";
+import { bindEngineToggle } from "./engine-toggle";
 import { bindLogControls } from "./log-controls";
 import { need } from "./need";
 import { bindReplayControls } from "./replay-controls";
 import "./styles.css";
 
-const editor = need<HTMLDivElement>("#editor");
-const inspector = createInspector({ editor, mount: need("#inspector") });
+const element = need<HTMLDivElement>("#editor");
+
+let editor: Editor | null = null;
+
+const inspector = createInspector({
+  editor: element,
+  mount: need("#inspector"),
+  modelProbe: engineProbe(() => editor),
+});
+
+const presets = bindContentPresets({
+  element,
+  getEditor: () => editor,
+  onApplied: inspector.refresh,
+});
 
 need("#ua").textContent = `${navigator.userAgent} · ${navigator.platform}`;
 
-bindIntercept(editor);
-bindLogControls(inspector.log);
-bindReplayControls(editor);
-bindContentPresets(editor, inspector.refresh);
+bindEngineToggle(element, (next) => {
+  editor = next;
+  presets.syncAvailability(next !== null);
+  inspector.refresh();
+});
 
-editor.focus();
+bindLogControls(inspector.log);
+bindReplayControls(element);
+
+element.focus();
