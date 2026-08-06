@@ -1,0 +1,414 @@
+:root {
+  --bg: #0f1115;
+  --panel: #161a21;
+  --panel-head: #1c222b;
+  --line: #262d38;
+  --fg: #d7dde7;
+  --dim: #7c8798;
+  --accent: #6ea8fe;
+  --str: #9ece6a;
+  --key: #7dcfff;
+  --warn: #e0af68;
+  --err: #f7768e;
+  --atomic: #bb9af7;
+  --sel: #ff9e64;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--fg);
+  font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ---------- top bar ---------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-head);
+  flex-wrap: wrap;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.controls label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+.ua {
+  margin-left: auto;
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 10px;
+  max-width: 40ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dim {
+  color: var(--dim);
+  font-weight: 400;
+}
+
+/* ---------- buttons & inputs ---------- */
+
+button {
+  font: inherit;
+  font-size: 12px;
+  padding: 3px 9px;
+  color: var(--fg);
+  background: #232a35;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+button.primary {
+  background: var(--accent);
+  color: #0f1115;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+input[type="text"],
+.script {
+  font-family: var(--mono);
+  font-size: 12px;
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  color: var(--fg);
+  background: #0c0e12;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+
+.script:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ---------- layout ---------- */
+
+.cols {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(420px, 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+@media (max-width: 900px) {
+  .cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ---------- panels ---------- */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-head);
+  border-radius: 7px 7px 0 0;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.panel-extra {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--dim);
+}
+
+.panel-body {
+  padding: 10px;
+  min-height: 0;
+  overflow: auto;
+}
+
+.legend {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+}
+
+/* The events panel should absorb the leftover height. */
+.col > .panel:last-child {
+  flex: 1;
+}
+
+/* ---------- editor ---------- */
+
+.editor {
+  min-height: 90px;
+  padding: 9px 11px;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.6;
+  /* Load-bearing: without pre-wrap, runs of spaces collapse and every offset lies. */
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  background: #0c0e12;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+
+.editor:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.editor .chip {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #2b2340;
+  color: var(--atomic);
+  border: 1px solid #3d3157;
+}
+
+.hint,
+.error {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--dim);
+}
+
+.error {
+  color: var(--err);
+  font-family: var(--mono);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+
+.delay {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--dim);
+  font-size: 11px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+/* ---------- key/value rows ---------- */
+
+.kv {
+  display: flex;
+  gap: 10px;
+  padding: 2px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.kv-k {
+  width: 12ch;
+  flex: none;
+  color: var(--dim);
+}
+
+.kv-v {
+  color: var(--fg);
+  word-break: break-all;
+}
+
+.kv-warn {
+  color: var(--warn);
+}
+
+/* ---------- dom tree ---------- */
+
+.tree {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.65;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.t-tag {
+  color: var(--dim);
+}
+.t-atomic {
+  color: var(--atomic);
+  font-weight: 600;
+}
+.t-key {
+  color: var(--key);
+}
+.t-str {
+  color: var(--str);
+}
+.t-dim {
+  color: var(--dim);
+}
+.t-warn {
+  color: var(--warn);
+}
+.t-br {
+  color: var(--warn);
+  font-weight: 600;
+}
+.t-sel {
+  color: var(--sel);
+  font-weight: 600;
+}
+
+/* ---------- event log ---------- */
+
+.log-body {
+  padding: 0;
+  flex: 1;
+}
+
+.log-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.log-row {
+  display: grid;
+  grid-template-columns: 4ch 6ch 14ch 1fr;
+  gap: 8px;
+  padding: 2px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  border-bottom: 1px solid #1b212a;
+  border-left: 2px solid transparent;
+}
+
+.log-seq,
+.log-time {
+  color: #4d5666;
+  text-align: right;
+}
+
+.log-type {
+  font-weight: 600;
+}
+
+.log-summary {
+  color: var(--fg);
+  word-break: break-word;
+}
+
+.log-input {
+  border-left-color: var(--accent);
+}
+.log-input .log-type {
+  color: var(--accent);
+}
+
+.log-key {
+  border-left-color: #3d4757;
+}
+.log-key .log-type {
+  color: var(--dim);
+}
+
+.log-composition {
+  border-left-color: var(--atomic);
+  background: #1a1526;
+}
+.log-composition .log-type {
+  color: var(--atomic);
+}
+
+.log-clipboard {
+  border-left-color: var(--warn);
+}
+.log-clipboard .log-type {
+  color: var(--warn);
+}
+
+.log-focus,
+.log-selection {
+  border-left-color: #2b3340;
+}
+.log-focus .log-type,
+.log-selection .log-type {
+  color: #5a6474;
+}
+
+kbd {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 1px 4px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: #0c0e12;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--key);
+}
