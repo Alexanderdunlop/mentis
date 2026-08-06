@@ -21,6 +21,8 @@ export interface Editor {
   undo: () => boolean;
   redo: () => boolean;
   getHistory: () => HistoryInfo;
+  /** True while the browser owns the DOM for an IME composition. */
+  isComposing: () => boolean;
   /** Called after every applied transaction and every selection change. */
   subscribe: (listener: (state: EditorState) => void) => () => void;
   /** Detach listeners and leave the element as a plain contentEditable. */

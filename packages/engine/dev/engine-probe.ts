@@ -14,7 +14,7 @@ import type { ModelProbe } from "../src/devtools/index";
  * only ever points this way.
  */
 export const engineProbe = (getEditor: () => Editor | null): ModelProbe => ({
-  label: "M1 — text only · uncheck “engine” for a bare contentEditable",
+  label: "uncheck “engine” for a bare contentEditable",
 
   getState: () => {
     const editor = getEditor();
@@ -28,6 +28,7 @@ export const engineProbe = (getEditor: () => Editor | null): ModelProbe => ({
       characters: text.length,
       positions: docLength(doc),
       selection,
+      composing: editor.isComposing(),
       history: editor.getHistory(),
       nodes: doc.nodes,
     };

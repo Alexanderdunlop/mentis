@@ -18,8 +18,15 @@ const INSERT_TEXT = new Set([
   "insertFromDrop",
   "insertFromYank",
   "insertTranspose",
-  "insertCompositionText",
 ]);
+
+/*
+ * `insertCompositionText` is deliberately absent. Composition is handled through the
+ * composition events, which let the browser own the DOM and reconcile afterwards (ADR
+ * 0009). Treating a stray one as an insertion would apply the composed text twice, so it
+ * is reported as unhandled instead — the engine's standing rule for input it has no rule
+ * for.
+ */
 
 const INSERT_NEWLINE = new Set(["insertParagraph", "insertLineBreak"]);
 

@@ -10,6 +10,8 @@ export type { HistoryCommand } from "./input/history-shortcut";
 
 export { createDoc, emptyDoc } from "./model/create-doc";
 export { docLength } from "./model/doc-length";
+export { diffDocs } from "./model/diff-docs";
+export type { DocDiff } from "./model/diff-docs";
 export { docText } from "./model/doc-text";
 export { mentions, type MentionEntry } from "./model/mentions";
 export { atomNode, isAtom, isText, nodeText, textNode } from "./model/nodes";
@@ -41,3 +43,5 @@ export type { InputIntent } from "./input/types";
 
 export { ATOM_CLASS, VALUE_ATTR } from "./view/atom-element";
 export { positionRect } from "./view/position-rect";
+export { readDomState } from "./view/read-dom-state";
+export type { DomState } from "./view/read-dom-state";

@@ -52,7 +52,6 @@ describe("transactionFor — insertion", () => {
       "insertFromPaste",
       "insertFromDrop",
       "insertReplacementText",
-      "insertCompositionText",
     ]) {
       const transaction = transactionFor(
         intent({ inputType, text: "hi", range: { from: 1, to: 4 } })
@@ -165,5 +164,12 @@ describe("transactionFor — unknown input", () => {
     expect(transactionFor(intent({ inputType: "formatBold" }))).toBeNull();
     expect(transactionFor(intent({ inputType: "historyUndo" }))).toBeNull();
     expect(transactionFor(intent({ inputType: "" }))).toBeNull();
+  });
+
+  it("refuses insertCompositionText, which the composition events own", () => {
+    // Handling it here as well would apply the composed text a second time; see ADR 0009.
+    expect(
+      transactionFor(intent({ inputType: "insertCompositionText", text: "に" }))
+    ).toBeNull();
   });
 });
