@@ -6,7 +6,12 @@ dist/
 .DS_Store
 .eslintcache
 
+# Matches at any depth, so the root CLAUDE.md stays personal and local.
 CLAUDE.md
+# ...but the e2e one is a shared instruction file: it carries the "pin bugs with
+# test.fixme, never edit packages/mentis/src" constraint that anyone's agent
+# needs before touching a spec.
+!e2e/CLAUDE.md
 
 packages/mentis/README.md
 packages/mentis/LICENSE
