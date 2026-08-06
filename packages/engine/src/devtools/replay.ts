@@ -25,6 +25,9 @@
  *
  * What this cannot reproduce: IME composition, mobile autocorrect, and real hardware
  * key repeat. Those need Playwright/CDP — see `docs/prompts/e2e-harness.md`.
+ *
+ * Background on why untrusted events cannot edit, and what the three alternatives buy
+ * you: docs/notes/contenteditable-traps.md
  */
 
 export interface Modifiers {

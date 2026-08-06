@@ -4,12 +4,14 @@
  * The whitespace substitutions below are all single-char → single-char, which is
  * load-bearing: it means a character offset into the raw string is still valid in
  * the rendered string, so selection markers can be spliced in by offset.
+ *
+ * Why a non-breaking space must not look like a space:
+ * docs/notes/contenteditable-traps.md
  */
 
 const WHITESPACE_MAP: Record<string, string> = {
   " ": "·",
-  " ": "⍽", // non-breaking space — browsers insert these unprompted, so they
-  //                 must be visually distinct from a normal space
+  " ": "⍽", // U+00A0 non-breaking space — never the same glyph as a space
   "\n": "⏎",
   "\t": "⇥",
   "​": "⌀", // zero-width space
@@ -65,6 +67,9 @@ export const truncate = (text: string, max = 80): string =>
  *
  * Deliberately not `Range.toString()`, which silently ignores `<br>` — an
  * inconsistency that would make every offset near a line break wrong.
+ *
+ * That `<br>` is worth exactly one `\n` is a modelling commitment the document model
+ * inherits, not just a measurement detail: docs/adr/0001-line-breaks-as-newline-characters.md
  */
 export const textLength = (node: Node): number => {
   if (node.nodeType === Node.TEXT_NODE) return (node as Text).data.length;

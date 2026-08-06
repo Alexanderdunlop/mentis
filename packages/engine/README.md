@@ -28,13 +28,15 @@ too, from day one.
 | **Model** | empty at M0. `ModelProbe` in `src/devtools/model-probe.ts` is the seam M1 plugs into |
 | **Events** | every `keydown`, `beforeinput`, `input`, `composition*`, `paste`/`copy`/`cut`/`drop`, focus/blur — with `inputType`, `data`, `getTargetRanges()` mapped to char offsets, `isComposing`, and whether the event was `PREVENTED` |
 
-Two details worth knowing:
+Two details worth knowing, both explained in full elsewhere rather than duplicated here:
 
-- **nbsp is rendered differently from a space on purpose.** Browsers substitute
-  `&nbsp;` unprompted, and the two being visually identical hides real bugs.
-- **`textLength` counts a `<br>` as one newline**, deliberately unlike
-  `Range.toString()`, which ignores `<br>` entirely and would make every offset near a
-  line break wrong.
+- **nbsp is rendered differently from a space on purpose** — they look identical but
+  `char === " "` is false for nbsp, so identical glyphs would hide the bug.
+  → [contenteditable traps](../../docs/notes/contenteditable-traps.md)
+- **`textLength` counts a `<br>` as one newline**, unlike `Range.toString()`, which
+  ignores `<br>` and would make every offset after a line break wrong. This is a
+  modelling commitment M1 inherits, not just a measurement detail.
+  → [ADR 0001](../../docs/adr/0001-line-breaks-as-newline-characters.md)
 
 ### Controls
 

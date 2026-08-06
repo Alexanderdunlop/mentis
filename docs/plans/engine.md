@@ -180,6 +180,26 @@ aimed at first, just arrived at last, on solid ground.
    - the UI Events / Input Events spec on `beforeinput`
 4. **Timebox boss fights.** Park, don't grind.
 
+## Where documentation goes
+
+Three homes, split by who needs the knowledge and when. The test: **would someone
+coming back after a month away find this?** Code comments fail that test, because you
+have to already be in the file.
+
+| Kind | Home | Example |
+|---|---|---|
+| Local "don't break this" | comment at the line | the whitespace map is 1:1 so offsets stay valid |
+| A commitment future work inherits | `docs/adr/NNNN-*.md` | a line break is one `\n` ([0001](../adr/0001-line-breaks-as-newline-characters.md)) |
+| Platform behaviour that will bite again | [`docs/notes/contenteditable-traps.md`](../notes/contenteditable-traps.md) | nbsp is not a space; untrusted events can't edit |
+
+ADRs are short and dated, and record the alternatives plus a **revisit-when** trigger —
+the point is to make overturning a decision deliberate rather than accidental. The
+traps file is append-only: add an entry every time you lose an hour to something.
+
+That file is also the feeder for rule 2 below. Accumulating notes as you hit things is
+far cheaper than reconstructing them months later, and it means the write-ups are a
+side effect of work already planned rather than a separate chore.
+
 ## Salvage list from `overhaul-html-node-logic`
 
 Worth taking (pure string logic + its tests, no DOM, no framework):
