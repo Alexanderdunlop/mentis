@@ -130,10 +130,32 @@ values just work — which v1 cannot do, and which the old branch's own code com
 > Steps now carry a *slice* rather than a string, so undoing a deleted mention restores
 > the mention and not its label text. Arrow traversal and whole-chip delete come from
 > `contenteditable="false"` rather than from our code.
+
+
+### M2.5 — Trigger detection, so mentions can be typed
+
+M2 gave mentions a model but no way to create one by typing. This slot exists because
+that work fell between milestones and was nearly smuggled into M3 — it is a chunk in its
+own right, not a footnote.
+
+- trigger detection as a **pure function of (doc, selection)**
+- a query that stops at whitespace and at atoms, and only opens at a word start
+- dropdown and its keyboard, built in the harness rather than the engine
+
+**Done when:** typing `@al` opens a filtered menu, arrows move, Enter or Tab inserts a
+mention that replaces the trigger and query, Escape dismisses.
+
+> **Built** — `src/query/`, plus `positionRect` for placement.
+> [ADR 0006](adr/0006-the-mention-query-is-derived-state.md): the query is **derived, never
+> stored**, so there is no open/closed flag to go stale and no detect/clear events to
+> sequence — which is what the archived v2 branch got wrong.
 >
-> **Still unclaimed:** trigger detection and the dropdown. Typing `@al` does nothing yet —
-> no milestone owns it, and it should get its own slot rather than being smuggled into
-> M3. `v2/mention-query/*` on the archived branch is the salvage material.
+> The dropdown and its key handling live in `dev/`, not `src/`. The engine is headless and
+> ADR 0003 confines it to `beforeinput`, so Arrow/Enter/Escape/Tab belong to the consumer.
+> That makes the harness a rehearsal for the M7 adapters rather than a shortcut.
+>
+> Salvaged from `v2/mention-query/*` and fixed on the way in: its `isWhitespace` compared
+> against `" "` and so missed U+00A0, and its query slice was off by one.
 
 ### M3 — Undo stack
 
@@ -267,6 +289,7 @@ pnpm install          # worktrees don't share node_modules
 - [x] M0 — instrument panel
 - [x] M1 — model + text-only editor
 - [x] M2 — atomic nodes / mentions
+- [x] M2.5 — trigger detection + dropdown
 - [ ] M3 — undo stack
 - [ ] M4 — IME / composition
 - [ ] M5 — clipboard
