@@ -209,10 +209,11 @@ real failure.
 > on every keystroke. The difference is scope: one composition, one writer, diffed against a
 > model that was correct going in, canonical DOM restored immediately after.
 >
-> **Nothing here has met a real IME.** The tests play the browser's part by hand, which
-> verifies the reconciliation contract and nothing about real event ordering. Revisit the ADR
-> after the first session with a Japanese input source — that is the timebox check, and it
-> needs a human at a keyboard.
+> **Still nothing here has met a real IME.** A harness session on 2026-08-08 confirmed chip
+> traversal (ADR 0005), the trailing-newline caret (ADR 0002) and that undo works (ADR 0007)
+> — but the IME path was not exercised. The tests only play the browser's part by hand, which
+> verifies the reconciliation contract and nothing about real event ordering. **This is the
+> outstanding timebox check for M4**, and it needs a human with a Japanese input source.
 
 ### M5 — Clipboard as a serialisation problem
 

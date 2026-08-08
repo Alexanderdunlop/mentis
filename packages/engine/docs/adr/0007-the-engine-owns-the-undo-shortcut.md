@@ -72,9 +72,12 @@ Costs and risks:
   keys need a new ADR.
 - A consumer with its own ⌘Z handler will double-handle unless it stops propagation. Worth
   documenting at M7, when adapters exist.
-- **Unverified in a real browser:** the premise that ⌘Z fires no `beforeinput` once every
-  event is prevented. It is the reason this ADR exists, and it is exactly what the M0 event
-  log can settle — press ⌘Z with the engine attached and watch whether anything arrives.
+- **Partly verified, 2026-08-08.** Undo and redo work from the keyboard in a real browser,
+  so the decision holds in practice. The *narrower* premise — that ⌘Z fires no
+  `beforeinput` at all once every event is prevented — was not separately reported, and it
+  cannot be inferred from undo working: the engine handles both routes, so a `historyUndo`
+  arriving would produce the same visible result. If it does fire, the keydown listener is
+  redundant rather than wrong. Still worth one look at the event log.
 
 ## Revisit when
 

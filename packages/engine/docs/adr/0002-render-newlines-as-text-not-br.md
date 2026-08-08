@@ -63,9 +63,10 @@ Costs and risks:
   in `CLAUDE.md`.
 - The trailing-`<br>` exception is a special case in both the renderer and the position
   mapper. Two places to get wrong; both are covered by tests.
-- **Unverified in a real browser.** Whether one trailing `<br>` is sufficient for the
-  caret to land on the last line, on every engine, is exactly the kind of claim the
-  M0 inspector exists to check and no local test can.
+- ~~Unverified in a real browser.~~ **Confirmed 2026-08-08** via the harness: the "trailing
+  newline" preset gives the caret a reachable final empty line. Checked in one engine only —
+  Safari and Firefox are still unchecked, and the CSS `white-space` dependency means a
+  future consumer overriding it would break this silently.
 
 ## Revisit when
 

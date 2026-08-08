@@ -85,13 +85,15 @@ Costs and risks:
 - M5's clipboard work must serialise the value, not just the label, or a copy-paste
   round trip degrades a mention to text. The value is already on the element as
   `data-mention-value` for exactly this reason.
-- **Unverified in a real browser:** whether every engine truly treats a
-  `contenteditable="false"` span as one caret stop, in both directions, and whether
-  Backspace targets the whole chip. That is the M2 claim only the inspector can settle.
+- ~~Unverified in a real browser.~~ **Confirmed 2026-08-08** via the harness: arrow keys
+  step over a chip as a single caret stop and Backspace removes it whole, inherited from
+  `contenteditable="false"` rather than implemented. Checked in one engine only — **Safari
+  remains unchecked**, and it is the one most likely to diverge.
 
 ## Revisit when
 
-- A browser is found stepping *into* a `contenteditable="false"` atom rather than over
-  it, which would reopen ADR 0003's correction question, **or**
+- Safari, or any engine not yet checked, is found stepping *into* a
+  `contenteditable="false"` atom rather than over it, which would reopen ADR 0003's
+  correction question, **or**
 - mentions need internal structure — an editable label, say — at which point the node
   stops being atomic and this ADR no longer applies.
