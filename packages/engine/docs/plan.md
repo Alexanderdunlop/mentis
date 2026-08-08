@@ -199,6 +199,21 @@ Android emulator.
 `composition: "passthrough"` escape hatch and move on. The project dying is the only
 real failure.
 
+> **Built** — [ADR 0009](adr/0009-yield-the-dom-during-composition.md). Passthrough turned
+> out to *be* the mechanism rather than the fallback: `compositionstart` hands the DOM to
+> the browser, `compositionend` reads it back
+> (`view/read-dom-state.ts`), diffs it (`model/diff-docs.ts`) and applies one transaction —
+> so a whole composition is a single undo step.
+>
+> This is the one place the DOM is treated as a source, which is exactly what v1 does wrong
+> on every keystroke. The difference is scope: one composition, one writer, diffed against a
+> model that was correct going in, canonical DOM restored immediately after.
+>
+> **Nothing here has met a real IME.** The tests play the browser's part by hand, which
+> verifies the reconciliation contract and nothing about real event ordering. Revisit the ADR
+> after the first session with a Japanese input source — that is the timebox check, and it
+> needs a human at a keyboard.
+
 ### M5 — Clipboard as a serialisation problem
 
 - paste rules pipeline: HTML → model
@@ -309,7 +324,7 @@ pnpm install          # worktrees don't share node_modules
 - [x] M2 — atomic nodes / mentions
 - [x] M2.5 — trigger detection + dropdown
 - [x] M3 — undo stack
-- [ ] M4 — IME / composition
+- [x] M4 — IME / composition *(unverified against a real IME)*
 - [ ] M5 — clipboard
 - [ ] M6 — nasty-input gauntlet
 - [ ] M7 — adapters

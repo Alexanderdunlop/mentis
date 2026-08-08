@@ -41,6 +41,14 @@
               <code>contenteditable</code> and compare — the Model panel goes empty
               when detached.
             </p>
+            <p class="hint">
+              <strong>IME:</strong> during composition the engine deliberately hands
+              the DOM to the browser, then reconciles on
+              <code>compositionend</code> — watch <code>composing</code> in the Model
+              panel flip, and the composition events in the log. Switch to a Japanese
+              or Chinese input source and type <code>nihongo</code>. This is the one
+              path no local test covers.
+            </p>
           </div>
         </section>
 

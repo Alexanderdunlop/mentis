@@ -9,7 +9,7 @@ pnpm --filter @mentis/engine test
 pnpm --filter @mentis/engine typecheck
 ```
 
-## Current state: M3 — undo
+## Current state: M4 — IME and composition
 
 The editor is engine-driven: `beforeinput` is intercepted, a transaction is applied to
 the document, and the DOM is patched to match. **The DOM is a projection of the model,
@@ -53,6 +53,12 @@ free.
 
 Steps carry a **slice** — a list of inline nodes — rather than a string, so undoing a
 deleted mention restores the mention rather than its label text.
+
+During an IME composition the engine deliberately **stops** owning the DOM — the browser
+needs to render its own pre-edit text — then reads it back and reconciles on
+`compositionend` ([ADR 0009](docs/adr/0009-yield-the-dom-during-composition.md)). That is
+the single exception to the invariant above, and **it has not yet met a real IME**: the
+tests simulate the browser's part.
 
 Undo (<kbd>⌘Z</kbd> / <kbd>⌘⇧Z</kbd> / <kbd>Ctrl+Y</kbd>) is the engine's, since preventing
 every `beforeinput` empties the browser's own stack — see
