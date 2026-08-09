@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { textNode } from "../../model/nodes";
+import { atomNode, textNode } from "../../model/nodes";
 import { transactionFor } from "../transaction-for";
 import type { InputIntent } from "../types";
 
@@ -61,6 +61,50 @@ describe("transactionFor — insertion", () => {
         { type: "insert", at: 1, slice: [textNode("hi")] },
       ]);
     }
+  });
+
+  it("inserts a pasted slice rather than its text, keeping the mention", () => {
+    const slice = [textNode("hi "), atomNode("@Alice", "u_1")];
+    const transaction = transactionFor(
+      intent({ inputType: "insertFromPaste", text: "hi @Alice", slice, range: { from: 2, to: 2 } })
+    );
+    expect(transaction?.steps).toEqual([{ type: "insert", at: 2, slice }]);
+  });
+
+  it("puts the caret after a pasted mention in position space, not character space", () => {
+    // `sliceText(slice).length` is 9 here and `sliceLength(slice)` is 4. Using the former
+    // would land the caret past the end of the document — ADR 0005.
+    const transaction = transactionFor(
+      intent({
+        inputType: "insertFromPaste",
+        slice: [textNode("hi "), atomNode("@Alice", "u_1")],
+        range: { from: 2, to: 2 },
+      })
+    );
+    expect(transaction?.selection).toEqual({ anchor: 6, head: 6 });
+  });
+
+  it("dispatches a paste as a command, so it is always its own undo step", () => {
+    // `editShapeOf` only coalesces `origin: "user"`. Without this a one-character paste
+    // would join whatever typing run it landed in, contradicting history/types.ts.
+    for (const inputType of ["insertFromPaste", "insertFromDrop", "insertFromYank"]) {
+      const transaction = transactionFor(
+        intent({ inputType, slice: [textNode("x")], range: { from: 1, to: 1 } })
+      );
+      expect(transaction?.origin).toBe("program");
+    }
+    expect(transactionFor(intent({ inputType: "insertText", text: "x" }))?.origin).toBe(
+      "user"
+    );
+  });
+
+  it("falls back to the transfer's plain text when the slice could not be read", () => {
+    const transaction = transactionFor(
+      intent({ inputType: "insertFromPaste", text: "hi", slice: null, range: { from: 0, to: 0 } })
+    );
+    expect(transaction?.steps).toEqual([
+      { type: "insert", at: 0, slice: [textNode("hi")] },
+    ]);
   });
 
   it("treats missing data as an empty insertion, deleting any selection", () => {

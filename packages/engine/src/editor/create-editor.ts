@@ -1,3 +1,5 @@
+import { copyHandlers } from "../clipboard/copy-handlers";
+import { readClipboard } from "../clipboard/read-clipboard";
 import { editShapeOf } from "../history/edit-shape";
 import {
   canRedo,
@@ -148,6 +150,9 @@ export const createEditor = ({
     const transaction = transactionFor({
       inputType: input.inputType,
       text: inputText(input),
+      // Null for everything that is not a paste or a drop. Read here, synchronously off
+      // the event, because that is the only place a `DataTransfer` is readable at all.
+      slice: readClipboard(input.dataTransfer),
       range,
       rangeFromBrowser: fromBrowser !== null,
       docLength: docLength(state.doc),
@@ -211,6 +216,15 @@ export const createEditor = ({
     travel(command);
   };
 
+  // Copy and cut are not `beforeinput`, so they need their own listeners. ADR 0012 sets
+  // out why that is a boundary of ADR 0003 rather than an exception to it.
+  const { onCopy, onCut } = copyHandlers({
+    element,
+    getDoc: () => state.doc,
+    isComposing: () => composing,
+    dispatch: apply,
+  });
+
   // Caret movement is the browser's job (ADR 0003); this only collects the result so the
   // next edit knows where it lands.
   const onSelectionChange = (): void => {
@@ -230,6 +244,8 @@ export const createEditor = ({
 
   element.addEventListener("beforeinput", onBeforeInput);
   element.addEventListener("keydown", onKeyDown);
+  element.addEventListener("copy", onCopy as EventListener);
+  element.addEventListener("cut", onCut as EventListener);
   element.addEventListener("compositionstart", onCompositionStart);
   element.addEventListener("compositionend", onCompositionEnd);
   document.addEventListener("selectionchange", onSelectionChange);
@@ -255,6 +271,8 @@ export const createEditor = ({
     destroy: () => {
       element.removeEventListener("beforeinput", onBeforeInput);
       element.removeEventListener("keydown", onKeyDown);
+      element.removeEventListener("copy", onCopy as EventListener);
+      element.removeEventListener("cut", onCut as EventListener);
       element.removeEventListener("compositionstart", onCompositionStart);
       element.removeEventListener("compositionend", onCompositionEnd);
       document.removeEventListener("selectionchange", onSelectionChange);

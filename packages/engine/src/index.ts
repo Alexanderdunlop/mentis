@@ -3,6 +3,13 @@ export type { Editor, EditorState, HistoryInfo } from "./editor/types";
 
 export { insertMention } from "./commands/insert-mention";
 
+export { htmlToSlice } from "./clipboard/html-to-slice";
+export { readClipboard } from "./clipboard/read-clipboard";
+export { serialiseSlice } from "./clipboard/serialise-slice";
+export { textToSlice } from "./clipboard/text-to-slice";
+export { writeClipboard } from "./clipboard/write-clipboard";
+export type { ClipboardPayload } from "./clipboard/types";
+
 export { emptyHistory } from "./history/types";
 export type { EditKind, HistoryEntry, HistoryState } from "./history/types";
 export { historyShortcut } from "./input/history-shortcut";

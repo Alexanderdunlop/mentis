@@ -1,4 +1,7 @@
-import { replaceWithText, type Transaction } from "../model/transaction";
+import { textNode } from "../model/nodes";
+import { sliceLength } from "../model/slice-between";
+import { replaceRange, type Transaction } from "../model/transaction";
+import type { Slice } from "../model/types";
 import type { InputIntent } from "./types";
 
 /**
@@ -13,11 +16,24 @@ import type { InputIntent } from "./types";
 const INSERT_TEXT = new Set([
   "insertText",
   "insertReplacementText",
+  "insertTranspose",
+]);
+
+/**
+ * Insertions whose content arrives on a `dataTransfer` rather than in `event.data`, and
+ * which therefore insert a **slice** — the only shape that keeps a pasted mention a
+ * mention.
+ *
+ * They are dispatched as commands rather than as user edits, which is what makes
+ * `history/types.ts`'s claim that "paste is its own undo step" true rather than
+ * aspirational: `editShapeOf` only coalesces `origin: "user"`, so without this a
+ * one-character paste would join whatever typing run it landed in.
+ */
+const CLIPBOARD_INSERT = new Set([
   "insertFromPaste",
   "insertFromPasteAsQuotation",
   "insertFromDrop",
   "insertFromYank",
-  "insertTranspose",
 ]);
 
 /*
@@ -57,10 +73,18 @@ const collapsedAt = (position: number): Transaction["selection"] => ({
   head: position,
 });
 
-const insertion = ({ range }: InputIntent, text: string): Transaction => ({
-  steps: replaceWithText(range.from, range.to, text),
-  selection: collapsedAt(range.from + text.length),
-  origin: "user",
+const textSlice = (text: string): Slice => (text === "" ? [] : [textNode(text)]);
+
+const insertion = (
+  { range }: InputIntent,
+  slice: Slice,
+  origin: Transaction["origin"]
+): Transaction => ({
+  steps: replaceRange(range.from, range.to, slice),
+  // Positions, not characters. `sliceText(slice).length` would put the caret past the end
+  // of the document the moment a pasted mention was involved — see ADR 0005.
+  selection: collapsedAt(range.from + sliceLength(slice)),
+  origin,
 });
 
 const deletion = (from: number, to: number): Transaction => ({
@@ -70,10 +94,16 @@ const deletion = (from: number, to: number): Transaction => ({
 });
 
 export const transactionFor = (intent: InputIntent): Transaction | null => {
-  const { inputType, text, range, rangeFromBrowser, docLength } = intent;
+  const { inputType, text, slice, range, rangeFromBrowser, docLength } = intent;
 
-  if (INSERT_TEXT.has(inputType)) return insertion(intent, text ?? "");
-  if (INSERT_NEWLINE.has(inputType)) return insertion(intent, "\n");
+  if (CLIPBOARD_INSERT.has(inputType)) {
+    // A transfer we could not read leaves the plain text, which is what `inputText` took
+    // off the same event — a paste with no usable payload inserts nothing rather than
+    // guessing at one.
+    return insertion(intent, slice ?? textSlice(text ?? ""), "program");
+  }
+  if (INSERT_TEXT.has(inputType)) return insertion(intent, textSlice(text ?? ""), "user");
+  if (INSERT_NEWLINE.has(inputType)) return insertion(intent, textSlice("\n"), "user");
   if (DELETE_EXACT.has(inputType)) return deletion(range.from, range.to);
 
   if (DELETE_BACKWARD.has(inputType)) {

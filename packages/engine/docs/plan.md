@@ -225,6 +225,36 @@ Note for when you get here: the old branch used `navigator.clipboard.readText()`
 `v2/input/input-processor.ts`. That's wrong — it needs permissions and is async. The
 paste event's `clipboardData` gives it to you synchronously with neither problem.
 
+> **Built** — `src/clipboard/`, nine of its eleven files pure and testable with no DOM.
+>
+> [ADR 0010](adr/0010-the-clipboard-carries-html.md): the clipboard carries **`text/html`
+> and `text/plain`, both, every time** — no custom MIME type, which would be invisible
+> outside our own editor and a second serialisation to keep in step. The mention's `value`
+> rides on `data-mention-value`, which [ADR 0005](adr/0005-an-atom-is-one-position-wide.md)
+> put on the element for exactly this. A pasted mention **keeps its identity**: the user
+> copied that mention, and the engine is headless, so it has no one to re-resolve against
+> and inventing a hook would be it reaching for consumer state.
+>
+> [ADR 0011](adr/0011-paste-is-a-parse-not-a-recovery.md): paste is a **parse**, not a
+> reuse of M4's `readDomState`. That is recovery code — it assumes canonical structure and
+> keeps every character, because it is reconstructing a window the engine did not watch.
+> Paste knows exactly what arrived and can decide what it means. Three roles cover it:
+> skip, break, transparent. The bit that actually bit was ordering — nbsp has to be
+> converted **last**, because it is the one space HTML doesn't collapse, so folding it to
+> U+0020 early lets a later rule eat one of a deliberate pair.
+>
+> [ADR 0012](adr/0012-the-engine-listens-for-copy-and-cut.md): the engine listens for
+> `copy` and `cut`, which is a **boundary** of ADR 0003 rather than an exception — copy is
+> editing-adjacent and cut is an edit, and neither is caret movement. `setData` is
+> discarded unless the event is cancelled, so writing the clipboard and cancelling are one
+> act; cut then owns the deletion, one transaction, clipboard written first. Clipboard
+> edits dispatch as `origin: "program"`, which is what finally makes `history/types.ts`'s
+> claim that "paste is its own undo step" true rather than aspirational.
+>
+> **The round trip has never met a real clipboard.** The tests serialise and then parse,
+> which covers everything except the operating system in the middle — see the Unverified
+> sections of 0010 and 0012.
+
 ### M6 — The nasty-input gauntlet
 
 - **Grapheme clusters.** `"👨‍👩‍👧".length === 8`, so every offset in the codebase is
@@ -325,6 +355,6 @@ pnpm install          # worktrees don't share node_modules
 - [x] M2.5 — trigger detection + dropdown
 - [x] M3 — undo stack
 - [x] M4 — IME / composition *(unverified against a real IME)*
-- [ ] M5 — clipboard
+- [x] M5 — clipboard *(round trip unverified against a real clipboard)*
 - [ ] M6 — nasty-input gauntlet
 - [ ] M7 — adapters

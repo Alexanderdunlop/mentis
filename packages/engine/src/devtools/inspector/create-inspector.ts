@@ -1,7 +1,7 @@
 import { createEventLog, type EventLog } from "../log/create-event-log";
 import { nullModelProbe, type ModelProbe } from "../model-probe";
 import { readSelection } from "../selection/read-selection";
-import { escapeHtml } from "../text/escape-html";
+import { escapeHtml } from "../../text/escape-html";
 import { renderDomTree } from "../tree/render-tree";
 import { createPanel, preBody } from "./panel";
 import { renderSelection } from "./render-selection";
