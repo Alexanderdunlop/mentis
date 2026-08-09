@@ -108,6 +108,80 @@ exactly this reason.
 
 ---
 
+## `setData` on a copy is discarded unless you cancel the event
+
+**Symptom.** You set `text/html` on a `copy` event, everything looks right in the
+handler, and the clipboard still holds the browser's own serialisation. Pasting back
+gives a mention as plain text and no error anywhere.
+
+**Mechanism.** `event.clipboardData.setData()` during `copy`/`cut` writes to a *pending*
+data store. The browser only promotes it to the system clipboard if the event ends up
+cancelled. An uncancelled `copy` runs its default action — serialise the selection —
+and throws the pending store away.
+
+The same coupling runs the other way for `cut`: cancelling to keep your payload also
+cancels the deletion, so no `beforeinput` with `deleteByCut` arrives and the edit is
+yours to make. Setting data and cancelling are one act; so are cancelling and deleting.
+
+**What to do.** Write and cancel together, or not at all. Make the function that writes
+return whether it wrote, so the caller cannot cancel an event it put nothing on — and
+leave a collapsed selection completely alone, since there is nothing to write and
+nothing worth disagreeing with the browser about.
+
+**Where it shows up here.** `writeClipboard` returns a boolean for exactly this reason,
+and `onCopy`/`onCut` in `editor/create-editor.ts` treat it as the condition for
+`preventDefault()`. Reasoning in
+[ADR 0012](../adr/0012-the-engine-listens-for-copy-and-cut.md).
+
+---
+
+## A non-breaking space must be converted last, not first
+
+**Symptom.** Text pasted from a page with `a&nbsp;&nbsp;b` arrives as `a b`. One space,
+where the author deliberately wrote two. Every individual function in the pipeline looks
+correct.
+
+**Mechanism.** nbsp is the one space HTML does **not** collapse — that is what it is
+*for*. Normalise it to U+0020 on the way in and it becomes indistinguishable from
+collapsible whitespace, so the next rule that collapses a run eats one of the pair. The
+bug is entirely in the ordering; no single function is wrong.
+
+**What to do.** Do every whitespace-collapsing step first, while nbsp is still visibly
+different, and convert it in the last step before the text reaches the model. Keeping the
+conversion in its own function makes the ordering a call-site decision instead of a
+comment someone has to find.
+
+**Where it shows up here.** `clipboard/nbsp-to-space.ts` is separate from
+`clipboard/normalise-text.ts` for this reason alone, and there is a test asserting that
+the wrong order loses a space. See
+[ADR 0011](../adr/0011-paste-is-a-parse-not-a-recovery.md).
+
+---
+
+## happy-dom reports every selection as collapsed, and half-decodes attributes
+
+**Symptom.** A `dom-smoke` test for copy writes an empty clipboard. Separately, a value
+round-tripped through an attribute comes back containing `&lt;`.
+
+**Mechanism.** Two unrelated gaps in the test environment, not in any browser:
+
+- `Selection` stores the range correctly — `getRangeAt(0)` has the right offsets and
+  `isCollapsed` is right — but `anchorOffset` and `focusOffset` always read 0. Anything
+  reading anchor/focus, which is how you keep a selection's *direction*, sees a caret.
+- The HTML parser decodes `&amp;` and `&quot;` in attribute values but leaves `&lt;` and
+  `&gt;` encoded. Real browsers decode all four.
+
+**What to do.** Neither is a reason to reshape engine code. Play the browser's part by
+hand — a small `Selection` stub reporting anchor and focus off the range — exactly as the
+composition tests already do for an IME, and keep assertions off the entities happy-dom
+gets wrong. Real caret behaviour still belongs in Playwright.
+
+**Where it shows up here.** `installSelection()` in
+`src/editor/tests/clipboard.dom.test.ts`, and the deliberately `<`-free value in
+`src/clipboard/tests/round-trip.dom.test.ts`.
+
+---
+
 ## Script-created events cannot cause editing
 
 **Symptom.** You dispatch a `KeyboardEvent` to simulate typing. Your listeners fire.

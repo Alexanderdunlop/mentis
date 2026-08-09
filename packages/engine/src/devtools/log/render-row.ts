@@ -1,4 +1,4 @@
-import { escapeHtml } from "../text/escape-html";
+import { escapeHtml } from "../../text/escape-html";
 import type { LogEntry } from "./types";
 
 export const renderRow = (entry: LogEntry): HTMLElement => {

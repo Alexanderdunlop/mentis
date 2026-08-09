@@ -1,10 +1,19 @@
-import type { ModelRange } from "../model/types";
+import type { ModelRange, Slice } from "../model/types";
 
 export interface InputIntent {
   /** `InputEvent.inputType`. */
   inputType: string;
   /** `event.data`, or the resolved clipboard/drop text — whichever applies. */
   text: string | null;
+  /**
+   * What a paste or a drop is inserting, parsed from its `dataTransfer`.
+   *
+   * A slice rather than a string, because that is the only shape that can carry a
+   * mention's `value` — pasting a chip back as `text` would degrade it to its label, the
+   * exact round-trip loss ADR 0005 flagged as M5's job to prevent. Null for every other
+   * `inputType`, and for a transfer holding nothing usable.
+   */
+  slice?: Slice | null;
   /**
    * The range the edit applies to, in model coordinates.
    *

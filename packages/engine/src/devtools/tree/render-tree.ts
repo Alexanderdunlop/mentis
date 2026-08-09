@@ -1,4 +1,4 @@
-import { escapeHtml } from "../text/escape-html";
+import { escapeHtml } from "../../text/escape-html";
 import { isAtomic, renderableAttrs } from "./attrs";
 import {
   boundaryGlyphs,

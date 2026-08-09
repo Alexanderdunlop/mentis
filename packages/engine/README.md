@@ -9,7 +9,7 @@ pnpm --filter @mentis/engine test
 pnpm --filter @mentis/engine typecheck
 ```
 
-## Current state: M4 — IME and composition
+## Current state: M5 — the clipboard
 
 The editor is engine-driven: `beforeinput` is intercepted, a transaction is applied to
 the document, and the DOM is patched to match. **The DOM is a projection of the model,
@@ -40,7 +40,9 @@ src/view/      render (patches, never innerHTML) + position mapping both ways
 src/input/     beforeinput -> transaction                    — transaction-for.ts is pure
 src/query/     trigger detection                             — pure, no DOM
 src/history/   undo stack, coalescing                        — pure, no DOM, no clock
+src/clipboard/ serialise + paste rules                       — all but the parse is pure
 src/commands/  higher-level edits, e.g. insertMention        — pure, returns transactions
+src/text/      escape-html, shared by the serialiser and the inspector
 src/editor/    the wiring that ties them together
 ```
 
@@ -59,6 +61,24 @@ needs to render its own pre-edit text — then reads it back and reconciles on
 `compositionend` ([ADR 0009](docs/adr/0009-yield-the-dom-during-composition.md)). That is
 the single exception to the invariant above, and **it has not yet met a real IME**: the
 tests simulate the browser's part.
+
+**Copy a selection containing a mention, paste it back, and it is still a mention** — with
+its `value`, not its label as text. The clipboard carries `text/html` with
+`data-mention-value` alongside `text/plain`, both every time, and no custom MIME type
+([ADR 0010](docs/adr/0010-the-clipboard-carries-html.md)). A pasted mention keeps its
+identity rather than being re-resolved; the engine is headless and has nobody to ask.
+
+Paste is a **parse**, not a reuse of the composition recovery path
+([ADR 0011](docs/adr/0011-paste-is-a-parse-not-a-recovery.md)) — foreign HTML reduces to
+text, newlines and atoms through three roles, since a flat inline document has nowhere to
+put anything else. The whitespace ordering is the subtle part: nbsp is converted **last**,
+because it is the one space HTML doesn't collapse.
+
+Copy and cut need their own listeners, since neither is a `beforeinput`
+([ADR 0012](docs/adr/0012-the-engine-listens-for-copy-and-cut.md)). `setData` is discarded
+unless the event is cancelled, so cut owns its own deletion — one transaction, one undo
+step, clipboard written before anything is removed. **None of this has met a real system
+clipboard**; the tests serialise and parse, which is everything but the OS in the middle.
 
 Undo (<kbd>⌘Z</kbd> / <kbd>⌘⇧Z</kbd> / <kbd>Ctrl+Y</kbd>) is the engine's, since preventing
 every `beforeinput` empties the browser's own stack — see
@@ -164,7 +184,7 @@ One idea per file, so a reviewer never has to hold two concepts at once. Tests s
 src/devtools/
   index.ts             public exports, nothing else
 
-  text/                visible-whitespace · escape-html · truncate
+  text/                visible-whitespace · truncate
   dom/                 text-length (ADR 0001) · node-path
   selection/           char-offset · read-selection · types
   tree/                markers · attrs · render-tree
