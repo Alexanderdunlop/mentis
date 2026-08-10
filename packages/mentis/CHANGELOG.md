@@ -1,5 +1,11 @@
 # mentis
 
+## 0.2.8
+
+### Patch Changes
+
+- [#90](https://github.com/Alexanderdunlop/mentis/pull/90) [`edad732`](https://github.com/Alexanderdunlop/mentis/commit/edad7325254f91df78bd0d6a321cfc419c08d92c) Thanks [@Alexanderdunlop](https://github.com/Alexanderdunlop)! - Rewrite the npm package description and keywords so the package is discoverable as a maintained `react-mentions` alternative. No runtime changes — a release is needed for the new metadata to reach the npm registry.
+
 ## 0.2.7
 
 ### Patch Changes
