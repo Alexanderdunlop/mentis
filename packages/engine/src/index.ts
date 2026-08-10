@@ -15,11 +15,19 @@ export type { EditKind, HistoryEntry, HistoryState } from "./history/types";
 export { historyShortcut } from "./input/history-shortcut";
 export type { HistoryCommand } from "./input/history-shortcut";
 
+export { positionAfter, positionBefore } from "./model/adjacent-position";
 export { createDoc, emptyDoc } from "./model/create-doc";
 export { docLength } from "./model/doc-length";
 export { diffDocs } from "./model/diff-docs";
 export type { DocDiff } from "./model/diff-docs";
 export { docText } from "./model/doc-text";
+export {
+  isSingleGrapheme,
+  snapBack,
+  snapForward,
+  stepBack,
+  stepForward,
+} from "./model/grapheme-boundary";
 export { mentions, type MentionEntry } from "./model/mentions";
 export { atomNode, isAtom, isText, nodeText, textNode } from "./model/nodes";
 export { sliceBetween, sliceLength, sliceText } from "./model/slice-between";

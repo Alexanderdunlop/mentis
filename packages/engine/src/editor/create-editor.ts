@@ -15,7 +15,6 @@ import { targetRange } from "../input/target-range";
 import { transactionFor } from "../input/transaction-for";
 import { createDoc } from "../model/create-doc";
 import { diffDocs } from "../model/diff-docs";
-import { docLength } from "../model/doc-length";
 import {
   applyTransaction,
   replaceRange,
@@ -155,7 +154,7 @@ export const createEditor = ({
       slice: readClipboard(input.dataTransfer),
       range,
       rangeFromBrowser: fromBrowser !== null,
-      docLength: docLength(state.doc),
+      doc: state.doc,
     });
 
     if (!transaction) {

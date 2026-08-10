@@ -78,6 +78,23 @@ describe("editShapeOf", () => {
     expect(editShapeOf(typed(3, "hello")).kind).toBe("other");
   });
 
+  it("counts a typed emoji as one character, however many code units it is", () => {
+    // Measuring in code units would classify every emoji as "not typing" and hand it its
+    // own undo step, so `hi ??` would undo in three pieces rather than as one run.
+    expect(editShapeOf(typed(3, "\u{1F44D}")).kind).toBe("type");
+    expect(editShapeOf(typed(3, "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}")).kind).toBe(
+      "type"
+    );
+    expect(editShapeOf(typed(3, "e\u{0301}")).kind).toBe("type");
+  });
+
+  it("still measures the run in positions, so a long emoji run breaks up", () => {
+    // `size` stays in position space — an emoji costs two of the group budget, not one —
+    // because that is what the coalescing cap and every step offset are counted in.
+    expect(editShapeOf(typed(3, "\u{1F44D}")).size).toBe(2);
+    expect(editShapeOf(typed(3, "\u{1F44D}")).endedAt).toBe(5);
+  });
+
   it("treats a multi-step transaction as other", () => {
     expect(
       editShapeOf({

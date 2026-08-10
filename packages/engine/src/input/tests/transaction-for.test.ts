@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createDoc } from "../../model/create-doc";
 import { atomNode, textNode } from "../../model/nodes";
 import { transactionFor } from "../transaction-for";
 import type { InputIntent } from "../types";
@@ -8,7 +9,8 @@ const intent = (over: Partial<InputIntent>): InputIntent => ({
   text: null,
   range: { from: 0, to: 0 },
   rangeFromBrowser: false,
-  docLength: 10,
+  // Ten positions of plain text: the default subject for range arithmetic.
+  doc: createDoc("0123456789"),
   ...over,
 });
 
@@ -148,6 +150,61 @@ describe("transactionFor — deletion", () => {
     expect(transaction?.steps).toEqual([{ type: "delete", from: 4, to: 5 }]);
   });
 
+  it("falls back over a whole emoji rather than half a surrogate pair", () => {
+    // ADR 0004 recorded this as knowingly wrong and left it to M6. Deleting one position
+    // leaves a lone surrogate: a `?` the user did not type and cannot type away.
+    const THUMBS_UP = "\u{1F44D}";
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentBackward",
+        doc: createDoc(THUMBS_UP),
+        range: { from: 2, to: 2 },
+        rangeFromBrowser: false,
+      })
+    );
+    expect(transaction?.steps).toEqual([{ type: "delete", from: 0, to: 2 }]);
+  });
+
+  it("falls back over a whole ZWJ sequence", () => {
+    const FAMILY = "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}";
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentBackward",
+        doc: createDoc(FAMILY),
+        range: { from: 8, to: 8 },
+        rangeFromBrowser: false,
+      })
+    );
+    expect(transaction?.steps).toEqual([{ type: "delete", from: 0, to: 8 }]);
+  });
+
+  it("falls back over a whole atom, which is still exactly one position", () => {
+    // The other half of "one character": ADR 0005 makes an atom one position wide however
+    // long its label, so the same fallback has to mean two different things.
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentBackward",
+        doc: { nodes: [textNode("hi "), atomNode("@Alice", "u_1")] },
+        range: { from: 4, to: 4 },
+        rangeFromBrowser: false,
+      })
+    );
+    expect(transaction?.steps).toEqual([{ type: "delete", from: 3, to: 4 }]);
+  });
+
+  it("falls back forwards over a whole character too", () => {
+    const THUMBS_UP = "\u{1F44D}";
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentForward",
+        doc: createDoc(`${THUMBS_UP}x`),
+        range: { from: 0, to: 0 },
+        rangeFromBrowser: false,
+      })
+    );
+    expect(transaction?.steps).toEqual([{ type: "delete", from: 0, to: 2 }]);
+  });
+
   it("trusts a collapsed range from the browser instead of widening it", () => {
     // The browser saying "delete nothing" is information, not an omission — widening it
     // here is how a word delete becomes a character delete.
@@ -173,7 +230,6 @@ describe("transactionFor — deletion", () => {
       intent({
         inputType: "deleteContentForward",
         range: { from: 10, to: 10 },
-        docLength: 10,
       })
     );
     expect(transaction?.steps).toEqual([]);
