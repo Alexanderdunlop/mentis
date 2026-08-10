@@ -1,6 +1,7 @@
 import { createInspector } from "../src/devtools/index";
 import type { Editor } from "../src/editor/types";
 import { bindContentPresets } from "./content-presets";
+import { bindDirectionToggle } from "./direction-toggle";
 import { engineProbe } from "./engine-probe";
 import { bindHistoryControls } from "./history-controls";
 import { bindEngineToggle } from "./engine-toggle";
@@ -26,6 +27,10 @@ const presets = bindContentPresets({
   getEditor: () => editor,
   onApplied: inspector.refresh,
 });
+
+// Independent of the engine toggle: direction is the container's either way, which is
+// itself the demonstration — RTL looks the same attached and detached.
+bindDirectionToggle(element);
 
 const mentionControls = bindMentionControls(() => editor);
 const mentionFlow = bindMentionFlow(element);

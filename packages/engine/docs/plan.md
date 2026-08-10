@@ -345,9 +345,39 @@ more of the engine's design constraints to arrive from that direction.
 > expectation, because parked it would have gone on failing for behaviour the engine had
 > decided to keep.
 >
-> Still to do in M6: RTL/bidi, iOS autocorrect and dictation, Android word-level
-> replacement. IME is done for Chromium (above); Gboard is the case that remains, and it is
-> also the one M6 was most worried about.
+> **RTL / bidi: built, and it cost almost nothing.**
+> [ADR 0015](adr/0015-direction-belongs-to-the-consumer.md) — direction belongs to the
+> consumer's container and the engine reads it nowhere.
+>
+> The model is **byte-for-byte identical** in `ltr` and `rtl` for the same content, on all
+> four projects: same text, same length, same nodes, same mention offsets. Editing RTL text,
+> deleting a chip, typing beside one, undo restoring it as a mention — all already correct.
+>
+> That is a consequence rather than luck, and naming the cause is the useful part: ADR 0003
+> gives navigation to the browser, so bidi caret behaviour is never the engine's problem;
+> ADR 0004 takes ranges from `getTargetRanges()`, so the browser resolves what a keypress
+> means in a reordered line; ADR 0005 makes positions logical offsets, which have no
+> direction. Three earlier decisions paying out at once.
+>
+> So the ADR is mostly a set of things deliberately **not** done — no `dir` on the root, none
+> on chips, no bidi control characters, nothing reading visual order — and the spec asserts
+> the model is *unaffected*, which is the claim a future change would break.
+>
+> One real bug found where direction is unavoidable: **`positionRect` was off by the width of
+> the editor at the end of an RTL line in WebKit**, which reports no client rects at all for
+> a collapsed range at the end of a text node, sending it into a fallback that returned the
+> line box's left edge. It now derives the caret from the preceding character, choosing the
+> edge by *measurement* — `getComputedStyle(...).direction` is the container's, and the run's
+> is what matters, so an RTL word in an `ltr` container would pick the wrong side.
+>
+> Also learned, the hard way: an unsettled caret read right after a keypress produces
+> convincing nonsense. A first pass "found" Chromium repeating and skipping offsets in RTL;
+> it was a race in the probe. Both are in the traps note.
+>
+> Still to do in M6: **iOS autocorrect and dictation, and Android word-level replacement** —
+> all of which go through `insertReplacementText`, which is handled but has no real coverage
+> and cannot get any without a device. IME is verified on Chromium (above); **Gboard** is the
+> case that remains, and it is the one M6 was most worried about from the start.
 
 ### M7 — Adapters, as the victory lap
 

@@ -7,9 +7,9 @@ import {
 } from "@playwright/test";
 // Type-only, so importing the harness page here never executes it. The page owns these
 // definitions and the global declaration; duplicating them is how the two drift apart.
-import type { Content, HarnessModel, HarnessNode } from "../../dev/e2e";
+import type { Content, Direction, HarnessModel, HarnessNode } from "../../dev/e2e";
 
-export type { Content, HarnessModel, HarnessNode };
+export type { Content, Direction, HarnessModel, HarnessNode };
 
 /**
  * Page object for the engine's browser matrix.
@@ -39,13 +39,35 @@ export class EngineHarness {
 
   // --- setup ---------------------------------------------------------------
 
-  async reset(content: Content[] = []): Promise<void> {
+  /**
+   * `dir` sets the container's writing direction, as a consumer would. The engine reads
+   * it nowhere — that is the claim ADR 0015 makes and `adr-0015-direction.spec.ts` checks.
+   */
+  async reset(content: Content[] = [], dir?: Direction): Promise<void> {
     await this.page.evaluate(
-      (items) => window.engineHarness.reset(items),
-      content as never
+      ({ items, dir: d }) => window.engineHarness.reset(items, d),
+      { items: content, dir } as never
     );
     await this.editor.click();
     await this.setCaretToEnd();
+  }
+
+  /** The container's writing direction as the browser resolved it, not as we set it. */
+  async resolvedDirection(): Promise<string> {
+    return this.editor.evaluate((element) => getComputedStyle(element).direction);
+  }
+
+  /**
+   * Where a model position is on screen, via the engine's own `positionRect` — the one
+   * piece of geometry the engine owns, and what a consumer anchors a mention menu to.
+   */
+  async positionRect(
+    position: number
+  ): Promise<{ left: number; right: number; width: number } | null> {
+    return this.page.evaluate(
+      (at) => window.engineHarness.positionRect(at),
+      position
+    );
   }
 
   // --- reading the model ---------------------------------------------------
