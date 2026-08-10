@@ -1,6 +1,6 @@
 {
   "name": "mentis",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Accessible @mention autocomplete input for React. ContentEditable, zero dependencies, TypeScript-first — a modern react-mentions alternative.",
   "type": "module",
   "license": "MIT",
