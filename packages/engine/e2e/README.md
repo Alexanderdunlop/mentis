@@ -33,6 +33,7 @@ port-of-its-own convention, same "observe, don't fix" discipline. See `e2e/CLAUD
 |---|---|
 | `adr-0001-newlines.spec.ts` | one `\n` per break, rendered as text, one trailing `<br>` |
 | `adr-0005-atoms.spec.ts` | a chip is one caret stop; the two coordinate spaces diverge |
+| `adr-0008-undo-granularity.spec.ts` | a word is one undo step — and a keypress that changed nothing is none |
 | `adr-0010-clipboard.spec.ts` | the round trip, through a real system clipboard |
 | `adr-0009-composition.spec.ts` | IME reconciliation, on a real composition (Chromium) |
 | `adr-0013-graphemes.spec.ts` | whole characters, on the browser's own ranges |
@@ -54,7 +55,9 @@ reasoning, as v1's `playground/e2e.html` on 5273.
 
 `window.engineHarness` exposes `reset`, `model`, `insertMention`, `setCaret`,
 `unhandledInput` and `positionRect`. `reset` takes an optional writing direction, always
-applied so one spec's `dir` can never leak into the next. It deliberately does **not**
+applied so one spec's `dir` can never leak into the next. The fixture adds composition on top
+via CDP — `compose`, `composeReplacing` (Android word-level replacement), `commitComposition`
+— which is Chromium-only. It deliberately does **not**
 expose the `Editor` or `dispatch`: specs
 drive the editor as a user does and read the model to check the result. A spec that could
 set up state the input pipeline cannot produce is a spec that proves something about
@@ -99,10 +102,14 @@ phenomenon.
 - **IME on WebKit and Firefox.** `adr-0009-composition.spec.ts` drives a real composition
   through CDP, which is Chromium-only; the other two engines have no equivalent, so those
   specs skip there. Gboard and iOS dictation still need a human at the harness on 5280.
-- **iOS autocorrect and dictation, and Android word-level replacement** — the rest of M6.
-  All three arrive as `insertReplacementText`, which the engine handles but which has no
-  real coverage here and cannot get any without a device. Synthesising the event would only
-  check the engine against our own guess at the shape, which is the thing ADR 0009's
-  Unverified section was complaining about before a real IME settled it.
+- **iOS autocorrect and dictation.** These arrive as `insertReplacementText` rather than as
+  a composition, and there is no automatable route — CDP has no spellcheck-correction
+  command, and synthesising the event would only check the engine against our own guess at
+  its shape, which is the thing ADR 0009's Unverified section was complaining about before a
+  real IME settled it.
+- **Real Gboard.** The *mechanism* is covered — `harness.composeReplacing` drives Android
+  word-level replacement through `replacementStart`/`replacementEnd` on Chromium and mobile
+  Chrome, which is what Gboard actually does. What needs a device is its *policy*: when it
+  fires, how much it takes, and what it does with a chip in range.
 - **An RTL mention menu placed by hand.** `adr-0015-direction.spec.ts` checks `positionRect`
   returns a rect on the correct side; how a real menu then looks involves the consumer's CSS.

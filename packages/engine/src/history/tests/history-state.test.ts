@@ -50,6 +50,38 @@ const add = (state: HistoryState, transaction: Transaction, at: number) => {
   return record(state, next, shape);
 };
 
+/**
+ * A transaction that changed nothing, built the way `create-editor`'s `apply` builds one:
+ * no steps, so the inverse has none either.
+ *
+ * Reachable from the keyboard, not hypothetical — Chromium and Firefox fire
+ * `deleteContentForward` with a collapsed range when there is nothing ahead of the caret,
+ * and `transactionFor` turns that into exactly this.
+ */
+const addNothing = (state: HistoryState, at: number) => {
+  const transaction: Transaction = {
+    steps: [],
+    selection: { anchor: 3, head: 3 },
+    origin: "user",
+  };
+  const shape = editShapeOf(transaction);
+  return record(
+    state,
+    {
+      undoSteps: [],
+      redoSteps: [],
+      selectionBefore: null,
+      selectionAfter: transaction.selection ?? null,
+      kind: shape.kind,
+      endedAt: shape.endedAt,
+      size: shape.size,
+      char: shape.char,
+      at,
+    },
+    shape
+  );
+};
+
 describe("editShapeOf", () => {
   it("classifies a single typed character as type", () => {
     expect(editShapeOf(typed(3))).toEqual({
@@ -193,6 +225,51 @@ describe("mergeEntries", () => {
     const merged = mergeEntries(a, b);
     expect(merged.selectionBefore).toEqual({ anchor: 0, head: 0 });
     expect(merged.selectionAfter).toEqual({ anchor: 2, head: 2 });
+  });
+});
+
+describe("record — a transaction that changed nothing", () => {
+  it("is not recorded, so undo is never a keypress that does nothing", () => {
+    let state = emptyHistory();
+    state = add(state, typed(0, "a"), 1000);
+    const depth = state.done.length;
+
+    state = addNothing(state, 2000);
+    state = addNothing(state, 3000);
+    state = addNothing(state, 4000);
+
+    expect(state.done).toHaveLength(depth);
+  });
+
+  it("does not destroy the redo branch", () => {
+    // The serious half: `record` clears `undone`, so a keypress that did nothing made an
+    // undone edit unrecoverable. Type, undo, press Delete at the end, press redo — gone.
+    let state = emptyHistory();
+    state = add(state, typed(0, "a"), 1000);
+    const undone = undo(state)!.state;
+    expect(canRedo(undone)).toBe(true);
+
+    const after = addNothing(undone, 2000);
+
+    expect(canRedo(after)).toBe(true);
+    expect(redo(after)).not.toBeNull();
+  });
+
+  it("leaves the state object untouched rather than rebuilding it", () => {
+    // Cheap to assert and it pins the intent: nothing happened, so nothing changed.
+    const state = add(emptyHistory(), typed(0, "a"), 1000);
+    expect(addNothing(state, 2000)).toBe(state);
+  });
+
+  it("does not interrupt a typing run either side of it", () => {
+    // A dead keypress in the middle of a word must not split the word's undo step — that
+    // would trade a visible bug for a subtler one.
+    let state = emptyHistory();
+    state = add(state, typed(0, "h"), 1000);
+    state = addNothing(state, 1020);
+    state = add(state, typed(1, "i"), 1040);
+
+    expect(state.done).toHaveLength(1);
   });
 });
 

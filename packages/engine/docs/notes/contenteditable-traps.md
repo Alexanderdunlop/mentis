@@ -384,3 +384,54 @@ in range and never lands inside an atom, rather than asserting where it lands. A
 knowing while probing: an unsettled read of the caret right after a keypress produces
 convincing nonsense — an earlier version of this note claimed Chromium repeated and
 skipped offsets in RTL, which was a race in the probe, not a browser behaviour.
+
+---
+
+## A keypress that changes nothing still fires `beforeinput`
+
+**Symptom.** Undo appears broken. ⌘Z does nothing — once, twice, four times — and then
+suddenly works. Or worse: you undo, press a key that does nothing, press redo, and the
+work you undid is gone for good.
+
+**Mechanism.** Two things that are individually reasonable.
+
+Browsers fire `beforeinput` for edits that have nothing to edit. Caret at the end of the
+document, press Delete: **Chromium and Firefox fire `deleteContentForward` with a
+collapsed target range.** WebKit fires nothing at all.
+
+| | Delete with nothing ahead of the caret |
+|---|---|
+| Chromium, Firefox | `deleteContentForward`, target range collapsed |
+| WebKit | no `beforeinput` |
+
+A collapsed range from the browser genuinely means *delete nothing* — widening it is how a
+word delete becomes a character delete
+([ADR 0004](../adr/0004-take-edit-ranges-from-the-browser.md)). So the correct handling
+produces a transaction with **no steps**. And then the history layer records it, because
+"a transaction was applied" reads like "an edit happened".
+
+Recording it costs three things, worst last:
+
+1. a dead undo press, one per dead keystroke
+2. a **split typing run** — a no-op mid-word ends the group, so one word becomes two undo
+   steps
+3. the **redo branch**, if recording clears it. Undone work becomes unrecoverable
+
+**What to do.** Guard where the edit is *recorded*, not where the event is handled — the
+event handling is right, and every source of no-op transactions gets fixed at once. An
+entry with no undo steps and no redo steps is not an entry.
+
+Note the keyboard is not the only route: a **selection-only transaction** — moving the
+caret programmatically, which any adapter will want to do — has no steps either, and hits
+every engine including WebKit. If you only test with a keyboard you will conclude this is
+a Chromium and Firefox problem.
+
+**What to watch for when testing.** Assert the history is *unchanged*, not that it grew by
+a specific amount. Depth deltas differ across engines here precisely because WebKit does
+not send the event, so an exact-count assertion passes on WebKit for the wrong reason.
+
+**Where it shows up here.** `src/history/history-state.ts`, and
+`e2e/spec/adr-0008-undo-granularity.spec.ts`. Found while giving
+[ADR 0008](../adr/0008-undo-granularity-is-word-based.md) its first browser coverage —
+which is the argument for discharging *Unverified* sections even when you expect them to
+pass, because this had been shipping since M3.

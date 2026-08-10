@@ -16,6 +16,20 @@ interface RecordOptions {
  * Recording **clears the redo branch**. Editing after an undo abandons the future that
  * was undone — keeping it would let redo replay steps whose positions no longer refer to
  * anything in the current document.
+ *
+ * A transaction that changed **nothing** is not an edit and is not recorded. That is not a
+ * defensive check; it is reachable from the keyboard. [ADR
+ * 0004](../../docs/adr/0004-take-edit-ranges-from-the-browser.md) reads a collapsed range
+ * from the browser as "delete nothing — that is information, not an omission", and
+ * Chromium and Firefox *do* fire `deleteContentForward` with one when there is nothing
+ * ahead of the caret. So pressing Delete at the end of a document produced a zero-step
+ * transaction, and recording it cost the user two things:
+ *
+ *   - **a dead undo press** — ⌘Z that visibly does nothing, once per keystroke
+ *   - **their redo branch**, because recording clears it. Type, undo, press Delete at the
+ *     end, press redo: the text was gone for good
+ *
+ * The second is data loss, which is why this guard is here rather than in the caller.
  */
 export const record = (
   state: HistoryState,
@@ -23,6 +37,8 @@ export const record = (
   shape: EditShape,
   { maxDepth = DEFAULT_MAX_DEPTH, maxIdleMs, maxGroupSize }: RecordOptions = {}
 ): HistoryState => {
+  if (entry.undoSteps.length === 0 && entry.redoSteps.length === 0) return state;
+
   const previous = state.done[state.done.length - 1];
 
   const done = canCoalesce(previous, shape, entry.at, { maxIdleMs, maxGroupSize })

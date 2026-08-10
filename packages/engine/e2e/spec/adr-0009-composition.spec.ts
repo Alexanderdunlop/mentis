@@ -209,3 +209,71 @@ test("no stray insertCompositionText reaches the engine unhandled", async ({
 
   expect(await harness.unhandledInput()).toEqual([]);
 });
+
+/**
+ * Android word-level replacement — the aggressive case M6 was most worried about.
+ *
+ * `Input.imeSetComposition` takes `replacementStart`/`replacementEnd`, which is the actual
+ * mechanism Gboard uses to rewrite the word behind the caret rather than an approximation
+ * of it. So the shape of input the plan called "the boss fight" is drivable here, and only
+ * a real device's *choice* of when to fire it is out of reach.
+ */
+test("a composition that replaces a word reconciles to the new word", async ({
+  harness,
+}) => {
+  await harness.reset(["teh cat"]);
+  await harness.setCaret(3);
+
+  await harness.composeReplacing("the", 0, 3);
+  await harness.commitComposition("the");
+
+  await harness.expectText("the cat");
+  await harness.expectModelMatchesDom();
+  expect(await harness.unhandledInput()).toEqual([]);
+});
+
+test("a replaced word is a single undo step", async ({ harness }) => {
+  // The claim that makes reconciling worth doing rather than replacing the document. A
+  // word-level replacement is two edits in the DOM — remove, insert — and must be one here.
+  await harness.reset([]);
+  await harness.type("teh");
+  await harness.setCaret(3);
+
+  await harness.composeReplacing("the", 0, 3);
+  await harness.commitComposition("the");
+  await harness.expectText("the");
+
+  await harness.undo();
+
+  await harness.expectText("teh");
+  await harness.expectModelMatchesDom();
+});
+
+test("a replacement range stretched across a mention cannot destroy it", async ({
+  harness,
+}) => {
+  /*
+   * Deliberately asking for something dangerous: a replacement spanning the chip. If it
+   * were honoured, `replaceRange` would delete the atom and insert plain text — a mention
+   * silently degraded to its label, the bug class this engine exists to prevent.
+   *
+   * It cannot happen, and not because the engine checks: **Chromium clamps its own
+   * replacement range at the `contenteditable="false"` boundary** and will not compose
+   * across it. Same shape as ADR 0005's other protections — arrow traversal and whole-chip
+   * delete are inherited from the atom being uneditable, not implemented.
+   *
+   * Asserted as "the mention survives with its value" rather than as an exact document,
+   * because how much of the surrounding text a browser chooses to replace is its business.
+   */
+  await harness.reset(["hi ", ALICE, " teh"]);
+  await harness.setCaretToEnd();
+
+  await harness.composeReplacing("XXXX", 0, 8);
+  await harness.commitComposition("XXXX");
+
+  await expect(harness.chips()).toHaveCount(1);
+  expect((await harness.model()).mentions).toEqual([
+    expect.objectContaining({ label: "@Alice", value: "u_1" }),
+  ]);
+  await harness.expectModelMatchesDom();
+});

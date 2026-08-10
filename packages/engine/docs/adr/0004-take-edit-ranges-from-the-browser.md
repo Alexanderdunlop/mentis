@@ -122,3 +122,17 @@ That last part is this ADR's own *revisit-when* firing exactly as written — "a
 found reporting target ranges that disagree with what it actually intends to change" — so
 the exception is the rule working, not the rule breaking. An atom is the engine's own
 construct (ADR 0005), not a platform text convention, which is the line ADR 0014 draws.
+
+### A consequence of "delete nothing" that took a while to surface
+
+This ADR's rule that a collapsed browser range means *delete nothing* is still right, and it
+had a second-order cost nobody had looked for. Chromium and Firefox fire
+`deleteContentForward` with a collapsed range whenever there is nothing ahead of the caret,
+so the engine dutifully built a **zero-step transaction** — and the history layer recorded
+it. Pressing Delete at the end of a document therefore burned an undo step, split the word
+being typed, and cleared the redo branch, losing undone work outright.
+
+Fixed in `history/record` rather than here, because the range handling was not the mistake:
+see [ADR 0008](0008-undo-granularity-is-word-based.md)'s verification section. The lesson
+belongs to this ADR too, though — **"the browser sent an event" is not "the document
+changed"**, and a rule that deliberately produces no-ops needs its consumers to know that.

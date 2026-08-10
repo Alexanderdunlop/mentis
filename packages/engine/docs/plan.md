@@ -374,10 +374,42 @@ more of the engine's design constraints to arrive from that direction.
 > convincing nonsense. A first pass "found" Chromium repeating and skipping offsets in RTL;
 > it was a race in the probe. Both are in the traps note.
 >
-> Still to do in M6: **iOS autocorrect and dictation, and Android word-level replacement** —
-> all of which go through `insertReplacementText`, which is handled but has no real coverage
-> and cannot get any without a device. IME is verified on Chromium (above); **Gboard** is the
-> case that remains, and it is the one M6 was most worried about from the start.
+> **Word-level replacement: reachable after all, and it works.** CDP's
+> `Input.imeSetComposition` takes `replacementStart`/`replacementEnd` — which *is* the
+> Android mechanism, a composition that replaces an existing range rather than inserting at
+> the caret. So Gboard's aggressive case is drivable on Chromium and mobile Chrome without
+> faking anything, the same argument that made M4's IME verification worth doing.
+>
+> Two things came out of pointing it at the engine. Replacing `teh` with `the` reconciles
+> correctly and is **one** undo step. And a replacement range deliberately stretched across a
+> mention **cannot destroy the chip** — Chromium clamps its own replacement range at the
+> `contenteditable="false"` boundary and refuses to compose across it, so the mention keeps
+> its `value`. That is ADR 0005's pattern again: the protection is inherited rather than
+> implemented.
+>
+> **The real find was somewhere else, and it had been shipping since M3.** Giving
+> [ADR 0008](adr/0008-undo-granularity-is-word-based.md) its first browser coverage — a claim
+> nobody expected to fail — turned up that **a keypress which changed nothing was recorded as
+> an undo step.** ADR 0004 reads a collapsed browser range as "delete nothing", and Chromium
+> and Firefox fire `deleteContentForward` with one whenever there is nothing ahead of the
+> caret, so the engine built a zero-step transaction and the history recorded it. Delete at
+> the end of a document four times took the stack from depth 2 to 6.
+>
+> It cost a dead ⌘Z per keystroke, it **split the word being typed** — directly against ADR
+> 0008's central claim — and it **cleared the redo branch**, making undone work
+> unrecoverable. That last one is data loss. One guard in `record` fixes all three, and also
+> the route WebKit reaches it by: a selection-only transaction, which any M7 adapter will
+> dispatch to move the caret.
+>
+> The engine was right twice and still wrong: right that a collapsed range means delete
+> nothing, right to build a transaction for it — and wrong to treat *a transaction happened*
+> as *an edit happened*. Nothing had said those were different events.
+>
+> Still to do in M6: **iOS autocorrect and dictation**, which arrive as
+> `insertReplacementText` rather than as a composition and have no automatable route at all —
+> CDP has no spellcheck-correction command, and synthesising the event would only check the
+> engine against our own guess at its shape. That plus **real Gboard on a real device** is
+> what is left, and both need a human with a phone rather than another spec.
 
 ### M7 — Adapters, as the victory lap
 
