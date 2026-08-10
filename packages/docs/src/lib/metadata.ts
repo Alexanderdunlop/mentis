@@ -84,3 +84,48 @@ export function createMetadata({
     },
   };
 }
+
+export const author = {
+  name: "Alexander Dunlop",
+  url: "https://alexdunlop.com/",
+};
+
+/**
+ * Article metadata — as `createMetadata`, but with `og:type=article` and the
+ * publication dates, which is what social cards and news crawlers read.
+ *
+ * @param path - Absolute site path, e.g. `/blog/some-post`.
+ */
+export function createArticleMetadata({
+  title,
+  description,
+  path,
+  date,
+  updated,
+  keywords = [],
+}: {
+  title: string;
+  description: string;
+  path: string;
+  date: string;
+  updated?: string;
+  keywords?: string[];
+}): Metadata {
+  const base = createMetadata({ title, description, path });
+
+  return {
+    ...base,
+    // Article keywords first, so the page-specific terms lead.
+    keywords: [...keywords, ...siteKeywords],
+    authors: [author],
+    openGraph: {
+      ...base.openGraph,
+      type: "article",
+      // Open Graph wants an ISO 8601 *datetime*; the frontmatter carries a
+      // date, so anchor it to midnight UTC rather than inventing a time.
+      publishedTime: `${date}T00:00:00.000Z`,
+      modifiedTime: `${updated ?? date}T00:00:00.000Z`,
+      authors: [author.url],
+    },
+  };
+}

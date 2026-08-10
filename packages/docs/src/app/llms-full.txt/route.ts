@@ -1,4 +1,4 @@
-import { getDocEntries } from "@/lib/llms";
+import { getBlogEntries, getDocEntries } from "@/lib/llms";
 import { siteDescription, siteUrl } from "@/lib/metadata";
 
 export const dynamic = "force-static";
@@ -11,9 +11,9 @@ export const revalidate = false;
  * @see https://llmstxt.org
  */
 export async function GET() {
-  const entries = await getDocEntries();
+  const [docs, posts] = await Promise.all([getDocEntries(), getBlogEntries()]);
 
-  const sections = entries
+  const sections = [...docs, ...posts]
     .map((entry) => {
       const header = [
         `# ${entry.title}`,

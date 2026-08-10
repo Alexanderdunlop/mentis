@@ -1,0 +1,247 @@
+---
+title: The ARIA combobox pattern for @mention autocomplete
+description: "A mention dropdown is a combobox, and most implementations get it wrong in the same three ways. The attributes you need, why focus must stay in the input, and how to test it."
+date: "2026-08-10"
+author: Alexander Dunlop
+order: 3
+summary: "An @mention autocomplete is an ARIA combobox with an attached listbox. Keyboard focus must never leave the input: put role=combobox on the editable element with aria-expanded, aria-controls, aria-autocomplete=list and aria-haspopup=listbox, put role=listbox on the dropdown with role=option on each row, and point aria-activedescendant at the id of the highlighted option so a screen reader announces it without moving focus. Use aria-selected only on the active option. The three common mistakes are moving DOM focus into the list, leaving aria-expanded static, and pointing aria-activedescendant at an id that does not exist."
+keywords:
+  - aria combobox pattern
+  - accessible autocomplete react
+  - aria-activedescendant
+  - accessible mention input
+  - combobox listbox aria
+  - screen reader autocomplete
+  - wai-aria combobox
+---
+
+Typing `@` and getting a filtered dropdown is a combobox. Not a menu, not a
+dialog, not a listbox on its own — a combobox with an attached popup. The WAI-ARIA
+Authoring Practices have a pattern for exactly this, and mention inputs get it
+wrong in a small number of very consistent ways.
+
+## The rule everything follows from
+
+**Keyboard focus never leaves the input.**
+
+This is the whole pattern in one line. The user is typing. If pressing the down
+arrow moves DOM focus into the list, they can no longer type, and every subsequent
+keystroke goes somewhere they did not intend. So the highlighted option is not
+focused — it is *referenced*, by id, from the input, using `aria-activedescendant`.
+Screen readers announce the referenced element as if it were focused. Focus itself
+never moves.
+
+Once you accept that, the attributes stop being arbitrary and start being a
+consequence.
+
+## The attributes
+
+On the editable element:
+
+| Attribute | Value | Why |
+| --- | --- | --- |
+| `role="combobox"` | static | Declares the input as a combobox |
+| `aria-expanded` | `true` / `false` | Whether the popup is currently open |
+| `aria-controls` | id of the listbox | Points at the popup it owns |
+| `aria-haspopup` | `"listbox"` | Says what kind of popup appears |
+| `aria-autocomplete` | `"list"` | Suggestions are listed, not inlined into the text |
+| `aria-activedescendant` | id of the highlighted option | The virtual focus |
+
+On the popup:
+
+| Attribute | Value | Why |
+| --- | --- | --- |
+| `role="listbox"` | static | The popup is a list of choices |
+| `id` | matches `aria-controls` | Completes the relationship |
+
+On each row:
+
+| Attribute | Value | Why |
+| --- | --- | --- |
+| `role="option"` | static | A selectable choice |
+| `id` | unique, referenced by `aria-activedescendant` | The target of virtual focus |
+| `aria-selected` | `true` on the active row only | Which one Enter will choose |
+
+Here is the whole thing as mentis renders it, with the dropdown open and the
+second option highlighted:
+
+```html
+<div class="mention-input-container">
+  <div
+    role="combobox"
+    contenteditable="true"
+    aria-autocomplete="list"
+    aria-haspopup="listbox"
+    aria-expanded="true"
+    aria-controls="mention-modal"
+    aria-activedescendant="mention-option-bob"
+  >Hey @b</div>
+
+  <div id="mention-modal" role="listbox">
+    <div id="mention-option-alice" role="option" aria-selected="false">Alice</div>
+    <div id="mention-option-bob"   role="option" aria-selected="true">Bob</div>
+  </div>
+</div>
+```
+
+Note that `aria-expanded` is `false` and `aria-activedescendant` and `aria-controls`
+are absent entirely when the dropdown is closed. That matters — see the mistakes below.
+
+## The three mistakes
+
+### 1. Moving DOM focus into the list
+
+The symptom is that arrow keys work but the user cannot keep typing to narrow the
+results, and Escape does something surprising. If you find yourself calling
+`.focus()` on an option, or managing `tabindex="-1"` across rows, you have built a
+menu rather than a combobox. Options in this pattern are never focusable and never
+in the tab order.
+
+### 2. Leaving `aria-expanded` hard-coded
+
+`aria-expanded="true"` written once in JSX and never updated is extremely common,
+because nothing looks wrong. A screen reader user is simply told the popup is open
+at all times, including when it is not, so they arrow into a list that is not there.
+It must be bound to the same state that decides whether the popup renders:
+
+```tsx
+aria-expanded={showModal}
+```
+
+### 3. Pointing `aria-activedescendant` at an id that does not exist
+
+If the list is empty, or the highlighted index is out of range, or the ids are
+generated with a different scheme than the one the attribute builds, the reference
+dangles. Screen readers announce nothing at all, so it presents as "the dropdown is
+silent" rather than as a broken attribute. Guard it:
+
+```tsx
+aria-activedescendant={
+  showModal && filteredOptions.length > 0
+    ? `mention-option-${filteredOptions[highlightedIndex].value}`
+    : undefined
+}
+```
+
+Returning `undefined` rather than an empty string matters — React omits the
+attribute entirely, which is the correct state, whereas `aria-activedescendant=""`
+is a dangling reference.
+
+## The keyboard contract
+
+| Key | Popup open | Popup closed |
+| --- | --- | --- |
+| <kbd>↓</kbd> / <kbd>↑</kbd> | Move the highlight | Normal caret movement |
+| <kbd>Enter</kbd> | Select the highlighted option | Newline / your `onKeyDown` |
+| <kbd>Tab</kbd> | Select the highlighted option | Move focus onward |
+| <kbd>Esc</kbd> | Close without selecting | — |
+| <kbd>←</kbd> / <kbd>→</kbd> | Caret movement, including into chips | Caret movement |
+
+Two things about that table are worth stating explicitly, because they are the
+questions people ask.
+
+**Escape must not clear the input.** It closes the popup and leaves the text alone.
+Clearing on Escape is a different pattern and it loses work.
+
+**Tab selecting the highlighted option is a deliberate choice.** The alternative —
+Tab moves focus out and abandons the selection — is also valid per the authoring
+practices. Selecting is the better behaviour for mentions specifically, because
+typing `@ali` and tabbing is a natural completion gesture. But it means Tab does
+not move focus while the popup is open, which you should be consistent about.
+
+In mentis, these keys are consumed internally while the popup is open, so your own
+`onKeyDown` is not called for them — deliberately, so that a form which submits on
+Enter does not submit when the user meant to pick a name.
+
+## The contentEditable wrinkle
+
+Putting `role="combobox"` on a `contenteditable` div rather than an `input` is
+legitimate and well supported, but it changes two things.
+
+First, the accessible value is the element's text content, which now includes chip
+elements. A mention rendered as `<span class="mention-chip">@Alice</span>` is
+announced as "@Alice" because that is its text — which is what you want, and is
+better than the overlay approach where a mention is an indistinguishable run of a
+longer string.
+
+Second, you need a placeholder. `contenteditable` has no `placeholder` attribute,
+so it is done with CSS on an empty element, which means it is *decoration* and not
+an accessible name. If the input has no visible `<label>`, give it one with
+`aria-label`:
+
+```tsx
+<MentionInput
+  options={users}
+  slotsProps={{
+    contentEditable: {
+      "aria-label": "Comment",
+      "data-placeholder": "Add a comment…",
+    },
+  }}
+/>
+```
+
+This is worth doing and is easy to forget — a combobox with no accessible name is
+announced as just "combobox".
+
+## Where mentis is currently short
+
+Being straight about it: mentis wires the combobox relationship, the listbox, the
+options, and `aria-activedescendant` correctly, and the keyboard contract above is
+implemented. What it does not yet do is announce *result counts* through a live
+region — there is no `aria-live` element saying "3 results available" when the
+filter changes. Sighted users see the list resize; screen reader users find out by
+arrowing through it. It is on the list.
+
+If that matters for your compliance target today, you can add it yourself around
+the component, since you control the `options` array and therefore know the count.
+
+## Testing it
+
+Automated tooling will not catch most of this. axe and Lighthouse check that
+attributes are well-formed, not that they are *true* — a hard-coded
+`aria-expanded="true"` passes every automated check ever written.
+
+The five-minute manual pass:
+
+1. Tab to the input. It should be announced with a name and as a combobox.
+2. Type the trigger. The popup opening should be announced.
+3. Arrow down. Each option should be announced as you land on it — **without** focus
+   leaving the input, which you can confirm by typing another letter and watching the
+   list filter.
+4. Press Escape. The popup closes, the text survives.
+5. Inspect the DOM with the popup closed and confirm `aria-expanded="false"` and no
+   `aria-activedescendant`.
+
+VoiceOver with Safari and NVDA with Firefox are the two combinations worth the time;
+they disagree often enough to be worth checking both.
+
+## FAQ
+
+### Should a mention dropdown use `role="menu"`?
+
+No. A menu is for commands, and its options are focusable. A mention dropdown offers
+values to insert into a field, which is `role="listbox"` inside a combobox.
+
+### Does `aria-selected` go on every option?
+
+Only on the currently highlighted one, set to `true`; the others should be `false`.
+In a single-select listbox, `aria-selected="true"` on several rows is contradictory.
+
+### Do I need `aria-owns` as well as `aria-controls`?
+
+No. `aria-controls` on the combobox pointing at the listbox id is the required
+relationship. `aria-owns` is only needed when the popup is not a DOM descendant *and*
+you need to fix the accessibility tree ordering — rendering the popup inside the same
+container, as mentis does, avoids the question.
+
+### Is `aria-autocomplete="list"` or `"both"` right?
+
+`"list"` when suggestions appear only in the popup. `"both"` when you also complete
+the text inline in the field. Mention inputs are almost always `"list"`.
+
+### What is the difference between `aria-activedescendant` and roving tabindex?
+
+Both track a virtual selection. `aria-activedescendant` keeps DOM focus in one place
+and points elsewhere; roving tabindex actually moves focus between elements. Comboboxes
+need the former, because the user has to keep typing.

@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { source } from "@/lib/source";
+import { getBlogPosts, source } from "@/lib/source";
 
 /**
  * Strips MDX-only syntax so the output reads as plain Markdown.
@@ -107,4 +107,26 @@ export async function getDocEntries(): Promise<DocEntry[]> {
   );
 
   return entries;
+}
+
+/**
+ * Blog posts in the same shape, newest first.
+ *
+ * The `summary` frontmatter is prepended to the body verbatim: it is a direct
+ * answer to the post's title, so a model that truncates still reads the
+ * conclusion rather than the introduction.
+ */
+export async function getBlogEntries(): Promise<DocEntry[]> {
+  return Promise.all(
+    getBlogPosts().map(async (post) => {
+      const raw = await readFile(post.absolutePath, "utf-8");
+
+      return {
+        title: post.data.title,
+        description: post.data.description,
+        url: post.url,
+        content: `In short: ${post.data.summary}\n\n${mdxToPlainMarkdown(raw)}`,
+      };
+    }),
+  );
 }

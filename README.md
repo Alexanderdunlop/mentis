@@ -39,11 +39,12 @@ It's built on `contentEditable` rather than a plain `<textarea>`, which is what 
 
 ## Why Mentis?
 
-[`react-mentions`](https://www.npmjs.com/package/react-mentions) has been the default choice for years, but it hasn't seen a release since 2022 and is built on a `<textarea>` + overlay approach that can't render true chips. Mentis is a maintained, modern alternative:
+[`react-mentions`](https://www.npmjs.com/package/react-mentions) has been the default choice for years, but its last release was 4.4.10 in June 2023, its GitHub repository now returns a 404, and it's built on a `<textarea>` + overlay approach that can't render true chips. Mentis is a maintained, modern alternative:
 
 |                              | Mentis                        | react-mentions          |
 | ---------------------------- | ----------------------------- | ----------------------- |
-| Last release                 | Actively maintained           | 2022                    |
+| Last release                 | Actively maintained           | June 2023               |
+| Issue tracker                | ✅ Open                       | ❌ Repository 404s      |
 | Foundation                   | `contentEditable`             | `<textarea>` + overlay  |
 | Mentions render as chips     | ✅ Real DOM elements          | ❌ Styled text overlay  |
 | Runtime dependencies         | ✅ Zero                       | `substyle`, others      |

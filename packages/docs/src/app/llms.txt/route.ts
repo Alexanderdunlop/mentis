@@ -1,4 +1,4 @@
-import { getDocEntries } from "@/lib/llms";
+import { getBlogEntries, getDocEntries } from "@/lib/llms";
 import { siteDescription, siteUrl } from "@/lib/metadata";
 
 export const dynamic = "force-static";
@@ -10,14 +10,16 @@ export const revalidate = false;
  * @see https://llmstxt.org
  */
 export async function GET() {
-  const entries = await getDocEntries();
+  const [entries, posts] = await Promise.all([
+    getDocEntries(),
+    getBlogEntries(),
+  ]);
 
-  const links = entries
-    .map(
-      (entry) =>
-        `- [${entry.title}](${siteUrl}${entry.url})${entry.description ? `: ${entry.description}` : ""}`,
-    )
-    .join("\n");
+  const toLink = (entry: { title: string; url: string; description?: string }) =>
+    `- [${entry.title}](${siteUrl}${entry.url})${entry.description ? `: ${entry.description}` : ""}`;
+
+  const links = entries.map(toLink).join("\n");
+  const postLinks = posts.map(toLink).join("\n");
 
   const body = `# mentis
 
@@ -40,6 +42,10 @@ The controlled props are \`displayValue\` (what the user sees) and \`dataValue\`
 ## Documentation
 
 ${links}
+
+## Articles
+
+${postLinks}
 
 ## Optional
 

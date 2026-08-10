@@ -1,0 +1,174 @@
+---
+title: Why mention inputs outgrow the textarea
+description: "Most React mention libraries paint highlights on a div behind a transparent textarea. It is a clever trick with specific failure modes. Here is where it breaks, and what contentEditable costs you instead."
+date: "2026-08-10"
+author: Alexander Dunlop
+order: 2
+summary: "The textarea overlay technique renders a transparent textarea on top of a mirror div that repaints the same text with highlight spans behind it. It is popular because the browser keeps handling the caret, selection, and IME for you. It breaks when the mirror and the textarea disagree about text metrics — custom fonts, ligatures, RTL text, browser zoom, scroll position — and it can never produce a real chip, because a textarea can only contain text. contentEditable gives you real DOM chips and atomic deletion, at the cost of owning caret placement, paste sanitisation, undo, and IME composition yourself."
+keywords:
+  - contenteditable vs textarea
+  - react mention input architecture
+  - textarea overlay highlight
+  - contenteditable react
+  - mention chips react
+  - rich text input react
+---
+
+Nearly every mention input for React is built one of two ways. The choice is
+invisible from the outside until the day it isn't, and then it explains every bug
+you have.
+
+## The overlay trick
+
+Put a `textarea` on top. Make its text transparent but keep the caret visible.
+Behind it, absolutely position a `div` that renders the *same string*, character
+for character, except the mentions are wrapped in coloured spans. Sync the scroll
+positions. The user sees the highlights on the div and types into the textarea.
+
+It is genuinely clever, and the reason it is everywhere is that you get an
+enormous amount for free. The browser handles caret placement, click-to-position,
+double-click word selection, shift-arrow selection, drag selection, IME
+composition for Japanese and Chinese input, native undo, spellcheck, and mobile
+autocorrect. You write none of that. `react-mentions` works this way, and it
+worked well enough to reach 691,000 weekly downloads.
+
+The whole technique rests on one assumption: **the mirror div lays out text
+identically to the textarea.** Everything that goes wrong, goes wrong there.
+
+## Where the mirror drifts
+
+The two elements are different tag types with different default user-agent
+styling, and you are asking them to agree on glyph positions to the pixel.
+
+- **Font loading.** The mirror renders with the fallback font for the first paint;
+  the webfont arrives and the metrics shift. Highlights land a few pixels off until
+  something forces a reflow.
+- **Ligatures and kerning.** A `textarea` and a `div` do not always apply the same
+  font features. `fi`, `ffl`, and kerning pairs across a highlight boundary can
+  measure differently.
+- **Browser zoom and fractional device pixels.** Subpixel rounding accumulates
+  across a long line. At 110% zoom the offset is visible; at 175% it is obvious.
+- **Scroll sync.** The mirror is synced on the textarea's scroll event, so it is
+  always one frame behind on fast scroll or momentum scroll on iOS.
+- **RTL and bidirectional text.** Mixed Arabic or Hebrew and Latin text reorders
+  visually. Getting a highlight to land on the right run in both elements
+  simultaneously is genuinely hard.
+- **Wrapping.** `white-space`, `word-break`, `overflow-wrap`, and the scrollbar's
+  own width all have to match exactly, or the mirror wraps one word earlier than
+  the textarea and every line below is wrong.
+
+Each of these is fixable. That is the trap — they are all *individually* fixable,
+so the architecture never looks wrong, it just accumulates a long tail of
+per-browser corrections.
+
+## The thing you cannot fix
+
+A `textarea` contains text. Only text. No elements, ever.
+
+So a "chip" in the overlay approach is a coloured background painted on a div
+*behind* a transparent character range. It looks like a chip. It is not one, and
+the difference shows up wherever behaviour, rather than appearance, is involved:
+
+- **Deletion is per-character.** Backspace at the end of `@Alexander` removes the
+  `r`, leaving `@Alexande` — still highlighted, now referring to nobody. Libraries
+  work around this by intercepting backspace and deleting the whole run, which
+  works until the caret gets there by click or by selection rather than by arrow key.
+- **Selection can split a mention.** Drag from the middle of a mention to the middle
+  of a word. Copy. You now have half an entity on the clipboard, and the markup
+  string that comes back is unparseable.
+- **The chip cannot be a component.** No avatar, no hover card, no per-chip
+  affordance, no border-radius that survives a line wrap — it is a background
+  colour on a text range.
+- **Screen readers see a flat string.** There is no element boundary to announce,
+  so a mention is read as ordinary text.
+
+## What contentEditable gives you
+
+Make the input a `contentEditable` div and a mention becomes an actual element in
+the DOM. In mentis, that is a `span` carrying its own data:
+
+```html
+<div class="content-editable-input" role="combobox" contenteditable="true">
+  Hey <span class="mention-chip" data-value="alice" data-label="Alice">@Alice</span>, take a look
+</div>
+```
+
+Now the chip is a real node. It can be styled with a border, a background, and a
+radius that behaves properly across a line break. Backspace against it deletes the
+whole node rather than a character. Selection APIs treat it as a unit. Serialising
+is a DOM walk instead of a regex over markup, which is why mentis can hand you
+`displayValue` and `dataValue` as two separate strings without asking you to parse
+`@[__display__](__id__)` yourself.
+
+There is no mirror, so there is nothing to drift.
+
+## What it costs
+
+This is not a free upgrade, and anyone who tells you otherwise has not shipped one.
+The moment you set `contenteditable`, you inherit a pile of problems the textarea
+was solving silently:
+
+- **Caret placement.** You now position the caret yourself after every programmatic
+  change — inserting a chip, replacing a range, restoring after a re-render. Range
+  and Selection are fiddly, and the browsers disagree at the edges.
+- **Paste.** The default is to paste *HTML*. Someone pastes from Word and you have
+  `<o:p>` tags in your input. You must intercept paste and sanitise it down to text
+  and your own chips.
+- **Undo.** Native undo in a contentEditable is unreliable once you have made
+  programmatic DOM changes, so you generally end up implementing an undo stack.
+- **IME composition.** Japanese, Chinese, and Korean input arrives as a
+  multi-keystroke composition. If you read the DOM mid-composition, you corrupt it.
+  `compositionstart` and `compositionend` become load-bearing.
+- **Grapheme clusters.** "One character" is not one code unit. `👩‍👩‍👧‍👦` is seven code
+  points; a flag is two; `é` may be one or two. Naive index arithmetic cuts emoji in
+  half.
+- **React and the DOM disagree.** React wants to own the DOM; contentEditable means
+  the *browser* mutates it on every keystroke. You end up reconciling by hand.
+
+None of these are exotic. They are the standard cost of the approach, and they are
+why the overlay trick remains popular.
+
+## Which should you use?
+
+| Use the textarea overlay when | Use contentEditable when |
+| --- | --- |
+| Mentions are decoration — colour on a word | Mentions are entities users manipulate |
+| Your text is single-script and left-to-right | You ship RTL, CJK, or mixed-script content |
+| You need native undo and spellcheck, cheaply | You need chips to delete and select atomically |
+| Plain-text storage is the requirement | You want display text and IDs separated |
+| You are adding this in an afternoon | You want per-chip UI later — avatars, hovercards |
+
+There is no universally correct answer. There is a correct answer *for a given
+product*, and it is worth knowing which one you picked and why, rather than
+discovering it from a bug report about Arabic text at 125% zoom.
+
+mentis takes the contentEditable side of this — see
+[chips](/docs/chips) for how mention nodes behave, or
+[migrating from react-mentions](/blog/migrate-from-react-mentions) if you are
+coming from the other approach.
+
+## FAQ
+
+### Why do React mention libraries use a transparent textarea?
+
+Because a `textarea` cannot contain elements, so highlights have to be painted on a
+separate element behind it. Keeping the real textarea on top preserves native caret,
+selection, IME, and undo behaviour for free.
+
+### Can you put a styled chip inside a textarea?
+
+No. A `textarea` holds text only. Anything that looks like a chip inside one is
+drawn on a different element positioned behind the text.
+
+### Is contentEditable bad for accessibility?
+
+Not inherently. A `contentEditable` div with `role="combobox"` and correct
+`aria-activedescendant` wiring is a well-supported pattern, and real chip elements
+give screen readers a boundary that a highlighted text range does not. See
+[the ARIA combobox pattern for mention inputs](/blog/accessible-mention-autocomplete-aria-combobox).
+
+### Does contentEditable work on mobile?
+
+Yes, though it is where the cost is highest — mobile keyboards, autocorrect, and IME
+interact with programmatic DOM changes in ways desktop browsers do not. Test on real
+devices rather than a narrow viewport.
