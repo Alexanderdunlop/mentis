@@ -1,4 +1,5 @@
 import { positionAfter, positionBefore } from "../model/adjacent-position";
+import { atomAhead } from "../model/node-ahead";
 import { textNode } from "../model/nodes";
 import { sliceLength } from "../model/slice-between";
 import { replaceRange, type Transaction } from "../model/transaction";
@@ -95,7 +96,7 @@ const deletion = (from: number, to: number): Transaction => ({
 });
 
 export const transactionFor = (intent: InputIntent): Transaction | null => {
-  const { inputType, text, slice, range, rangeFromBrowser, doc } = intent;
+  const { inputType, text, slice, range, rangeFromBrowser, selection, doc } = intent;
 
   if (CLIPBOARD_INSERT.has(inputType)) {
     // A transfer we could not read leaves the plain text, which is what `inputText` took
@@ -119,6 +120,16 @@ export const transactionFor = (intent: InputIntent): Transaction | null => {
   }
 
   if (DELETE_FORWARD.has(inputType)) {
+    // The one place a browser-supplied range is overruled. Narrow on purpose: only this
+    // inputType, only from a collapsed caret, only when an atom starts there. See ADR
+    // 0014 — Firefox computes this range as "the atom plus one grapheme of whatever
+    // follows", and reports it collapsed when nothing follows, so a trailing chip cannot
+    // be deleted at all.
+    if (inputType === "deleteContentForward" && selection.from === selection.to) {
+      const atom = atomAhead(doc, selection.from);
+      // An atom is one position wide (ADR 0005), so its whole extent is `from + 1`.
+      if (atom) return deletion(selection.from, selection.from + 1);
+    }
     if (range.from !== range.to) return deletion(range.from, range.to);
     if (rangeFromBrowser) return deletion(range.from, range.to);
     return deletion(range.from, positionAfter(doc, range.from));

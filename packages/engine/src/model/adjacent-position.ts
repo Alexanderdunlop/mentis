@@ -1,6 +1,6 @@
 import { stepBack, stepForward } from "./grapheme-boundary";
 import { docLength } from "./doc-length";
-import { nodeLength } from "./node-length";
+import { nodeAhead } from "./node-ahead";
 import { isAtom } from "./nodes";
 import { resolvePosition } from "./resolve-position";
 import type { Doc } from "./types";
@@ -29,8 +29,8 @@ import type { Doc } from "./types";
 /*
  * `resolvePosition` puts a position that falls exactly between two nodes at the **end of
  * the earlier one**. That convention is free for `positionBefore`, which wants to look
- * backwards anyway, and is the one thing `positionAfter` has to undo: sitting at a node's
- * end *is* sitting at the start of the next, and the character ahead belongs to that one.
+ * backwards anyway, and is the one thing looking forward has to undo — which is why
+ * `positionAfter` goes through `nodeAhead` rather than resolving the position itself.
  */
 
 /** The position one character before `at`, or `at` itself at the start of the document. */
@@ -48,19 +48,10 @@ export const positionBefore = (doc: Doc, at: number): number => {
 
 /** The position one character after `at`, or `at` itself at the end of the document. */
 export const positionAfter = (doc: Doc, at: number): number => {
-  const end = docLength(doc);
-  if (at >= end) return end;
+  const ahead = nodeAhead(doc, at);
+  if (!ahead) return docLength(doc);
 
-  const { index, offset } = resolvePosition(doc, at);
-  const node = doc.nodes[index];
-  if (!node) return end;
-
-  // See above: at a node's trailing edge the next character is the following node's.
-  const atTrailingEdge = offset >= nodeLength(node);
-  const target = atTrailingEdge ? doc.nodes[index + 1] : node;
-  const within = atTrailingEdge ? 0 : offset;
-  if (!target) return end;
-
-  if (isAtom(target)) return at + 1;
-  return at + (stepForward(target.text, within) - within);
+  const { node, offset } = ahead;
+  if (isAtom(node)) return at + 1;
+  return at + (stepForward(node.text, offset) - offset);
 };

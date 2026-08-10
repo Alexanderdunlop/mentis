@@ -144,7 +144,9 @@ export const createEditor = ({
     }
 
     const fromBrowser = targetRange(element, state.doc, input);
-    const range = fromBrowser ?? rangeOf(readSelection(element, state.doc));
+    // Read unconditionally rather than only as the fallback: ADR 0014's clamp needs to
+    // know whether the caret was collapsed even when the browser did supply a range.
+    const selection = rangeOf(readSelection(element, state.doc));
 
     const transaction = transactionFor({
       inputType: input.inputType,
@@ -152,8 +154,9 @@ export const createEditor = ({
       // Null for everything that is not a paste or a drop. Read here, synchronously off
       // the event, because that is the only place a `DataTransfer` is readable at all.
       slice: readClipboard(input.dataTransfer),
-      range,
+      range: fromBrowser ?? selection,
       rangeFromBrowser: fromBrowser !== null,
+      selection,
       doc: state.doc,
     });
 

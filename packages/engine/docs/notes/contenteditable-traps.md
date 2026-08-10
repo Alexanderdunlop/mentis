@@ -133,15 +133,41 @@ one member plus a joiner from a ZWJ sequence, where the others take the whole cl
 Firefox's position on separately-deletable combining marks is long-standing and not
 obviously wrong.
 
-**What to do.** Don't assert a specific deletion *extent* across the matrix — assert
-what every engine agrees on: nothing is half a code point, the model and the DOM stay
-in step, and an atom is never partially removed. If you decide the engine should clamp
-the browser's range to its own idea of one unit, that contradicts ADR 0004 and needs an
-ADR of its own; it is not a patch.
+**The trap inside the trap: "nothing is corrupted" is not the same as "nothing is
+broken", and filing all of this as one phenomenon hides the difference.** Probing the
+whole family rather than the one document above found Firefox's actual rule for a forward
+delete at an atom — *the atom plus one grapheme of whatever text follows* — and the case
+that rule produces when nothing follows:
 
-**Where it shows up here.** `test.fixme` in `e2e/spec/adr-0005-atoms.spec.ts` and
-`e2e/spec/adr-0013-graphemes.spec.ts`, each naming the cause. Found by the engine's
-browser matrix on the day it was built, which is what it was built for.
+| document, caret before the chip | Firefox's range | result |
+|---|---|---|
+| `[chip]"hi"` | atom + `"h"` | `"i"` — a letter destroyed |
+| `[chip]"👍x"` | atom + `"👍"` | `"x"` — a whole emoji destroyed |
+| `[chip]` at the end of the document | **collapsed** | **nothing deleted, ever** |
+
+ADR 0004 reads a collapsed browser range as "delete nothing — that is information, not an
+omission". So a trailing mention chip could not be removed with the Delete key at all, and
+that had been sitting under a `test.fixme` labelled "granularity" because the first probe
+happened to use a document with a space after the chip.
+
+**What to do.** Two different things, and telling them apart is the point:
+
+- **Grapheme extent: don't assert it across the matrix, and don't override it.** Assert
+  what every engine agrees on — nothing is half a code point, model and DOM stay in step.
+  Firefox's difference is *directional* (peels backwards, whole forwards), which is a
+  convention, and ADR 0003 says leave those alone. Pin it per engine so a change fails.
+- **A range that does not describe what the browser meant to do is not a convention.** A
+  collapsed range for a delete the browser plainly intended is the trigger ADR 0004's
+  own *revisit-when* already wrote down. That is a bug, and it earns an exception.
+- **When a browser diverges, probe the whole family before naming the phenomenon.** One
+  document gave "the atom and the following space" and cost a day of treating a defect as
+  a preference.
+
+**Where it shows up here.** [ADR 0014](../adr/0014-clamp-a-forward-delete-to-an-atom.md)
+and `e2e/spec/adr-0014-delete-granularity.spec.ts`, which holds both halves so the split
+stays visible. All three `test.fixme`s are gone: two discharged by the clamp, one converted
+to a per-engine expectation. Found by the engine's browser matrix on the day it was built,
+which is what it was built for.
 
 ---
 

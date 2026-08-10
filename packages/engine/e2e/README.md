@@ -36,6 +36,7 @@ port-of-its-own convention, same "observe, don't fix" discipline. See `e2e/CLAUD
 | `adr-0010-clipboard.spec.ts` | the round trip, through a real system clipboard |
 | `adr-0009-composition.spec.ts` | IME reconciliation, on a real composition (Chromium) |
 | `adr-0013-graphemes.spec.ts` | whole characters, on the browser's own ranges |
+| `adr-0014-delete-granularity.spec.ts` | the atom clamp, and the grapheme difference kept on purpose |
 
 The mirroring is the point. Every ADR carries an **Unverified** section, and this is where
 those get discharged — so a claim cannot quietly outlive its evidence. When a spec settles
@@ -70,24 +71,25 @@ Its companion is that `model().selection` and `domCaretOffset()` **deliberately 
 for any document containing a mention — position space against character space, ADR 0005.
 Asserting both is how a spec proves that divergence is real rather than theoretical.
 
-## Current `test.fixme` backlog (3)
+## Current `test.fixme` backlog (0)
 
-All Firefox, all the same finding: **browsers disagree about how much one delete covers.**
-Nothing is corrupted — no lone surrogate is produced and the model stays in step with the
-DOM — so this is granularity, not a defect.
+There were three, all Firefox, all filed as one finding — "browsers disagree about how much
+one delete covers" — on the grounds that nothing was corrupted. Probing the whole family
+rather than the one document they were written against found **two** findings with opposite
+answers, which is why they could not be cleared together. See
+[ADR 0014](../docs/adr/0014-clamp-a-forward-delete-to-an-atom.md).
 
-- `adr-0005-atoms.spec.ts` — forward delete removes the chip *and the character after it*,
-  because Firefox's `getTargetRanges()` reports `(DIV,0) → (" hi",1)` where Chromium and
-  WebKit report `(DIV,0) → (" hi",0)`.
-- `adr-0013-graphemes.spec.ts` — Backspace removes one member plus a joiner from a ZWJ
-  sequence rather than the whole cluster.
-- `adr-0013-graphemes.spec.ts` — Backspace removes a combining mark on its own. Firefox's
-  position on this is long-standing and not obviously wrong.
+- **Grapheme extent really is convention.** Firefox peels a cluster backwards and takes it
+  whole forwards. Not overridden; the two grapheme fixmes became per-engine expectations in
+  `adr-0014-delete-granularity.spec.ts`, so a change in *either* browser now fails.
+- **The atom case was a defect.** Firefox's rule is "the atom plus one grapheme of whatever
+  follows", so it destroyed a letter or a whole emoji — and it reports a **collapsed** range
+  when nothing follows, meaning a trailing chip could not be deleted at all. That is now
+  clamped in `src/input/transaction-for.ts`, and the fixme passes on all four engines.
 
-Each is left failing on purpose. Making them pass means clamping a browser-supplied range
-to the engine's own idea of one unit, which overrides platform convention and contradicts
-[ADR 0004](../docs/adr/0004-take-edit-ranges-from-the-browser.md) — a decision that needs
-its own ADR, not a patch.
+Worth keeping the shape of that mistake in mind when adding the next one: **"nothing is
+corrupted" is not "nothing is broken"**, and a single document is not enough to name a
+phenomenon.
 
 ## Not covered yet
 

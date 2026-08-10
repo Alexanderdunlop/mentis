@@ -73,47 +73,23 @@ test("Backspace takes the whole chip", async ({ harness }) => {
   expect((await harness.model()).mentions).toHaveLength(0);
 });
 
-test.fixme(
-  "Delete forward takes the whole chip and nothing else",
-  async ({ harness }) => {
-    /*
-     * FIREFOX ONLY. The chip is removed correctly; the character after it goes too.
-     *
-     * Cause: Firefox's own `getTargetRanges()` covers more than the atom. For this exact
-     * document and keypress the browsers report:
-     *
-     *   chromium/webkit  (DIV, 0) → (" hi", 0)   the atom
-     *   firefox          (DIV, 0) → (" hi", 1)   the atom *and* the following space
-     *
-     * So this is not a mapping error on our side — `domToModel` carried the range
-     * faithfully. It is the premise of ADR 0004 ("the browser has already worked out the
-     * right range") turning out to be browser-specific.
-     *
-     * Left failing rather than fixed: whether the engine should clamp a browser range to
-     * what it believes one unit is, and thereby override platform convention, is a design
-     * decision that contradicts ADR 0004 and needs its own ADR.
-     */
-    await harness.reset([ALICE, " hi"]);
-    await harness.setCaret(0);
-
-    await harness.press("{Delete}");
-
-    await harness.expectText(" hi");
-    await expect(harness.chips()).toHaveCount(0);
-  }
-);
-
-test("Delete forward removes the chip, whatever else it takes with it", async ({
-  harness,
-}) => {
-  // The part every engine agrees on, and the part ADR 0005 actually claims: an atom is
-  // never half-deleted. Kept passing alongside the fixme above so a regression in the
-  // agreed behaviour cannot hide behind the known divergence.
+test("Delete forward takes the whole chip and nothing else", async ({ harness }) => {
+  /*
+   * Was a `test.fixme` for Firefox, which reported `(DIV, 0) → (" hi", 1)` — the atom
+   * *and* the following space — where Chromium and WebKit reported the atom alone. Never a
+   * mapping error on our side; `domToModel` carried the range faithfully.
+   *
+   * [ADR 0014](../../docs/adr/0014-clamp-a-forward-delete-to-an-atom.md) answered the
+   * design question this was parked on: a forward delete from a collapsed caret at an atom
+   * is clamped to that atom. The wider Firefox story, including the trailing chip that
+   * could not be deleted at all, is in `adr-0014-delete-granularity.spec.ts`.
+   */
   await harness.reset([ALICE, " hi"]);
   await harness.setCaret(0);
 
   await harness.press("{Delete}");
 
+  await harness.expectText(" hi");
   await expect(harness.chips()).toHaveCount(0);
   expect((await harness.model()).mentions).toHaveLength(0);
   await harness.expectModelMatchesDom();

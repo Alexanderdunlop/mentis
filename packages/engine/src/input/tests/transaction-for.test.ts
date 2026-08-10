@@ -9,6 +9,9 @@ const intent = (over: Partial<InputIntent>): InputIntent => ({
   text: null,
   range: { from: 0, to: 0 },
   rangeFromBrowser: false,
+  // Defaults to matching `range`, which is the ordinary case: a keypress edits where the
+  // caret is. Specs that need the two to differ — a selection delete — set it explicitly.
+  selection: over.range ?? { from: 0, to: 0 },
   // Ten positions of plain text: the default subject for range arithmetic.
   doc: createDoc("0123456789"),
   ...over,
@@ -256,6 +259,145 @@ describe("transactionFor — deletion", () => {
       );
       expect(transaction?.steps).toEqual([]);
     }
+  });
+});
+
+/**
+ * ADR 0014. Every range below was measured in a real browser — see the ADR's table — so
+ * these are recorded behaviour rather than invented cases.
+ */
+describe("transactionFor — a forward delete at an atom is clamped to it", () => {
+  const ALICE = atomNode("@Alice", "u_1");
+  /** Chip, then text: positions 0 (the atom) and 1–3 (" hi"). */
+  const chipThenText = { nodes: [ALICE, textNode(" hi")] };
+  /** Text, then a trailing chip: the case Firefox cannot delete at all. */
+  const textThenChip = { nodes: [textNode("ab"), ALICE] };
+
+  it("ignores a range that over-reaches into the following text", () => {
+    // Firefox: (DIV, 0) → (" hi", 1) — the atom *and* the space after it. Used as given,
+    // one keypress costs the user a character they did not ask to lose.
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentForward",
+        doc: chipThenText,
+        range: { from: 0, to: 2 },
+        rangeFromBrowser: true,
+        selection: { from: 0, to: 0 },
+      })
+    );
+    expect(transaction?.steps).toEqual([{ type: "delete", from: 0, to: 1 }]);
+  });
+
+  it("deletes the atom even when the browser reports an empty range", () => {
+    // Firefox again, and the worse half: with nothing after the atom to absorb, the range
+    // collapses. ADR 0004 reads a collapsed browser range as "delete nothing", so a
+    // trailing chip could not be deleted at all.
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentForward",
+        doc: textThenChip,
+        range: { from: 2, to: 2 },
+        rangeFromBrowser: true,
+        selection: { from: 2, to: 2 },
+      })
+    );
+    expect(transaction?.steps).toEqual([{ type: "delete", from: 2, to: 3 }]);
+  });
+
+  it("leaves an already-correct range alone", () => {
+    // Chromium and WebKit report exactly the atom. The clamp must be a no-op for them,
+    // not a second opinion that happens to agree.
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentForward",
+        doc: chipThenText,
+        range: { from: 0, to: 1 },
+        rangeFromBrowser: true,
+        selection: { from: 0, to: 0 },
+      })
+    );
+    expect(transaction?.steps).toEqual([{ type: "delete", from: 0, to: 1 }]);
+  });
+
+  it("does not clamp a selection that happens to start at an atom", () => {
+    // The reason `selection` is on the intent at all. Highlighting the chip and " hi" and
+    // pressing Delete arrives as the same inputType with a range starting in the same
+    // place; only the selection says this one means "remove what I highlighted".
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentForward",
+        doc: chipThenText,
+        range: { from: 0, to: 4 },
+        rangeFromBrowser: true,
+        selection: { from: 0, to: 4 },
+      })
+    );
+    expect(transaction?.steps).toEqual([{ type: "delete", from: 0, to: 4 }]);
+  });
+
+  it("does not clamp a word or line delete", () => {
+    // These legitimately cover more than one unit, and narrowing them to the atom is
+    // exactly the failure ADR 0004 warns about — a word delete becoming a character one.
+    for (const inputType of [
+      "deleteWordForward",
+      "deleteSoftLineForward",
+      "deleteHardLineForward",
+    ]) {
+      const transaction = transactionFor(
+        intent({
+          inputType,
+          doc: chipThenText,
+          range: { from: 0, to: 4 },
+          rangeFromBrowser: true,
+          selection: { from: 0, to: 0 },
+        })
+      );
+      expect(transaction?.steps).toEqual([{ type: "delete", from: 0, to: 4 }]);
+    }
+  });
+
+  it("still does nothing at the end of the document", () => {
+    // The clamp's carve-out is "collapsed *and* an atom starts here". With no atom ahead
+    // a collapsed range keeps meaning what ADR 0004 says it means.
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentForward",
+        doc: chipThenText,
+        range: { from: 4, to: 4 },
+        rangeFromBrowser: true,
+        selection: { from: 4, to: 4 },
+      })
+    );
+    expect(transaction?.steps).toEqual([]);
+  });
+
+  it("leaves a forward delete in plain text to the browser", () => {
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentForward",
+        doc: chipThenText,
+        range: { from: 1, to: 2 },
+        rangeFromBrowser: true,
+        selection: { from: 1, to: 1 },
+      })
+    );
+    expect(transaction?.steps).toEqual([{ type: "delete", from: 1, to: 2 }]);
+  });
+
+  it("does not clamp backwards, where no engine misreports the range", () => {
+    // Deliberately no symmetric rule: every engine reports a clean whole-atom range for
+    // Backspace, and the fallback path already treats an atom as one position. A clamp
+    // here would be code no test could justify.
+    const transaction = transactionFor(
+      intent({
+        inputType: "deleteContentBackward",
+        doc: textThenChip,
+        range: { from: 2, to: 3 },
+        rangeFromBrowser: true,
+        selection: { from: 3, to: 3 },
+      })
+    );
+    expect(transaction?.steps).toEqual([{ type: "delete", from: 2, to: 3 }]);
   });
 });
 

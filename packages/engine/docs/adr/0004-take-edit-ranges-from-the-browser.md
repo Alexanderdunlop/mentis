@@ -103,3 +103,22 @@ browser-supplied range to its own idea of one unit. That would override platform
 convention and contradict this ADR, so it needs a decision of its own rather than a
 patch. Pinned as `test.fixme` in `e2e/spec/adr-0005-atoms.spec.ts` and
 `e2e/spec/adr-0013-graphemes.spec.ts` until then.
+
+### Answered — 2026-08-10, by [ADR 0014](0014-clamp-a-forward-delete-to-an-atom.md)
+
+**And the postscript above gets one thing wrong, which is worth leaving visible.** It files
+all three fixmes as one phenomenon, "granularity". Measuring properly found two, with
+opposite answers — so they could never have been settled as one question:
+
+- **Grapheme clusters stay the browser's.** Firefox peels a cluster backwards and takes it
+  whole forwards; that is a coherent platform convention and this ADR's default holds.
+- **A forward delete at an atom is now clamped to the atom**, overruling the browser. The
+  table above understates the case: Firefox's rule is "the atom plus one grapheme of
+  whatever follows", so it destroyed a letter or a whole emoji rather than just a space —
+  and where nothing followed it reported a **collapsed** range, which this ADR reads as
+  "delete nothing", so **a trailing chip could not be deleted at all**.
+
+That last part is this ADR's own *revisit-when* firing exactly as written — "a browser is
+found reporting target ranges that disagree with what it actually intends to change" — so
+the exception is the rule working, not the rule breaking. An atom is the engine's own
+construct (ADR 0005), not a platform text convention, which is the line ADR 0014 draws.

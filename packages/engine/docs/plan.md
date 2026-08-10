@@ -322,8 +322,32 @@ more of the engine's design constraints to arrive from that direction.
 > browser has worked out the right range" now reads "*its* range". Three `test.fixme`s hold
 > the question open; answering it needs an ADR, not a patch.
 >
+> **Delete granularity: answered.** [ADR 0014](adr/0014-clamp-a-forward-delete-to-an-atom.md),
+> and the useful part is that the question above is *mis-stated*. It files three fixmes as one
+> phenomenon; probing the whole family instead of the one document found two, with opposite
+> answers.
+>
+> Firefox's real rule for a forward delete at an atom is **"the atom plus one grapheme of
+> whatever follows"**, so it destroyed a letter or a whole emoji rather than just a space —
+> and when nothing follows it reports a **collapsed** range. ADR 0004 reads that as "delete
+> nothing", so **a trailing mention chip could not be deleted with the Delete key at all in
+> Firefox.** That had been parked under a label that said "not a defect" for a day, purely
+> because the first probe used a document with a space after the chip.
+>
+> So: **grapheme extent stays the browser's** — Firefox peels a cluster backwards and takes
+> it whole forwards, which is a coherent convention and ADR 0003 says leave those alone —
+> while **a forward delete at a collapsed caret on an atom is clamped to that atom.** Three
+> conditions, each excluding a case the clamp would break, and a test for each asserting it
+> does *not* fire. The one place the engine overrules a browser range; the precedent is the
+> risk rather than the code, which is what the ADR is for.
+>
+> All three `test.fixme`s are gone — two discharged, one converted into a per-engine
+> expectation, because parked it would have gone on failing for behaviour the engine had
+> decided to keep.
+>
 > Still to do in M6: RTL/bidi, iOS autocorrect and dictation, Android word-level
-> replacement — and IME, which remains the package's oldest unverified claim.
+> replacement. IME is done for Chromium (above); Gboard is the case that remains, and it is
+> also the one M6 was most worried about.
 
 ### M7 — Adapters, as the victory lap
 

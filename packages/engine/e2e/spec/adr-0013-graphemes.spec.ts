@@ -47,38 +47,16 @@ for (const [name, character] of agreed) {
   });
 }
 
-/**
- * These two, engines disagree about — see the traps note entry "Browsers disagree about
- * how much one delete covers".
+/*
+ * A ZWJ sequence and a combining accent used to sit here as two `test.fixme`s, because
+ * Firefox peels them a component at a time where the others take the whole cluster.
  *
- * FIREFOX ONLY. One Backspace removes *part* of the cluster:
- *   - `👨‍👩‍👧` loses its last member and one joiner, leaving `👨‍👩`
- *   - `e` + combining acute loses only the accent, leaving `e`
- *
- * Neither corrupts anything — no lone surrogate is produced, and the model and DOM stay
- * in step — so this is a granularity difference rather than a defect. Firefox has a
- * long-standing position that a combining mark is separately deletable, and it is not
- * obviously wrong; ADR 0003's whole philosophy is to leave platform convention alone.
- *
- * Left failing rather than fixed, for the same reason as the atom case in
- * adr-0005-atoms.spec.ts: overriding the browser's own range contradicts ADR 0004 and
- * needs a decision, not a patch.
+ * They have moved to `adr-0014-delete-granularity.spec.ts`, which is the ADR that decided
+ * to *keep* that difference rather than clamp it — so they are now pinned per engine and
+ * fail if either browser changes, instead of parked and failing for behaviour the engine
+ * chose on purpose. What ADR 0013 itself claims about them is the next test: whatever a
+ * browser removes, it is never half a code point.
  */
-const disputed: [string, string][] = [
-  ["a ZWJ sequence", FAMILY],
-  ["a combining accent", E_COMBINING],
-];
-
-for (const [name, character] of disputed) {
-  test.fixme(`Backspace deletes ${name} whole`, async ({ harness }) => {
-    await harness.reset([`hi ${character}`]);
-    await harness.setCaretToEnd();
-
-    await harness.press("{Backspace}");
-
-    await harness.expectText("hi ");
-  });
-}
 
 test("Backspace never corrupts, whatever granularity the browser chose", async ({
   harness,
