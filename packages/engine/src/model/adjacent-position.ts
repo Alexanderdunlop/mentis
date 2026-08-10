@@ -39,7 +39,8 @@ export const positionBefore = (doc: Doc, at: number): number => {
 
   const { index, offset } = resolvePosition(doc, at);
   const node = doc.nodes[index];
-  if (!node) return Math.max(0, at - 1);
+  // Only reachable for an empty document, where there is no character to be before.
+  if (!node) return 0;
 
   if (isAtom(node)) return at - 1;
   return at - (offset - stepBack(node.text, offset));

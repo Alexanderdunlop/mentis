@@ -178,6 +178,23 @@ describe("diffDocs", () => {
       }
     });
 
+    it("still reports a change when the two share their *trailing* surrogate", () => {
+      // U+1F44D and U+1F84D differ in the high surrogate and agree in the low one, so the
+      // suffix scan matches a unit the prefix scan did not. Snapping that end the wrong
+      // way collapsed the whole diff to `{from: 0, to: 0, slice: []}` — "nothing changed"
+      // for two documents that plainly differ, which would leave the model behind the DOM
+      // after a composition and never catch up.
+      const a = "\u{1F44D}";
+      const b = "\u{1F84D}";
+      expect(a.charCodeAt(1)).toBe(b.charCodeAt(1));
+
+      expect(diffDocs(createDoc(a), createDoc(b))).toEqual({
+        from: 0,
+        to: 2,
+        slice: [textNode(b)],
+      });
+    });
+
     it("replaces a whole ZWJ sequence rather than an interior piece of it", () => {
       const shorter = "\u{1F468}\u{200D}\u{1F469}";
       const diff = diffDocs(createDoc(FAMILY), createDoc(shorter))!;

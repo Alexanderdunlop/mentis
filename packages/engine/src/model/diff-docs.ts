@@ -1,4 +1,4 @@
-import { snapBack } from "./grapheme-boundary";
+import { snapBack, snapForward } from "./grapheme-boundary";
 import { nodeLength } from "./node-length";
 import { isText } from "./nodes";
 import { textNode } from "./nodes";
@@ -62,18 +62,21 @@ const narrowToText = (diff: DocDiff, before: InlineNode[]): DocDiff => {
    * that inserts a lone `\uDC4E`. That renders as `�`, and the user can neither select it
    * nor delete it — they did not type it and cannot type it away.
    *
-   * So both ends widen outwards to a boundary. Outwards is the only safe direction:
-   * narrowing cuts a character in half, which is the bug. Taking the smaller prefix and
-   * the larger suffix of the two strings keeps the region valid in both at once, since
-   * they agree on everything outside it.
+   * So both ends widen **outwards** to a boundary. Outwards is the only safe direction:
+   * narrowing cuts a character in half, which is the bug.
+   *
+   * Note the two ends move opposite ways to achieve that. The region starts at `prefix`,
+   * so growing it means moving that *back*. It ends where the common suffix begins —
+   * `length - suffix` — so growing it means moving that *forward*, which makes the suffix
+   * smaller. Taking the smaller of each across the two strings keeps the region valid in
+   * both at once, since they agree on everything outside it.
    */
   prefix = Math.min(snapBack(old, prefix), snapBack(next, prefix));
 
-  const grownSuffix = Math.max(
-    old.length - snapBack(old, old.length - suffix),
-    next.length - snapBack(next, next.length - suffix)
+  suffix = Math.min(
+    old.length - snapForward(old, old.length - suffix),
+    next.length - snapForward(next, next.length - suffix)
   );
-  suffix = Math.min(grownSuffix, old.length - prefix, next.length - prefix);
 
   const middle = next.slice(prefix, next.length - suffix);
 
