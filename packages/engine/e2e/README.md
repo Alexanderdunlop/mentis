@@ -34,6 +34,7 @@ port-of-its-own convention, same "observe, don't fix" discipline. See `e2e/CLAUD
 | `adr-0001-newlines.spec.ts` | one `\n` per break, rendered as text, one trailing `<br>` |
 | `adr-0005-atoms.spec.ts` | a chip is one caret stop; the two coordinate spaces diverge |
 | `adr-0010-clipboard.spec.ts` | the round trip, through a real system clipboard |
+| `adr-0009-composition.spec.ts` | IME reconciliation, on a real composition (Chromium) |
 | `adr-0013-graphemes.spec.ts` | whole characters, on the browser's own ranges |
 
 The mirroring is the point. Every ADR carries an **Unverified** section, and this is where
@@ -90,7 +91,7 @@ its own ADR, not a patch.
 
 ## Not covered yet
 
-- **IME / composition (ADR 0009).** Still the oldest unverified claim in the package.
-  Playwright can drive composition through CDP in Chromium, which would cover some of it;
-  Japanese and Chinese input on WebKit, and Gboard, still need a human.
-- **RTL / bidi**, and **iOS dictation / Android word-level replacement** — the rest of M6.
+- **IME on WebKit and Firefox.** `adr-0009-composition.spec.ts` drives a real composition
+  through CDP, which is Chromium-only; the other two engines have no equivalent, so those
+  specs skip there. Gboard and iOS dictation still need a human at the harness on 5280.
+- **RTL / bidi**, and **Android word-level replacement** — the rest of M6.

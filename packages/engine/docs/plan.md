@@ -209,10 +209,15 @@ real failure.
 > on every keystroke. The difference is scope: one composition, one writer, diffed against a
 > model that was correct going in, canonical DOM restored immediately after.
 >
-> **Nothing here has met a real IME.** The tests play the browser's part by hand, which
-> verifies the reconciliation contract and nothing about real event ordering. Revisit the ADR
-> after the first session with a Japanese input source — that is the timebox check, and it
-> needs a human at a keyboard.
+> **Verified against a real composition on 2026-08-10**, once M6's browser matrix made it
+> reachable: CDP's `Input.imeSetComposition` drives genuine `compositionstart`/`update`
+> events and Chromium renders its own pre-edit text. The contract held on first contact —
+> one undo step per composition, canonical DOM restored, a neighbouring mention keeping its
+> `value`, and no stray `insertCompositionText`. See
+> [ADR 0009](adr/0009-yield-the-dom-during-composition.md).
+>
+> **Chromium only**, though: WebKit and Firefox have no CDP equivalent, and Gboard — the
+> aggressive case this milestone was most worried about — still needs a human at a keyboard.
 
 ### M5 — Clipboard as a serialisation problem
 
@@ -397,7 +402,7 @@ pnpm install          # worktrees don't share node_modules
 - [x] M2 — atomic nodes / mentions
 - [x] M2.5 — trigger detection + dropdown
 - [x] M3 — undo stack
-- [x] M4 — IME / composition *(unverified against a real IME)*
+- [x] M4 — IME / composition *(verified on Chromium; WebKit, Firefox and Gboard outstanding)*
 - [x] M5 — clipboard *(round trip unverified against a real clipboard)*
 - [ ] M6 — nasty-input gauntlet *(graphemes and the browser matrix done; bidi and mobile input outstanding)*
 - [ ] M7 — adapters
