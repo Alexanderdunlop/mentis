@@ -253,6 +253,25 @@ export class EngineHarness {
     });
   }
 
+  /**
+   * Compose text that **replaces an existing range** rather than inserting at the caret.
+   *
+   * This is Android word-level replacement — what Gboard does when it rewrites the word
+   * behind the caret — and `replacementStart`/`replacementEnd` is the actual mechanism, not
+   * an approximation of one. Offsets are DOM character offsets, as CDP expects.
+   */
+  async composeReplacing(text: string, from: number, to: number): Promise<void> {
+    await this.ensureFocused();
+    const cdp = await this.session();
+    await cdp.send("Input.imeSetComposition", {
+      text,
+      selectionStart: text.length,
+      selectionEnd: text.length,
+      replacementStart: from,
+      replacementEnd: to,
+    });
+  }
+
   /** Commit the composition — picking the candidate. Fires `compositionend`. */
   async commitComposition(text: string): Promise<void> {
     const cdp = await this.session();

@@ -116,15 +116,39 @@ Chromium only, so this is Chromium's idea of the event sequence. Specifically st
 untested:
 
 - Japanese and Chinese input on **WebKit and Firefox**, which have no CDP equivalent
-- **Gboard on Android**, which composes far more aggressively and is the case this ADR
-  called out as the aggressive one
-- iOS dictation and autocorrect
+- iOS dictation and autocorrect, which arrive as `insertReplacementText` rather than as a
+  composition and have no automatable route at all — CDP has no spellcheck-correction
+  command, and synthesising the event would only check the engine against our own guess at
+  its shape, which is the objection this whole section started as
 - whether a trailing `beforeinput` arrives after `compositionend` on *those* engines — it
   does not on Chromium, but that is where the doubt was cheapest to remove, not where it
   was largest
 
 A human at a keyboard with a Japanese input source is still the only way to close those,
 and the harness on port 5280 is where to do it.
+
+### Word-level replacement — verified 2026-08-10, and it was reachable after all
+
+**Gboard was on this list, and the mechanism turned out to be drivable.**
+`Input.imeSetComposition` accepts `replacementStart`/`replacementEnd`, which is the actual
+Android mechanism for rewriting the word behind the caret — a composition that replaces an
+existing range rather than inserting at the caret. Not an approximation of Gboard; the same
+shape of input, and nothing faked at the DOM level.
+
+Three specs, on Chromium and mobile Chrome:
+
+- replacing `teh` with `the` reconciles correctly, model and DOM in step, no stray
+  `insertCompositionText`
+- **a replaced word is one undo step** — two DOM edits, one history entry
+- a replacement range deliberately stretched across a mention **cannot destroy the chip**:
+  Chromium clamps its own replacement range at the `contenteditable="false"` boundary and
+  refuses to compose across it, so the mention keeps its `value`. Inherited protection, the
+  same pattern as ADR 0005's arrow traversal and whole-chip delete
+
+What is still out of reach is not the mechanism but the *policy* — when a real Gboard decides
+to fire one, how much text it takes, and what it does with a chip in the middle. That needs a
+device. The aggressive case is no longer entirely unexercised, though, which is what this
+list said it was.
 
 ## Original unverified note, kept for the record
 

@@ -77,9 +77,47 @@ Costs and risks:
 - **Unverified in a real browser.** The rule is tested at the model level; whether it
   *feels* right is exactly the judgement the harness exists for.
 
+## Verification, 2026-08-10
+
+**Confirmed on Chromium, Firefox, WebKit and mobile Chrome**
+(`e2e/spec/adr-0008-undo-granularity.spec.ts`), against real keystrokes rather than
+dispatched transactions: a word is one undo step, each word is its own step, redo replays
+the same grouping, and a mention is its own step however small.
+
+**And it found a bug that was not a granularity bug at all — it was hiding inside one.**
+
+**A keypress that changed nothing was recorded as an undo step.** [ADR
+0004](0004-take-edit-ranges-from-the-browser.md) reads a collapsed range from the browser as
+*"delete nothing — that is information, not an omission"*, and Chromium and Firefox do fire
+`deleteContentForward` with one when there is nothing ahead of the caret. So the engine
+correctly did nothing to the document and then recorded having done nothing. Pressing Delete
+four times at the end of a document took the history from depth 2 to depth 6.
+
+It cost three things, in increasing order of seriousness:
+
+1. **A dead undo press** per dead keystroke — ⌘Z that visibly does nothing.
+2. **A split typing run.** A dead keystroke mid-word ended the group, so `hi` + a no-op +
+   `gh` was two undo steps instead of one. Directly contrary to this ADR's central claim.
+3. **The redo branch.** `record` clears it, so an undone edit became unrecoverable: type,
+   undo, press Delete at the end, press redo — the text was gone for good. That one is data
+   loss, not an annoyance.
+
+The fix is a guard in `record`: an entry with no `undoSteps` and no `redoSteps` is not an
+edit and is not recorded. WebKit fires no `beforeinput` at all in that situation, so it never
+saw the keyboard route — but it reached the same bug through a **selection-only
+transaction**, which is an ordinary thing for a consumer or an M7 adapter to dispatch to move
+the caret. One guard covers both routes.
+
+Worth noting what this says about the design: the engine was *right* twice over — right to
+treat a collapsed range as "delete nothing", and right to build a transaction for it — and
+the bug was in treating "a transaction happened" as "an edit happened". Those are not the
+same event, and nothing had said so.
+
 ## Revisit when
 
 - Punctuation grouping grates in real use, **or**
 - deletion runs turn out to want word boundaries too, at which point `editShapeOf` needs
   the deleted text — which it currently does not capture, since a delete step is only a
-  range.
+  range, **or**
+- a transaction appears that changes the document without producing steps, which would make
+  `record`'s "no steps means no edit" guard wrong rather than merely narrow.
