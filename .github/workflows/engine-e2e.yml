@@ -1,0 +1,92 @@
+name: Engine E2E
+
+# Nightly and on demand — deliberately **not** on pull_request.
+#
+# packages/engine is `private: true` and CI does not run it on purpose, so that an
+# experiment can never block a mentis bug fix or release (see packages/engine/CLAUDE.md).
+# A red X on every mentis PR would be exactly that, by another route. Adding a
+# pull_request trigger here is a change to that isolation rule and needs arguing, not
+# assuming.
+#
+# It runs an hour after the mentis matrix so the two never contend for runners.
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: engine-e2e-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  matrix:
+    name: ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: chromium
+            browser: chromium
+          - project: firefox
+            browser: firefox
+          - project: webkit
+            browser: webkit
+          # Emulates a Pixel 7 but drives the chromium binary. M6's remaining work is
+          # mostly mobile input, so this is the project that will earn its keep next.
+          - project: mobile-chrome
+            browser: chromium
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4.1.0
+
+      - name: Set node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm --filter @mentis/engine typecheck && pnpm --filter @mentis/engine typecheck:e2e
+
+      - name: Unit tests
+        run: pnpm --filter @mentis/engine test
+
+      - name: Resolve Playwright version
+        id: playwright
+        run: |
+          echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache browsers
+        id: browser-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ms-playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ matrix.browser }}
+
+      - name: Install browser
+        if: steps.browser-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+
+      # Binaries are cached; the system libraries they link against are not.
+      - name: Install browser system dependencies
+        if: steps.browser-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps ${{ matrix.browser }}
+
+      - name: Test
+        run: pnpm --filter @mentis/engine exec playwright test --config e2e/playwright.config.ts --project=${{ matrix.project }}
+
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-playwright-report-${{ matrix.project }}
+          path: packages/engine/playwright-report/
+          retention-days: 14

@@ -112,7 +112,27 @@ Costs and risks:
 - `origin` now carries a history meaning as well as a provenance one. It is documented in
   two places rather than modelled once.
 
-## Unverified
+## Verification, 2026-08-10
+
+The browser matrix (`e2e/spec/adr-0010-clipboard.spec.ts`) settles the two largest doubts
+below on Chromium, Firefox, WebKit and mobile Chrome.
+
+**Firefox does populate `dataTransfer` on `beforeinput` for `insertFromPaste`.** This was
+the single biggest risk recorded here — if it did not, paste in Firefox would insert
+nothing at all, and the alternative "add a `paste` listener" would have become the
+decision. The paste specs pass there, so reading paste off `beforeinput` stands, and
+`insertFromDrop` keeps its one path.
+
+**Cut ordering holds.** Cut writes the clipboard, cancels the event, and performs its own
+deletion as one undo step on every engine — no `deleteByCut` arrives to double-delete, and
+the feared ordering inversion does not occur. `setData` on a cancelled copy behaves the
+same everywhere.
+
+Note the traps entry these runs produced: Firefox's `getTargetRanges()` covers a *wider*
+range than other engines for a delete beside an atom. That is unrelated to the clipboard
+path but it is the same family of surprise, and it is why the fixmes exist.
+
+## Still unverified
 
 - **Event ordering across engines.** The design assumes `cut` fires before any
   `beforeinput` with `deleteByCut`, which is what the Clipboard API specifies and what

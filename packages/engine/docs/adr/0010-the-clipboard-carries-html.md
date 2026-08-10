@@ -102,11 +102,22 @@ Costs and risks:
   value full of markup round-trips. `escape-html.ts` moved out of `devtools/` into
   `src/text/` to make that reuse a shared utility rather than a backwards dependency.
 
-## Unverified
+## Verification, 2026-08-10
 
-**No real browser has been asked to do this round trip.** The tests serialise and then
-parse, which checks everything except the operating system in the middle. Specifically
-untested:
+**The round trip has now been through a real system clipboard**, on Chromium, Firefox,
+WebKit and mobile Chrome (`e2e/spec/adr-0010-clipboard.spec.ts`): a copied mention pastes
+back as a mention with its `value`, two mentions sharing a label keep distinct values,
+deliberate runs of spaces survive, cut removes and one undo restores the mention as a
+mention, a cut selection pastes back, and a paste is a single undo step. Every copy and
+paste there is a real keystroke against the real clipboard — no constructed
+`ClipboardEvent`, which Firefox ignores anyway.
+
+That discharges the headline doubt, and the `setData`-on-a-cancelled-copy question with
+it: it behaves the same on all four engines.
+
+## Still unverified
+
+Not reachable from the matrix as it stands:
 
 - whether an engine hands back the exact `text/html` it was given, or rewrites it — every
   browser adds a `<html><body><!--StartFragment-->` wrapper of some shape, and only the

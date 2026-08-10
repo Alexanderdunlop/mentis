@@ -15,6 +15,9 @@ CLAUDE.md
 # Same reasoning for the engine: it is the only place the one-idea-per-file rule
 # and the nbsp / Range.toString() footguns are written down as instructions.
 !packages/engine/CLAUDE.md
+# And the engine's browser matrix, which carries the observe-don't-fix rule and the
+# reason it runs on a config of its own rather than the root one.
+!packages/engine/e2e/CLAUDE.md
 
 packages/mentis/README.md
 packages/mentis/LICENSE

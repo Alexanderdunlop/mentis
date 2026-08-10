@@ -298,9 +298,27 @@ more of the engine's design constraints to arrive from that direction.
 > character, so `hi 👍` is one undo step rather than three). Everywhere else the offsets
 > come from `getTargetRanges()`.
 >
+> **The browser matrix: built.** `packages/engine/e2e/`, on its own Playwright config —
+> the package is `private: true` and CI does not run it on purpose, so sharing the root
+> config would let an experiment block a mentis release. The shape is reused, the run is
+> not. Specs mirror **ADRs** rather than docs pages, one file per ADR that makes a
+> browser-observable claim, so every *Unverified* section has somewhere to be discharged.
+>
+> It paid for itself the day it was written. Four ADRs lost their headline doubt:
+> chip traversal is one caret stop on every engine (0005), the clipboard round trip works
+> through a real system clipboard (0010), cut ordering holds and **Firefox does populate
+> `dataTransfer` on `beforeinput`** (0012 — the largest single risk on the board), and no
+> engine ever produces half a code point (0013).
+>
+> And it found something: **browsers disagree about how much one delete covers.** Firefox's
+> `getTargetRanges()` reports a wider range than Chromium and WebKit for a delete beside a
+> chip, and removes a combining mark or one ZWJ member rather than a whole cluster. Nothing
+> is corrupted, so it is granularity rather than a defect — but it means ADR 0004's "the
+> browser has worked out the right range" now reads "*its* range". Three `test.fixme`s hold
+> the question open; answering it needs an ADR, not a patch.
+>
 > Still to do in M6: RTL/bidi, iOS autocorrect and dictation, Android word-level
-> replacement, and the engine's own cross-browser matrix — which is what would settle
-> whether every engine really does resolve clusters in `getTargetRanges()`.
+> replacement — and IME, which remains the package's oldest unverified claim.
 
 ### M7 — Adapters, as the victory lap
 
@@ -381,5 +399,5 @@ pnpm install          # worktrees don't share node_modules
 - [x] M3 — undo stack
 - [x] M4 — IME / composition *(unverified against a real IME)*
 - [x] M5 — clipboard *(round trip unverified against a real clipboard)*
-- [ ] M6 — nasty-input gauntlet *(graphemes done; bidi, mobile input and the browser matrix outstanding)*
+- [ ] M6 — nasty-input gauntlet *(graphemes and the browser matrix done; bidi and mobile input outstanding)*
 - [ ] M7 — adapters

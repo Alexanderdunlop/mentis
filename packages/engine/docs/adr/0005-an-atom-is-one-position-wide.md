@@ -85,9 +85,19 @@ Costs and risks:
 - M5's clipboard work must serialise the value, not just the label, or a copy-paste
   round trip degrades a mention to text. The value is already on the element as
   `data-mention-value` for exactly this reason.
-- **Unverified in a real browser:** whether every engine truly treats a
-  `contenteditable="false"` span as one caret stop, in both directions, and whether
-  Backspace targets the whole chip. That is the M2 claim only the inspector can settle.
+- **Confirmed in a real browser (2026-08-10).** The engine's matrix
+  (`e2e/spec/adr-0005-atoms.spec.ts`) exercises this on Chromium, Firefox, WebKit and
+  mobile Chrome. A `contenteditable="false"` span **is** one caret stop in both
+  directions on every engine, Backspace takes the whole chip, and the two coordinate
+  spaces measurably diverge — position 4 against character offset 9 for `hi @Alice`.
+  Two chips sharing a label stay distinct.
+
+  One divergence found, and it is about *extent* rather than about atoms: **Firefox's
+  forward delete removes the chip and the character after it**, because its
+  `getTargetRanges()` reports a wider range than the other engines. The atom is still
+  never half-deleted, which is what this ADR claims. Pinned as a `test.fixme` and
+  recorded in docs/notes/contenteditable-traps.md; whether to override the browser's
+  range contradicts ADR 0004 and needs its own decision.
 
 ## Revisit when
 

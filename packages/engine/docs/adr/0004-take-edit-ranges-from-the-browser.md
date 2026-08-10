@@ -74,3 +74,32 @@ Costs and risks:
   to change, **or**
 - M6 needs grapheme-aware arithmetic for cursor movement or measurement anyway, at which
   point the fallback should use it rather than counting code units.
+
+## Postscript — 2026-08-10, from the browser matrix
+
+This ADR's premise is that the browser "has already resolved grapheme clusters, word
+boundaries, and what an autocorrect replacement is actually replacing". The engine's
+matrix confirms the first half and complicates the second: **every engine resolves them,
+and they do not resolve them the same way.**
+
+Measured on one document, one keypress:
+
+| | `getTargetRanges()` for Delete over a chip | covers |
+|---|---|---|
+| Chromium, WebKit | `(DIV, 0) → (" hi", 0)` | the atom |
+| Firefox | `(DIV, 0) → (" hi", 1)` | the atom **and** the following space |
+
+Firefox likewise removes a combining mark on its own, and one member of a ZWJ sequence,
+where the others take the whole cluster.
+
+Nothing here is corrupted — no lone surrogate is ever produced and the model never falls
+out of step with the DOM — so trusting the browser remains the right default, and ADR
+0003's philosophy of leaving platform convention alone argues for keeping it. But
+"the browser has worked out the right range" should now read **"the browser has worked
+out *its* range"**, which is a weaker and more accurate claim.
+
+**Open question, deliberately not answered here:** whether the engine should clamp a
+browser-supplied range to its own idea of one unit. That would override platform
+convention and contradict this ADR, so it needs a decision of its own rather than a
+patch. Pinned as `test.fixme` in `e2e/spec/adr-0005-atoms.spec.ts` and
+`e2e/spec/adr-0013-graphemes.spec.ts` until then.
