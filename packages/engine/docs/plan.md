@@ -405,11 +405,10 @@ more of the engine's design constraints to arrive from that direction.
 > nothing, right to build a transaction for it — and wrong to treat *a transaction happened*
 > as *an edit happened*. Nothing had said those were different events.
 >
-> Still to do in M6: **iOS autocorrect and dictation**, which arrive as
-> `insertReplacementText` rather than as a composition and have no automatable route at all —
-> CDP has no spellcheck-correction command, and synthesising the event would only check the
-> engine against our own guess at its shape. That plus **real Gboard on a real device** is
-> what is left, and both need a human with a phone rather than another spec.
+> **M6 is parked here, deliberately** — everything reachable without a phone is done, and
+> what remains is a device and a person rather than more code. See
+> [Why M6 is parked rather than finished](#why-m6-is-parked-rather-than-finished) for the
+> full list and a checklist a device session can actually run.
 
 ### M7 — Adapters, as the victory lap
 
@@ -490,5 +489,70 @@ pnpm install          # worktrees don't share node_modules
 - [x] M3 — undo stack
 - [x] M4 — IME / composition *(verified on Chromium; WebKit, Firefox and Gboard outstanding)*
 - [x] M5 — clipboard *(round trip unverified against a real clipboard)*
-- [ ] M6 — nasty-input gauntlet *(graphemes and the browser matrix done; bidi and mobile input outstanding)*
+- [x] M6 — nasty-input gauntlet **— parked, deliberately.** Everything reachable without a
+      phone is done; see below
 - [ ] M7 — adapters
+
+## Why M6 is parked rather than finished
+
+Rule 4 of this document says **timebox boss fights — park, don't grind.** This is that rule
+being used on purpose, so it needs to say what was left and why, or "parked" quietly becomes
+"forgotten".
+
+**What is done:** grapheme clusters ([0013](adr/0013-positions-stay-code-units.md)), the
+browser matrix, IME on Chromium against a real composition
+([0009](adr/0009-yield-the-dom-during-composition.md)), delete granularity
+([0014](adr/0014-clamp-a-forward-delete-to-an-atom.md)), RTL and bidi
+([0015](adr/0015-direction-belongs-to-the-consumer.md)), and Android word-level replacement
+through the mechanism Gboard actually uses. Four ADRs lost their headline doubt on the day
+the matrix was written, and the `test.fixme` backlog is empty.
+
+**What is left, and the reason it is not a "keep going" item:**
+
+- **iOS autocorrect and dictation.** These arrive as `insertReplacementText`, and there is no
+  automatable route to one. CDP has no spellcheck-correction command; the event comes from a
+  context menu or a dictation engine. Synthesising it would only check the engine against
+  *our own guess* at its shape — which is precisely the objection ADR 0009's Unverified
+  section made before a real IME settled it, and it would produce a test that looks like
+  evidence and is not.
+- **Real Gboard.** The *mechanism* is covered — `composeReplacing` drives the same
+  `replacementStart`/`replacementEnd` composition Gboard uses. What needs a device is its
+  **policy**: when it decides to fire one, how much text it takes, and what it does with a
+  chip in range.
+- **Japanese and Chinese IME on WebKit and Firefox.** No CDP equivalent exists, so these
+  skip in the matrix. A human with a Japanese input source is the only route.
+
+The common thread: **what remains is not more code, it is a device and a person.** Grinding
+here would mean writing tests that assert our assumptions back to us, which is worse than an
+honest gap — an unverified claim that knows it is unverified is safer than a green test that
+proves nothing. Every one of these is written down in the ADR that owns it, so none of them
+can quietly expire.
+
+### What a device session should check
+
+Kept concrete so this is a session someone can actually run, not a wish. Harness on 5280
+(`pnpm --filter @mentis/engine dev:e2e`), or the inspector on 5180 for the event log.
+
+**Android / Gboard:**
+1. Type a word, let autocorrect rewrite it. Does the model match the DOM afterwards? Is it
+   one undo step?
+2. Type a word **immediately after a chip**, then let autocorrect fire. Does the chip keep
+   its `value`? This is the case the automated spec can only ask for politely — Chromium
+   clamps its own replacement range at the atom boundary, and Gboard may not.
+3. Swipe-type a whole sentence. Does anything arrive as `insertReplacementText` rather than
+   as a composition?
+4. Watch the event log for a trailing `beforeinput` *after* `compositionend`. Chromium does
+   not send one; ADR 0009 flagged it as possible elsewhere.
+
+**iOS:**
+1. Dictate a sentence, then dictate a correction over it.
+2. Let autocorrect fix a word next to a chip.
+3. Tap-and-hold a misspelled word and pick a suggestion — that is the `insertReplacementText`
+   path nothing has exercised.
+4. Check whether undo (shake, or ⌘Z on a keyboard) matches what the model thinks.
+
+**WebKit / Firefox desktop:** Japanese input, candidate window, commit with Enter. One ⌘Z
+should remove the whole composition. Compose immediately after a chip, and commit an emoji
+through the candidate window.
+
+Anything found here belongs in the ADR that owns the claim, dated — not in a new document.
