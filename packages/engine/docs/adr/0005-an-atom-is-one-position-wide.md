@@ -99,6 +99,18 @@ Costs and risks:
   recorded in docs/notes/contenteditable-traps.md; whether to override the browser's
   range contradicts ADR 0004 and needs its own decision.
 
+  **Resolved the same day by [ADR 0014](0014-clamp-a-forward-delete-to-an-atom.md)**, which
+  clamps a forward delete at a collapsed caret to the atom, and found the divergence was
+  worse than recorded: Firefox took *one grapheme* of whatever followed — a letter or a
+  whole emoji, not only a space — and reported a **collapsed** range when nothing followed,
+  so a trailing chip could not be deleted at all. That last case is what made this a defect
+  rather than a convention. The `test.fixme` is now a passing test on all four engines.
+
+  ADR 0014 leans directly on this ADR for its justification: an atom is one position wide,
+  so "clamp to the atom" has an unambiguous extent (`from + 1`), and an atom is the
+  engine's own construct rather than a platform text convention — which is what makes
+  overruling the browser here different from overruling it about grapheme clusters.
+
 ## Revisit when
 
 - A browser is found stepping *into* a `contenteditable="false"` atom rather than over

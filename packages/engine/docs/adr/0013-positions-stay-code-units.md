@@ -143,6 +143,19 @@ granularity rather than corruption, recorded in docs/notes/contenteditable-traps
 a postscript to [ADR 0004](0004-take-edit-ranges-from-the-browser.md). Whether the engine
 should override it is an open decision, pinned as `test.fixme`.
 
+**Decided — [ADR 0014](0014-clamp-a-forward-delete-to-an-atom.md), 2026-08-10: the engine
+does not override it.** Firefox's difference turned out to be *directional* — it peels a
+cluster backwards and removes it whole forwards — which reads as a deliberate convention
+rather than an oversight, and ADR 0003's philosophy is to leave those alone. The two
+`test.fixme`s here are gone: they asserted the whole-cluster outcome, which is behaviour the
+engine has now decided *not* to require, so they moved to
+`e2e/spec/adr-0014-delete-granularity.spec.ts` as per-engine expectations. Parked, they
+would have gone on failing for a difference that is meant to be there; pinned, they fail if
+either browser changes.
+
+What this ADR claims is untouched by that decision and is fully confirmed: whatever a
+browser chooses to remove, it is never half a code point.
+
 ## Still unverified
 
 - Emoji rendering and caret painting around a ZWJ sequence — whether the caret can be put

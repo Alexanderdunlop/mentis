@@ -181,8 +181,10 @@ records composition faithfully because those events are real.
 answerable: [`e2e/`](e2e/README.md) drives the engine in Chromium, Firefox, WebKit and
 mobile Chrome, on its own Playwright config so this `private: true` package can never
 block a mentis release. Specs mirror ADRs one-for-one. It found on day one that **browsers
-disagree about how much one delete covers**, which is now a trap note and three
-deliberate `test.fixme`s.
+disagree about how much one delete covers** — which turned out to be two findings rather
+than one, and produced [ADR 0014](docs/adr/0014-clamp-a-forward-delete-to-an-atom.md): the
+grapheme half is platform convention and stays the browser's, the atom half was a defect
+that hid behind it, and the `test.fixme` backlog is now empty.
 
 Two vitest projects below it, and the split is deliberate:
 

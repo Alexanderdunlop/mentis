@@ -26,6 +26,16 @@ export interface InputIntent {
   /** Whether `range` came from the browser rather than from our own selection read. */
   rangeFromBrowser: boolean;
   /**
+   * Where the selection was **before** the edit, normalised.
+   *
+   * Distinct from `range`, which is what the browser says the edit covers, and needed for
+   * exactly one decision: whether a forward delete is a keypress ("remove the next unit")
+   * or a selection delete ("remove what I highlighted"). Both arrive as
+   * `deleteContentForward` with a range starting in the same place, and only the selection
+   * tells them apart — see ADR 0014, which clamps the first and must not touch the second.
+   */
+  selection: ModelRange;
+  /**
    * The document the edit applies to.
    *
    * The whole document rather than just its length, because the fallback delete cannot be
