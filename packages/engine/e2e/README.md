@@ -37,6 +37,7 @@ port-of-its-own convention, same "observe, don't fix" discipline. See `e2e/CLAUD
 | `adr-0009-composition.spec.ts` | IME reconciliation, on a real composition (Chromium) |
 | `adr-0013-graphemes.spec.ts` | whole characters, on the browser's own ranges |
 | `adr-0014-delete-granularity.spec.ts` | the atom clamp, and the grapheme difference kept on purpose |
+| `adr-0015-direction.spec.ts` | RTL/bidi costs the engine nothing — asserted as the model being *unaffected* |
 
 The mirroring is the point. Every ADR carries an **Unverified** section, and this is where
 those get discharged — so a claim cannot quietly outlive its evidence. When a spec settles
@@ -51,8 +52,10 @@ Specs drive `dev/e2e.html` on port **5280** — never `dev/index.html`, which is
 inspector and grows a new panel whenever a milestone needs one. Same split, and the same
 reasoning, as v1's `playground/e2e.html` on 5273.
 
-`window.engineHarness` exposes `reset`, `model`, `insertMention`, `setCaret` and
-`unhandledInput`. It deliberately does **not** expose the `Editor` or `dispatch`: specs
+`window.engineHarness` exposes `reset`, `model`, `insertMention`, `setCaret`,
+`unhandledInput` and `positionRect`. `reset` takes an optional writing direction, always
+applied so one spec's `dir` can never leak into the next. It deliberately does **not**
+expose the `Editor` or `dispatch`: specs
 drive the editor as a user does and read the model to check the result. A spec that could
 set up state the input pipeline cannot produce is a spec that proves something about
 itself.
@@ -96,4 +99,10 @@ phenomenon.
 - **IME on WebKit and Firefox.** `adr-0009-composition.spec.ts` drives a real composition
   through CDP, which is Chromium-only; the other two engines have no equivalent, so those
   specs skip there. Gboard and iOS dictation still need a human at the harness on 5280.
-- **RTL / bidi**, and **Android word-level replacement** — the rest of M6.
+- **iOS autocorrect and dictation, and Android word-level replacement** — the rest of M6.
+  All three arrive as `insertReplacementText`, which the engine handles but which has no
+  real coverage here and cannot get any without a device. Synthesising the event would only
+  check the engine against our own guess at the shape, which is the thing ADR 0009's
+  Unverified section was complaining about before a real IME settled it.
+- **An RTL mention menu placed by hand.** `adr-0015-direction.spec.ts` checks `positionRect`
+  returns a rect on the correct side; how a real menu then looks involves the consumer's CSS.

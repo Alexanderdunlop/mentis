@@ -311,3 +311,76 @@ checks whether `dispatchEvent` returned `false` (i.e. a listener called
 browser's real contract — default action happens *unless* keydown was prevented — even
 though the events themselves aren't trusted. It cannot fake composition; test that by
 hand, or in Playwright later.
+
+---
+
+## A collapsed range at the end of a text node has no rects in WebKit
+
+**Symptom.** A dropdown anchored to the caret jumps to the far side of the editor, but
+only in Safari, and only when the caret is at the very end of the text. In an RTL line
+it is wrong by the entire width of the editor, which looks less like a rounding bug and
+more like the anchor was never set.
+
+**Mechanism.** `Range.getClientRects()` returns an **empty list** for a collapsed range
+positioned at the end of a text node in WebKit. Chromium and Firefox return one rect.
+Measured on `"שלום עולם"` in a `dir="rtl"` container:
+
+| position | Chromium | Firefox | WebKit |
+|---|---|---|---|
+| the last character | 1 rect | 1 rect | 1 rect |
+| **after** the last character | 1 rect | 1 rect | **0 rects** |
+
+Any "fall back to the containing element's rect" branch then fires — and an element rect
+is a *line box*, not a caret. Its `left` is the start of the line, which in RTL is the
+opposite end from where the caret actually is.
+
+**What to do.** Derive the caret from the character *before* the position: take a range
+covering that one character, and put the caret on its trailing edge.
+
+Which edge is "trailing" must be **measured, not read from
+`getComputedStyle(...).direction`.** The direction that matters is the bidi *run's*, and
+the computed value is the *container's* — an RTL word inside an `ltr` container computes
+as `ltr` while being laid out right to left, so the computed value picks the wrong edge
+for precisely the mixed content this is needed for. Instead: the caret one character back
+sits at that character's leading edge, so whichever of the character's own edges that
+lands on tells you which way text flows there.
+
+**Where it shows up here.** `src/view/position-rect.ts`, and
+[ADR 0015](../adr/0015-direction-belongs-to-the-consumer.md). Reachable through the
+exported `positionRect` but *not* through the mention menu, which anchors on the `@`
+rather than on the caret and so always gets a rect — which is why it went unnoticed until
+RTL was looked at deliberately.
+
+---
+
+## Arrow keys in bidi text: engines disagree, and it is not yours to settle
+
+**Symptom.** ArrowLeft moves the caret in Firefox and does nothing in Chrome and Safari,
+in the same document, with the same selection.
+
+**Mechanism.** In mixed-direction text, "left" and "back" are different directions, and
+there is no single answer about which an arrow key means. Measured on Hebrew text in a
+`dir="ltr"` container, caret at logical offset 0, pressing ArrowLeft nine times (with
+polling, so a slow `selectionchange` cannot be mistaken for "did not move"):
+
+| | resulting offsets |
+|---|---|
+| Firefox | `1, 2, 3, 4, 5, 6, 7, 8, 9` |
+| Chromium, WebKit | `0, 0, 0, 0, 0, 0, 0, 0, 0` |
+
+Both are defensible: the run is laid out right to left, so its logical start is at the
+run's *right*, and "visually left" and "logically back" genuinely point opposite ways. In
+a `dir="rtl"` container all three engines agree.
+
+**What to do.** Nothing — and specifically, do not assert a caret offset after an arrow
+key in bidi text. [ADR 0003](../adr/0003-own-editing-not-navigation.md) gives navigation
+to the browser precisely so this is never the engine's problem; users get their
+platform's behaviour, which is what they get in every other text field. The assertion
+worth making is the weaker one: *whatever* selection arrives is a position the model can
+represent.
+
+**Where it shows up here.** `e2e/spec/adr-0015-direction.spec.ts` asserts the caret stays
+in range and never lands inside an atom, rather than asserting where it lands. Also worth
+knowing while probing: an unsettled read of the caret right after a keypress produces
+convincing nonsense — an earlier version of this note claimed Chromium repeated and
+skipped offsets in RTL, which was a race in the probe, not a browser behaviour.

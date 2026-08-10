@@ -7,6 +7,7 @@ import { mentions } from "../src/model/mentions";
 import { replaceRange } from "../src/model/transaction";
 import { atomNode, textNode } from "../src/model/nodes";
 import type { InlineNode } from "../src/model/types";
+import { positionRect } from "../src/view/position-rect";
 
 /**
  * The e2e harness page — **not** the inspector.
@@ -42,6 +43,15 @@ export interface HarnessNode {
 /** What `reset` accepts: a run of plain text, or a mention. */
 export type Content = string | { label: string; value: string };
 
+/**
+ * Writing direction for the container, for the RTL/bidi specs.
+ *
+ * The engine has no direction policy of its own — direction belongs to the consumer's
+ * container, and the model is logical regardless (ADR 0015). So this sets the attribute
+ * a consumer would set, rather than anything the engine reads.
+ */
+export type Direction = "ltr" | "rtl";
+
 const describeNode = (node: InlineNode): HarnessNode =>
   node.type === "atom"
     ? { type: "atom", text: node.label, value: node.value }
@@ -60,11 +70,19 @@ export interface HarnessModel {
 }
 
 const harness = {
-  /** Rebuild the editor. `content` accepts plain text or a mention spec, in order. */
-  reset(content: Content[] = []): void {
+  /**
+   * Rebuild the editor. `content` accepts plain text or a mention spec, in order.
+   *
+   * `dir` sets the container's writing direction and is **always applied**, cleared when
+   * omitted, so a direction set by one spec can never leak into the next.
+   */
+  reset(content: Content[] = [], dir?: Direction): void {
     editor?.destroy();
     element.replaceChildren();
     unhandled.length = 0;
+
+    if (dir) element.setAttribute("dir", dir);
+    else element.removeAttribute("dir");
 
     editor = createEditor({
       element,
@@ -110,6 +128,20 @@ const harness = {
   /** `inputType`s the engine had no rule for — should be empty in every passing spec. */
   unhandledInput(): string[] {
     return [...unhandled];
+  },
+
+  /**
+   * Where a model position is on screen, via the engine's own `positionRect`.
+   *
+   * The one piece of *geometry* the engine owns, and the only thing a consumer needs in
+   * order to place a mention menu — so it is the only part of ADR 0015's "the engine stays
+   * logical" that a direction can actually break. Returned as plain numbers rather than a
+   * `DOMRect` so it survives the trip out of the page.
+   */
+  positionRect(at: number): { left: number; right: number; width: number } | null {
+    if (!editor) throw new Error("harness: reset() first");
+    const rect = positionRect(element, editor.getState().doc, at);
+    return rect ? { left: rect.left, right: rect.right, width: rect.width } : null;
   },
 };
 

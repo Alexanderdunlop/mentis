@@ -30,6 +30,10 @@
                 ><input type="checkbox" id="engine" checked /> engine
                 attached</label
               >
+              <label
+                title="Sets dir=rtl on the container — the whole of the engine's RTL integration"
+                ><input type="checkbox" id="rtl" /> rtl</label
+              >
             </span>
           </header>
           <div class="panel-body">
@@ -40,6 +44,13 @@
               <strong>engine attached</strong> to fall back to a bare
               <code>contenteditable</code> and compare — the Model panel goes empty
               when detached.
+            </p>
+            <p class="hint">
+              <strong>RTL:</strong> tick <strong>rtl</strong> and type Hebrew or
+              Arabic. The model stays in logical order while the line reorders on
+              screen — and a mention chip keeps its own label direction, so mixed text
+              is bidi, not broken. Direction is the container's; the engine reads it
+              nowhere.
             </p>
             <p class="hint">
               <strong>IME:</strong> during composition the engine deliberately hands
