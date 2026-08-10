@@ -7,14 +7,8 @@ export default function Layout({ children }: { children: ReactNode }) {
     <HomeLayout
       {...baseOptions}
       links={[
-        {
-          text: "Documentation",
-          url: "/docs",
-        },
-        {
-          text: "Blog",
-          url: "/blog",
-        },
+        { text: "Documentation", url: "/docs" },
+        { text: "Blog", url: "/blog", active: "nested-url" },
       ]}
     >
       {children}

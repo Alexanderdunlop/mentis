@@ -59,6 +59,12 @@ export default function Layout({ children }: { children: ReactNode }) {
       <head>
         <link rel="preload" as="image" href="/logo/logo.png" />
         <link rel="icon" href="/logo/logo.png" />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="mentis — blog"
+          href="/rss.xml"
+        />
       </head>
       <body className="flex flex-col min-h-screen">
         <RootProvider>{children}</RootProvider>

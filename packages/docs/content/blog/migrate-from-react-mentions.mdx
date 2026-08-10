@@ -1,0 +1,259 @@
+---
+title: How to migrate from react-mentions to mentis
+description: "react-mentions still has 691k weekly downloads, but its GitHub repo is gone and the last release was June 2023. Here is a prop-by-prop migration to mentis — and when a fork is the better call."
+date: "2026-08-10"
+author: Alexander Dunlop
+order: 1
+summary: "react-mentions is unmaintained: its last release was 4.4.10 on 30 June 2023 and github.com/signavio/react-mentions now returns 404. To migrate to mentis, replace the MentionsInput/Mention children API with a single MentionInput and an options array, swap the value prop for displayValue, and read mentionData.dataValue instead of parsing @[__display__](__id__) markup yourself. If you need async suggestion loading, custom suggestion rendering, or multiple triggers in one input, mentis does not support those yet — use react-mentions-ts instead."
+keywords:
+  - react-mentions alternative
+  - migrate react-mentions
+  - react-mentions unmaintained
+  - react-mentions replacement
+  - react mention input
+  - react-mentions typescript
+  - mentions input react 19
+---
+
+If you are reading this, you probably ran `npm audit`, or bumped React, or clicked
+through to `react-mentions`' GitHub link and got a 404. Here is where things
+actually stand, and what to do about it.
+
+## Is react-mentions dead?
+
+Effectively, yes — though "dead" undersells how many people are still on it.
+
+| | Status |
+| --- | --- |
+| Latest release | `4.4.10`, published **30 June 2023** |
+| GitHub repository | `github.com/signavio/react-mentions` → **404** |
+| Weekly npm downloads | **~691,000** |
+| Issue tracker | Gone with the repository |
+
+That combination is the problem. The package still works — 691k weekly downloads
+is not a rounding error — but there is nowhere to report a bug, nowhere to ask a
+question, and no one to merge a fix. Every React major, every transitive
+dependency advisory, every new bundler default is now something you absorb
+yourself.
+
+## What are the actual options?
+
+Be honest with yourself about which of these you are: not everyone should
+migrate, and not everyone who migrates should pick mentis.
+
+| Option | Best when | Cost |
+| --- | --- | --- |
+| **Stay on react-mentions** | It works, you are not upgrading anything, you can vendor a patch if needed | Unbounded — no upstream, no tracker |
+| **[react-mentions-ts](https://www.npmjs.com/package/react-mentions-ts)** | You want out of the maintenance risk with the smallest possible diff | Near-zero — it is a maintained fork of the same API |
+| **[rc-mentions](https://www.npmjs.com/package/rc-mentions)** | You are already on Ant Design | Ties you to the antd ecosystem |
+| **mentis** | You want real DOM chips, ARIA combobox semantics, and no markup parsing | A genuine API change — this post |
+
+If your goal is purely "stop depending on an abandoned package", **react-mentions-ts
+is the rational choice** and you should stop reading here. It is a drop-in fork; the
+migration is a string change in `package.json`. Picking mentis only makes sense if
+you want what the different architecture buys you, covered in
+[why mention inputs outgrow the textarea](/blog/contenteditable-vs-textarea-mention-input).
+
+## What mentis does not do yet
+
+Stated up front, because finding out three files into a migration is worse.
+
+- **No async suggestion loading.** react-mentions lets you pass `data` a function
+  `(query, callback) => void` to fetch suggestions per keystroke. `mentis` takes a
+  static `options` array; you filter and fetch in your own component and pass the
+  result down.
+- **No custom suggestion rendering.** There is no equivalent of `renderSuggestion`.
+  You can restyle each option through `slotsProps.option`, but you cannot render
+  arbitrary JSX (avatar + name + handle) inside a row.
+- **One trigger per input.** react-mentions supports multiple `<Mention>` children
+  with different triggers in a single field. `mentis` takes a single `trigger` string.
+- **No `singleLine` mode.** The input is always multi-line.
+
+If any of those are load-bearing for you, migrating will be painful. That is the
+honest answer.
+
+## The prop mapping
+
+| react-mentions | mentis | Notes |
+| --- | --- | --- |
+| `<MentionsInput>` + `<Mention>` children | `<MentionInput>`, no children | Configuration moves to props |
+| `value` | `displayValue` | There is **no** `value` prop on mentis |
+| `onChange(event, newValue, newPlainTextValue, mentions)` | `onChange(mentionData)` | One object argument, not four positional ones |
+| `newValue` (markup string) | `mentionData.dataValue` | Already resolved — no markup to parse |
+| `newPlainTextValue` | `mentionData.displayValue` | What the user sees |
+| `mentions` | `mentionData.mentions` | `{ label, value, startIndex, endIndex }[]` |
+| `<Mention data={users} />` | `options={users}` | `{ label, value }[]` |
+| `<Mention trigger="@" />` | `trigger="@"` | Default is `"@"` |
+| `markup="@[__display__](__id__)"` | — | No markup format; `dataValue` carries the IDs |
+| `displayTransform` | — | Set `label` to what you want displayed |
+| `appendSpaceOnAdd` | Always on | A space is inserted after a chip |
+| `style` (substyle object) | `slotsProps` (class names) | See below |
+| `className` / `classNames` | `slotsProps.container.className` etc. | |
+| `onKeyDown` | `onKeyDown` | Same idea; see the caveat below |
+| `a11ySuggestionsListLabel` | — | The listbox is wired via `aria-controls`/`aria-activedescendant` |
+
+## Before and after
+
+The canonical react-mentions setup:
+
+```tsx
+import { MentionsInput, Mention } from "react-mentions";
+
+const users = [
+  { id: "alice", display: "Alice" },
+  { id: "bob", display: "Bob" },
+];
+
+function CommentBox() {
+  const [value, setValue] = useState("");
+
+  return (
+    <MentionsInput
+      value={value}
+      onChange={(event, newValue, newPlainTextValue, mentions) => {
+        setValue(newValue);
+      }}
+    >
+      <Mention trigger="@" data={users} markup="@[__display__](__id__)" />
+    </MentionsInput>
+  );
+}
+```
+
+The same thing in mentis:
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { MentionInput, type MentionData } from "mentis";
+import "mentis/dist/index.css";
+
+const users = [
+  { label: "Alice", value: "alice" },
+  { label: "Bob", value: "bob" },
+];
+
+function CommentBox() {
+  const [displayValue, setDisplayValue] = useState("");
+  const [dataValue, setDataValue] = useState("");
+
+  return (
+    <MentionInput
+      displayValue={displayValue}
+      options={users}
+      trigger="@"
+      onChange={(mentionData: MentionData) => {
+        setDisplayValue(mentionData.displayValue);
+        setDataValue(mentionData.dataValue);
+      }}
+    />
+  );
+}
+```
+
+Three things changed structurally: `id`/`display` became `value`/`label`, the
+`<Mention>` child became props, and you now hold two strings instead of one
+markup string.
+
+## Migrating your stored data
+
+This is the part that takes real time, and it is worth doing deliberately.
+
+react-mentions persists a **markup string** — `"Hey @[Alice](alice), look at this"`.
+mentis persists `dataValue`, which contains the raw IDs and no display labels.
+The two are not the same shape, so you need a one-off conversion:
+
+```ts
+/** `"Hey @[Alice](alice)"` → `"Hey @alice"` */
+export function markupToDataValue(markup: string): string {
+  return markup.replace(/@\[[^\]]*\]\(([^)]*)\)/g, "@$1");
+}
+```
+
+Run that over your existing rows in a migration, or lazily on read behind a
+`schemaVersion` column if you cannot take the write. Keep the original column
+until you are confident — this is exactly the kind of transform where one
+unescaped bracket in user content ruins a Saturday.
+
+To render a stored value back into chips, pass it as the `dataValue` prop and
+mentis reconstructs the chips from your `options`:
+
+```tsx
+<MentionInput dataValue={storedValue} options={users} onChange={handleChange} />
+```
+
+## Migrating your styles
+
+react-mentions styles through `substyle`, so you hand it a nested style object.
+mentis has no style prop at all — every part takes a class name, so Tailwind,
+CSS modules, and plain CSS all work the same way:
+
+```tsx
+<MentionInput
+  options={users}
+  slotsProps={{
+    container: { className: "relative w-full" },
+    contentEditable: {
+      className: "min-h-24 rounded-lg border p-3",
+      "data-placeholder": "Add a comment…",
+    },
+    modal: { className: "rounded-lg border bg-white shadow-lg" },
+    option: { className: "px-3 py-2 cursor-pointer" },
+    highlightedClassName: "bg-blue-50",
+    chipClassName: "rounded bg-blue-100 px-1 text-blue-800",
+  }}
+/>
+```
+
+The full slot list is in the [styling docs](/docs/styling).
+
+## Gotchas that will cost you an hour each
+
+1. **There is no `value` prop.** The controlled props are `displayValue` and
+   `dataValue`. Passing `value` silently does nothing — the input just looks
+   uncontrolled.
+2. **`onChange` receives an object, not a string.** `onChange={setDisplayValue}`
+   will store `[object Object]`.
+3. **Import the stylesheet.** `import "mentis/dist/index.css"` — without it the
+   chips and dropdown render unstyled and it looks broken rather than plain.
+4. **It is a client component.** Under the Next.js App Router, the importing file
+   needs `"use client"`.
+5. **Your `onKeyDown` is bypassed while the dropdown is open.** Enter, Tab, Escape
+   and the arrow keys are consumed for navigation. If you submit a form on Enter,
+   that is the behaviour you want — but test it with the menu open.
+
+## FAQ
+
+### Is react-mentions still safe to use in 2026?
+
+It still functions, and 691k weekly downloads suggests most people are still on it.
+The risk is not that it breaks tomorrow; it is that when it does break — a React
+major, a bundler change, a security advisory in a transitive dependency — there is
+no repository to file against and no maintainer to merge a fix.
+
+### What is the closest drop-in replacement for react-mentions?
+
+[`react-mentions-ts`](https://www.npmjs.com/package/react-mentions-ts), a maintained
+TypeScript fork of the same API. mentis is a different API and a different
+architecture, so it is a migration rather than a swap.
+
+### Does mentis support React 19?
+
+Yes. The peer range is `>=18.2.0 || ^19.0.0-0`.
+
+### Can I load mention suggestions from an API?
+
+Not from inside the component — there is no async `data` callback. Fetch in your own
+component, hold the results in state, and pass them as `options`.
+
+### How do I store mentions in a database after migrating?
+
+Store `mentionData.dataValue`, which contains option IDs rather than display labels,
+so renaming a user does not rewrite history. Pass it back as `dataValue` to rehydrate.
+See [onChange](/docs/onchange).
+
+### Does mentis need `@types/mentis`?
+
+No. Types ship in the package — `MentionInputProps`, `MentionOption`, `MentionData`,
+and `SlotProps` are all exported.
