@@ -1,10 +1,10 @@
 {
   "name": "mentis",
   "version": "0.2.7",
-  "description": "A flexible mention tagger for React that hooks into your existing inputs.",
+  "description": "Accessible @mention autocomplete input for React. ContentEditable, zero dependencies, TypeScript-first — a modern react-mentions alternative.",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://github.com/alexanderdunlop/mentis#readme",
+  "homepage": "https://mentis.alexdunlop.com",
   "bugs": {
     "url": "https://github.com/alexanderdunlop/mentis/issues"
   },
@@ -16,14 +16,34 @@
   "author": "Alexander Dunlop <alexjamesdunlop@gmail.com>",
   "funding": "https://github.com/sponsors/alexanderdunlop",
   "keywords": [
+    "react",
     "mentions",
-    "mentis",
-    "mention tagger",
     "mention",
-    "tag",
+    "mention-input",
+    "mentions-input",
+    "react-mentions",
+    "at-mention",
+    "autocomplete",
+    "combobox",
+    "typeahead",
+    "suggestions",
+    "tagging",
     "tagger",
-    "mention tag",
-    "react"
+    "chips",
+    "contenteditable",
+    "rich-text",
+    "text-editor",
+    "input",
+    "textarea",
+    "chat",
+    "comments",
+    "accessible",
+    "a11y",
+    "aria",
+    "typescript",
+    "zero-dependencies",
+    "react-component",
+    "mentis"
   ],
   "files": [
     "dist"

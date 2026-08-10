@@ -155,21 +155,21 @@ Here's how to handle form submission when the user presses Enter (but only when 
 
 ```tsx
 import { useState } from "react";
-import { MentionInput } from "@mentis/react";
+import { MentionInput } from "mentis";
 
 function ChatForm() {
-  const [value, setValue] = useState("");
+  const [displayValue, setDisplayValue] = useState("");
 
   const handleSubmit = async () => {
     console.log("submit");
-    setValue("");
+    setDisplayValue("");
   };
 
   return (
     <form onSubmit={(e) => e.preventDefault()}>
       <MentionInput
-        value={value}
-        onChange={setValue}
+        displayValue={displayValue}
+        onChange={(mentionData) => setDisplayValue(mentionData.displayValue)}
         onKeyDown={(event) => {
           // Handle Enter key for form submission
           if (event.key === "Enter") {
@@ -227,7 +227,7 @@ Options can have function values that execute when selected. This is useful for 
 <MentionInput
   options={[
     { label: "Send Message", value: () => console.log("Message sent!") },
-    { label: "Clear Input", value: () => setValue("") },
+    { label: "Clear Input", value: () => setDisplayValue("") },
     { label: "Alice", value: "alice" },
   ]}
 />

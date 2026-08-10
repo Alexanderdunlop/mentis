@@ -2,10 +2,14 @@
   <img src="https://mentis.alexdunlop.com/_next/image?url=%2Flogo%2Flogo.png&w=256&q=75" width="200" alt="Mentis" />
   <h1>Mentis</h1>
   <p>
-    <strong>A flexible mention tagger for React that hooks into your existing inputs.</strong>
+    <strong>Accessible <code>@mention</code> autocomplete input for React.</strong>
+    <br />
+    ContentEditable, zero dependencies, TypeScript-first.
   </p>
   <p>
     <a href="https://mentis.alexdunlop.com/"><strong>📖 Read the docs »</strong></a>
+    &nbsp;·&nbsp;
+    <a href="https://mentis.alexdunlop.com/"><strong>▶️ Live demo »</strong></a>
   </p>
 </div>
 
@@ -28,6 +32,38 @@
 </div>
 
 <br />
+
+**Mentis** adds Slack- and Notion-style `@mention` autocomplete to a React app. You give it a list of options, it gives you an input where typing `@` opens a filtered dropdown and picking someone inserts a styled chip. `onChange` hands back both what the user sees (`displayValue`) and the clean IDs you want to store (`dataValue`), so you never have to parse mention syntax yourself.
+
+It's built on `contentEditable` rather than a plain `<textarea>`, which is what makes real chips, caret navigation through mentions, and paste handling possible. It ships with full ARIA `combobox` semantics, TypeScript types, and no runtime dependencies.
+
+## Why Mentis?
+
+[`react-mentions`](https://www.npmjs.com/package/react-mentions) has been the default choice for years, but it hasn't seen a release since 2022 and is built on a `<textarea>` + overlay approach that can't render true chips. Mentis is a maintained, modern alternative:
+
+|                              | Mentis                        | react-mentions          |
+| ---------------------------- | ----------------------------- | ----------------------- |
+| Last release                 | Actively maintained           | 2022                    |
+| Foundation                   | `contentEditable`             | `<textarea>` + overlay  |
+| Mentions render as chips     | ✅ Real DOM elements          | ❌ Styled text overlay  |
+| Runtime dependencies         | ✅ Zero                       | `substyle`, others      |
+| TypeScript types             | ✅ Built in                   | `@types/react-mentions` |
+| ARIA combobox / screenreader | ✅ Full                       | Partial                 |
+| React 19 support             | ✅                            | Unmaintained            |
+| Separate display / data       | ✅ `displayValue`/`dataValue` | Manual markup parsing   |
+
+If you're searching for a **react-mentions alternative**, a **React mentions input**, an **@mention autocomplete**, or a **tagging / typeahead input** — that's what this is.
+
+## Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Examples](#examples)
+- [API Reference](#api-reference)
+- [Keyboard Navigation](#keyboard-navigation)
+- [Advanced Features](#advanced-features)
+- [FAQ](#faq)
+- [For AI assistants and LLMs](#for-ai-assistants-and-llms)
 
 ## Features
 
@@ -101,14 +137,17 @@ function BasicExample() {
 import { MentionInput } from "mentis";
 
 function FunctionValueExample() {
+  const [displayValue, setDisplayValue] = useState("");
+
   return (
     <MentionInput
+      displayValue={displayValue}
       options={[
         { label: "Send Message", value: () => console.log("Message sent!") },
-        { label: "Clear Input", value: () => setValue("") },
+        { label: "Clear Input", value: () => setDisplayValue("") },
         { label: "Alice Johnson", value: "alice" },
       ]}
-      onChange={(mentionData) => console.log(mentionData)}
+      onChange={(mentionData) => setDisplayValue(mentionData.displayValue)}
     />
   );
 }
@@ -191,17 +230,17 @@ function AutoConvertExample() {
 import { MentionInput } from "mentis";
 
 function FormSubmissionExample() {
-  const [value, setValue] = useState("");
+  const [displayValue, setDisplayValue] = useState("");
 
   const handleSubmit = () => {
-    console.log("Submitting:", value);
-    setValue("");
+    console.log("Submitting:", displayValue);
+    setDisplayValue("");
   };
 
   return (
     <MentionInput
-      value={value}
-      onChange={(mentionData) => setValue(mentionData.value)}
+      displayValue={displayValue}
+      onChange={(mentionData) => setDisplayValue(mentionData.displayValue)}
       onKeyDown={(event) => {
         // Handle Enter key for form submission
         if (event.key === "Enter") {
@@ -356,6 +395,58 @@ The component intelligently parses mentions from pasted content, converting them
 ### Rich Text Support
 
 Mentions are displayed as styled chips within the contentEditable interface, providing a rich text experience.
+
+## FAQ
+
+### How do I add @mentions to a React app?
+
+Install `mentis`, import `MentionInput` and its stylesheet, and pass an `options` array. Typing `@` opens the dropdown. See [Quick Start](#quick-start).
+
+### Is this a drop-in replacement for react-mentions?
+
+Not literally — the prop API is different (`options` instead of `<Mention data={...} />` children, and `displayValue`/`dataValue` instead of a single markup string). But it covers the same use cases with less setup, and you don't have to parse `@[name](id)` markup yourself. See [Why Mentis?](#why-mentis).
+
+### Can I use a trigger other than `@`?
+
+Yes. Pass `trigger="#"` (or any string) to change it. Useful for hashtags, slash commands, or `$` for entities.
+
+### Does it work with Next.js and React Server Components?
+
+Yes. `MentionInput` is a client component, so import it from a file with `"use client"` (or a component that already has it). There's a [Next.js example](https://github.com/Alexanderdunlop/mentis/tree/main/packages/examples/nextjs).
+
+### Can I style it with Tailwind?
+
+Yes. Every part is styled via `slotsProps` — pass Tailwind classes to `container`, `contentEditable`, `modal`, `option`, `chipClassName`, and `highlightedClassName`. See [Custom Styling with Tailwind](#custom-styling-with-tailwind).
+
+### How do I store mentions in a database?
+
+Use `dataValue` from `onChange` — it contains your option IDs instead of display labels. Store that, then pass it back as the `dataValue` prop later to rehydrate the input with chips. See [DataValue Control](#datavalue-control).
+
+### Does it support TypeScript?
+
+Yes, types ship in the package — no `@types/*` install needed. `MentionInputProps`, `MentionOption`, `MentionData`, and `SlotProps` are all exported.
+
+### Is it accessible?
+
+Yes. It implements the ARIA `combobox`/`listbox`/`option` pattern with full keyboard navigation and screen reader support. See [Accessibility](https://mentis.alexdunlop.com/docs/accessibility).
+
+### How big is it?
+
+Zero runtime dependencies, and React is a peer dependency. See the [bundle size badge](https://bundlephobia.com/package/mentis) for the current number.
+
+### Does it support multiple mention types in one input?
+
+A single `MentionInput` has one `trigger`, but `options` can mix entity kinds, and option values can be functions to trigger actions instead of inserting a chip. See [Function Values](#function-values).
+
+## For AI assistants and LLMs
+
+If you're an AI coding assistant, or you're pointing one at this library, these are the machine-readable entry points:
+
+- [`/llms.txt`](https://mentis.alexdunlop.com/llms.txt) — index of every documentation page
+- [`/llms-full.txt`](https://mentis.alexdunlop.com/llms-full.txt) — the full documentation as a single plaintext file
+- [LLM Context page](https://mentis.alexdunlop.com/docs/llm) — architecture, types, and implementation notes
+
+The two props most often got wrong: the controlled value props are `displayValue` (what the user sees, with labels) and `dataValue` (IDs for storage). There is no plain `value` prop.
 
 ## Examples Directory
 
