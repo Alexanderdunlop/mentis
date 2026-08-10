@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mentis engine — React adapter</title>
+  </head>
+  <body>
+    <main class="cols">
+      <div class="col">
+        <section class="panel">
+          <header class="panel-head">
+            <span>React adapter</span>
+            <span class="panel-extra legend">
+              <code>useMentis</code> + <code>useMentionQuery</code>
+            </span>
+          </header>
+          <div class="panel-body">
+            <div id="root"></div>
+            <p class="hint">
+              The same engine as the inspector, driven by React instead of by
+              <code>dev/main.ts</code>. Type <code>@al</code> to open the menu; arrows
+              move, Enter or Tab inserts, Escape dismisses.
+            </p>
+            <p class="hint">
+              <strong>What this is proving:</strong> the whole adapter is two hooks and a
+              ref. React never renders into the editor — it renders an empty
+              <code>div</code> and the engine owns the children from there. The mention
+              menu is a <code>useMemo</code> over derived state, not a piece of React
+              state, so there is no open/closed flag that can go stale (ADR 0006), and the
+              keyboard handling is the consumer's because the engine only ever intercepts
+              <code>beforeinput</code> (ADR 0003).
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="/react-demo.tsx"></script>
+  </body>
+</html>

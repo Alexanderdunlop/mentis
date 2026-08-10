@@ -5,6 +5,9 @@
     "moduleDetection": "force",
     "module": "preserve",
     "moduleResolution": "bundler",
+    // Needed only by `src/adapters/react/`, which is the one layer allowed to know a
+    // framework exists — `src/tests/layering.test.ts` keeps it that way.
+    "jsx": "react-jsx",
     "types": ["node"],
     "strict": true,
     "noUnusedLocals": true,

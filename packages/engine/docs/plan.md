@@ -417,6 +417,35 @@ React / Vue / Svelte / vanilla wrappers, ~100 lines each, all in one afternoon. 
 is the *proof* the layering worked — and note it's the same destination the old branch
 aimed at first, just arrived at last, on solid ground.
 
+> **React: built, and the victory lap was real.**
+> [ADR 0016](adr/0016-an-adapter-is-lifecycle-not-ui.md) — an adapter is framework lifecycle
+> and reactivity glue, nothing else. Two hooks, 130 lines, in `src/adapters/react/`.
+>
+> **It needed nothing new from `src/`.** Not one export, not one signature change. The engine
+> already had `subscribe(listener) => unsubscribe` and a `getState()` whose reference changes
+> exactly when something changed, which is `useSyncExternalStore`'s contract arrived at in M1
+> and M3 with React nowhere in the room. And that was not foresight: ADR 0006 forced the
+> query to be derived, which forced `subscribe` to fire on selection changes, which is the
+> thing that makes a React menu correct. A constraint adopted for its own reasons paid out in
+> a layer that did not exist yet.
+>
+> `dev/react-demo.tsx` and `dev/mention-flow.ts` are the same shape — subscribe, derive the
+> query, own the keys, dispatch to insert — which is what M2.5 meant by building the dropdown
+> in the harness as "a rehearsal for the M7 adapters".
+>
+> **The hard rule is now enforced rather than trusted.** `src/tests/layering.test.ts` walks
+> `src/`, extracts every module specifier, and fails naming the file — and asserts it is not
+> vacuous, so deleting the adapters cannot make it pass while proving nothing.
+>
+> **The plan lists four adapters; only three are real.** `createEditor({ element })` *is* the
+> vanilla adapter — an element in, `dispatch`/`subscribe`/`destroy` out, no framework. An
+> `adapters/vanilla/` could only rename it.
+>
+> Demo: `pnpm --filter @mentis/engine dev` → `/react.html`.
+>
+> **Still to do: Vue and Svelte.** The pattern is established, but claiming the layering holds
+> for three frameworks on the evidence of one is the overreach ADR 0016 is about.
+
 ## Rules for making this survive
 
 1. **Greenfield. No parity pressure.** New code under a new package. Never open v1 to
@@ -491,4 +520,5 @@ pnpm install          # worktrees don't share node_modules
 - [x] M4 — IME / composition *(verified on Chromium; WebKit, Firefox and Gboard outstanding)*
 - [x] M5 — clipboard *(round trip unverified against a real clipboard)*
 - [ ] M6 — nasty-input gauntlet *(graphemes and the browser matrix done; bidi and mobile input outstanding)*
-- [ ] M7 — adapters
+- [ ] M7 — adapters *(React done, and the layering rule is now enforced by a test; Vue and
+      Svelte outstanding)*

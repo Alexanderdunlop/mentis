@@ -1,3 +1,4 @@
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -22,6 +23,18 @@ export default defineConfig({
           name: "dom-smoke",
           environment: "happy-dom",
           include: ["src/**/tests/*.dom.test.ts"],
+        },
+      },
+      {
+        // The adapters, which are the one layer allowed to know about a framework at all
+        // (see src/tests/layering.test.ts). Its own project because it is the only one
+        // needing JSX, and keeping the plugin off the other two means a framework cannot
+        // quietly become available to them.
+        plugins: [react()],
+        test: {
+          name: "adapters",
+          environment: "happy-dom",
+          include: ["src/adapters/**/tests/*.test.tsx"],
         },
       },
     ],

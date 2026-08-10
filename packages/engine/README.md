@@ -9,7 +9,11 @@ pnpm --filter @mentis/engine test
 pnpm --filter @mentis/engine typecheck
 ```
 
-## Current state: M6 — graphemes and the browser matrix (in progress)
+## Current state: M7 — adapters (React done; Vue and Svelte outstanding)
+
+M6 is [parked deliberately](docs/plan.md#why-m6-is-parked-rather-than-finished): everything
+reachable without a phone is done, and what remains is a device and a person rather than more
+code.
 
 The editor is engine-driven: `beforeinput` is intercepted, a transaction is applied to
 the document, and the DOM is patched to match. **The DOM is a projection of the model,
@@ -217,8 +221,18 @@ src/devtools/
   model-probe.ts       the seam M1 plugs into
   scenarios.ts         preset scripts, each chosen to expose something specific
 
-dev/                   the harness page — plain DOM, no framework
+dev/                   the harness pages — plain DOM, plus the React demo at /react.html
 ```
+
+```
+src/adapters/
+  react/               use-mentis · use-mention-query — the ONLY layer that may
+                       import a framework, enforced by src/tests/layering.test.ts
+```
+
+There is no `adapters/vanilla/`, on purpose: `createEditor({ element })` already **is** the
+vanilla adapter — an element in, `dispatch`/`subscribe`/`destroy` out, no framework
+([ADR 0016](docs/adr/0016-an-adapter-is-lifecycle-not-ui.md)).
 
 Two boundaries are deliberate rather than cosmetic:
 
