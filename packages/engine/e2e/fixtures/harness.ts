@@ -1,4 +1,10 @@
-import { test as base, expect, type Locator, type Page } from "@playwright/test";
+import {
+  test as base,
+  expect,
+  type CDPSession,
+  type Locator,
+  type Page,
+} from "@playwright/test";
 // Type-only, so importing the harness page here never executes it. The page owns these
 // definitions and the global declaration; duplicating them is how the two drift apart.
 import type { Content, HarnessModel, HarnessNode } from "../../dev/e2e";
@@ -189,6 +195,61 @@ export class EngineHarness {
   async paste(): Promise<void> {
     await this.ensureFocused();
     await this.page.keyboard.press(`${MODIFIER}+v`);
+  }
+
+  // --- composition ---------------------------------------------------------
+
+  /*
+   * IME composition, driven through CDP.
+   *
+   * **Chromium only** — there is no equivalent in Playwright for Firefox or WebKit, so
+   * specs using these must `test.skip` elsewhere. That is a real limit: it exercises the
+   * reconciliation contract against a genuine composition, which is far more than the
+   * unit tests could reach, but it is one engine's idea of the event sequence rather than
+   * proof that all of them agree. ADR 0009 says so.
+   *
+   * Nothing here is faked at the DOM level. `Input.imeSetComposition` makes the browser
+   * render its own pre-edit text and fire real `compositionstart`/`compositionupdate`,
+   * which is precisely the window ADR 0009 hands the DOM over for.
+   */
+
+  private cdp: CDPSession | null = null;
+
+  private async session(): Promise<CDPSession> {
+    this.cdp ??= await this.page.context().newCDPSession(this.page);
+    return this.cdp;
+  }
+
+  /** Show pre-edit text, as an IME does before you pick a candidate. */
+  async compose(text: string, caret: number = text.length): Promise<void> {
+    await this.ensureFocused();
+    const cdp = await this.session();
+    await cdp.send("Input.imeSetComposition", {
+      text,
+      selectionStart: caret,
+      selectionEnd: caret,
+    });
+  }
+
+  /** Commit the composition — picking the candidate. Fires `compositionend`. */
+  async commitComposition(text: string): Promise<void> {
+    const cdp = await this.session();
+    await cdp.send("Input.insertText", { text });
+  }
+
+  /** Abandon it, the way Escape does mid-composition. */
+  async cancelComposition(): Promise<void> {
+    const cdp = await this.session();
+    await cdp.send("Input.imeSetComposition", {
+      text: "",
+      selectionStart: 0,
+      selectionEnd: 0,
+    });
+  }
+
+  /** Whether the engine currently believes the browser owns the DOM. */
+  async isComposing(): Promise<boolean> {
+    return (await this.model()).composing;
   }
 
   // --- assertions ----------------------------------------------------------

@@ -1,6 +1,6 @@
 # 0009 — The engine yields the DOM during composition
 
-- **Status:** accepted, **unverified against a real IME**
+- **Status:** accepted, **verified against a real composition on Chromium** (2026-08-10)
 - **Date:** 2026-08-06
 
 ## Context
@@ -86,7 +86,47 @@ Costs and risks:
 - Structure the browser leaves behind is discarded rather than understood. If a browser
   ever encodes something meaningful in it, that meaning is lost.
 
-## Unverified — and this is the important part
+## Verification, 2026-08-10
+
+**A real composition has now driven this**, through CDP
+(`e2e/spec/adr-0009-composition.spec.ts`). `Input.imeSetComposition` makes Chromium render
+its own pre-edit text and fire genuine `compositionstart` / `compositionupdate`, which is
+the window this ADR hands the DOM over for. Nothing is faked at the DOM level, and the
+contract held on first contact:
+
+- pre-edit text is rendered **by the browser** and visible in the DOM while the model has
+  deliberately not moved — the proof that `beforeinput` really is being let through, and
+  the failure mode where composition simply does not work
+- `compositionend` reconciles, and the model and DOM agree afterwards
+- **a whole composition is one undo step**, across several candidate changes
+- the DOM comes back canonical: one text node, no wrapper the browser invented
+- a mention beside the composition survives with its `value`, which is `readDomState`
+  rebuilding atoms from `data-mention-value` and the reason that attribute exists
+- committing an emoji does not split it — the path the M6 `diffDocs` surrogate bug was
+  actually reachable from
+- **no stray `insertCompositionText` is reported unhandled**, so the prediction below
+  about a trailing `beforeinput` does not hold on Chromium
+
+That retires the headline doubt this ADR has carried since M4.
+
+## Still unverified
+
+**One engine is not every engine.** Playwright can drive composition through CDP in
+Chromium only, so this is Chromium's idea of the event sequence. Specifically still
+untested:
+
+- Japanese and Chinese input on **WebKit and Firefox**, which have no CDP equivalent
+- **Gboard on Android**, which composes far more aggressively and is the case this ADR
+  called out as the aggressive one
+- iOS dictation and autocorrect
+- whether a trailing `beforeinput` arrives after `compositionend` on *those* engines — it
+  does not on Chromium, but that is where the doubt was cheapest to remove, not where it
+  was largest
+
+A human at a keyboard with a Japanese input source is still the only way to close those,
+and the harness on port 5280 is where to do it.
+
+## Original unverified note, kept for the record
 
 **None of this has met a real IME.** The tests play the browser's part by hand: fire
 `compositionstart`, write to the DOM as an IME might, fire `compositionend`, assert the
