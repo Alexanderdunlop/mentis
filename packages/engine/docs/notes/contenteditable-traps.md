@@ -108,6 +108,43 @@ exactly this reason.
 
 ---
 
+## Browsers disagree about how much one delete covers
+
+**Symptom.** One Backspace removes a whole emoji in Chrome and Safari, and part of one
+in Firefox. One Delete removes a mention chip in Chrome and Safari, and the chip *plus
+the space after it* in Firefox. Nothing is corrupted, so it reads as a library bug in
+whichever engine you didn't develop against.
+
+**Mechanism.** `InputEvent.getTargetRanges()` is the browser telling you what it was
+about to delete, and [ADR 0004](../adr/0004-take-edit-ranges-from-the-browser.md) takes
+it at its word precisely because the browser has already resolved clusters and word
+boundaries. It has — but **each engine resolves them differently**, and the answer is
+platform convention rather than a specification.
+
+Measured on the same document (`[@Alice][" hi"]`, caret at 0, Delete):
+
+| | reported range | covers |
+|---|---|---|
+| Chromium, WebKit | `(DIV, 0) → (" hi", 0)` | the atom |
+| Firefox | `(DIV, 0) → (" hi", 1)` | the atom **and** the following space |
+
+And for Backspace over one character, Firefox removes a combining mark on its own, and
+one member plus a joiner from a ZWJ sequence, where the others take the whole cluster.
+Firefox's position on separately-deletable combining marks is long-standing and not
+obviously wrong.
+
+**What to do.** Don't assert a specific deletion *extent* across the matrix — assert
+what every engine agrees on: nothing is half a code point, the model and the DOM stay
+in step, and an atom is never partially removed. If you decide the engine should clamp
+the browser's range to its own idea of one unit, that contradicts ADR 0004 and needs an
+ADR of its own; it is not a patch.
+
+**Where it shows up here.** `test.fixme` in `e2e/spec/adr-0005-atoms.spec.ts` and
+`e2e/spec/adr-0013-graphemes.spec.ts`, each naming the cause. Found by the engine's
+browser matrix on the day it was built, which is what it was built for.
+
+---
+
 ## `.length` is not how many characters there are
 
 **Symptom.** Backspace over an emoji leaves a `�` behind. The user cannot select it,

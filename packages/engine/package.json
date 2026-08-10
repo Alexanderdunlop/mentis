@@ -9,7 +9,11 @@
     "dev": "vite --config vite.config.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "dev:e2e": "vite --config vite.config.ts --port 5280 --strictPort",
+    "test:e2e": "playwright test --config e2e/playwright.config.ts",
+    "test:e2e:chromium": "playwright test --config e2e/playwright.config.ts --project=chromium",
+    "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json"
   },
   "devDependencies": {
     "@types/node": "^24.0.13",

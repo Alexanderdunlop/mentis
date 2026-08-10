@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mentis engine · e2e harness</title>
+    <style>
+      /*
+       * Deliberately almost unstyled. The inspector page is where things are made
+       * readable; this one exists to be asserted against, and every rule here is a
+       * rule a spec could accidentally depend on.
+       *
+       * `white-space: pre-wrap` is NOT set here: `createEditor` sets it on the element
+       * itself, because it is behaviour rather than styling (ADR 0002). If a stylesheet
+       * set it too, a spec could pass while the engine had stopped doing its job.
+       */
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 16px;
+      }
+      #editor {
+        border: 1px solid #999;
+        padding: 8px;
+        min-height: 3em;
+        font-size: 16px;
+      }
+      .mention {
+        background: #dde7ff;
+        border-radius: 3px;
+        padding: 0 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>engine e2e harness</h1>
+    <div id="editor" data-testid="editor"></div>
+    <script type="module" src="/e2e.ts"></script>
+  </body>
+</html>

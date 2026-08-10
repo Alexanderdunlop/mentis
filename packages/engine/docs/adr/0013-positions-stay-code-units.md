@@ -124,13 +124,27 @@ Costs and risks:
   code units, and `sliceBetween` will still cut a character in half if handed a position
   from somewhere new — the guard is that nothing produces one.
 
-## Unverified
+## Verification, 2026-08-10
 
-- **No real browser has exercised this.** The fallback path only runs when
-  `getTargetRanges()` is empty, which is what happy-dom does and what a real browser mostly
-  does not — so these tests cover the belt while the braces are what ship. Whether every
-  engine really does resolve clusters in `getTargetRanges()` is an M6 question the browser
-  matrix is meant to answer.
+The browser matrix answered the question this section used to ask.
+
+**Confirmed on Chromium, Firefox, WebKit and mobile Chrome**
+(`e2e/spec/adr-0013-graphemes.spec.ts`): a surrogate pair and a flag are indivisible on
+every engine, one ArrowRight crosses a whole emoji, a typed emoji joins the typing run for
+undo, and undo restores a deleted emoji intact. Above all, **no engine ever produces half
+a code point and the model never falls out of step with the DOM** — which is what this ADR
+actually guarantees.
+
+**Complicated, not confirmed:** the assumption that the browser "hands us code units
+already grapheme-resolved". Every engine resolves clusters; they disagree about how much
+one delete covers. Firefox removes a combining mark on its own, and one member plus a
+joiner from a ZWJ sequence, where Chromium and WebKit take the whole cluster. That is
+granularity rather than corruption, recorded in docs/notes/contenteditable-traps.md and as
+a postscript to [ADR 0004](0004-take-edit-ranges-from-the-browser.md). Whether the engine
+should override it is an open decision, pinned as `test.fixme`.
+
+## Still unverified
+
 - Emoji rendering and caret painting around a ZWJ sequence — whether the caret can be put
   between the family members visually — is a platform behaviour no unit test reaches.
 - Nothing here touches RTL/bidi, iOS dictation, or Android word-level replacement. They are

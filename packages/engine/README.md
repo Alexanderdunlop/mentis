@@ -9,7 +9,7 @@ pnpm --filter @mentis/engine test
 pnpm --filter @mentis/engine typecheck
 ```
 
-## Current state: M6 — grapheme clusters (in progress)
+## Current state: M6 — graphemes and the browser matrix (in progress)
 
 The editor is engine-driven: `beforeinput` is intercepted, a transaction is applied to
 the document, and the DOM is patched to match. **The DOM is a projection of the model,
@@ -177,7 +177,14 @@ records composition faithfully because those events are real.
 
 ## Testing stance
 
-Two vitest projects, and the split is deliberate:
+**Three layers now**, and the third is what finally makes the ADRs' *Unverified* sections
+answerable: [`e2e/`](e2e/README.md) drives the engine in Chromium, Firefox, WebKit and
+mobile Chrome, on its own Playwright config so this `private: true` package can never
+block a mentis release. Specs mirror ADRs one-for-one. It found on day one that **browsers
+disagree about how much one delete covers**, which is now a trap note and three
+deliberate `test.fixme`s.
+
+Two vitest projects below it, and the split is deliberate:
 
 - **`logic`** (`*.test.ts`, `environment: node`) — pure functions, no DOM available at
   all. If something here starts needing a DOM, that's a design signal, not an excuse
