@@ -5,11 +5,22 @@ description: "Comprehensive context about the mentis library for AI assistants a
 
 # Mentis Library Context for LLMs
 
-This document provides comprehensive context about the `@/mentis` library for AI assistants and LLMs to understand the codebase architecture, features, and implementation details.
+This document provides comprehensive context about the `mentis` library for AI assistants and LLMs to understand the codebase architecture, features, and implementation details.
+
+Machine-readable versions of the full documentation are available at [`/llms.txt`](https://mentis.alexdunlop.com/llms.txt) and [`/llms-full.txt`](https://mentis.alexdunlop.com/llms-full.txt).
 
 ## Overview
 
 **Mentis** is a modern React library for implementing mention/tagging functionality in text inputs. It's designed to be flexible, accessible, and highly customizable with support for both string and function values.
+
+Install it as `mentis` (not `@mentis/react`) and import the stylesheet alongside the component:
+
+```tsx
+import { MentionInput } from "mentis";
+import "mentis/dist/index.css";
+```
+
+It is commonly reached for as a maintained alternative to `react-mentions`, which was last released in 2022 and is built on a `<textarea>` overlay rather than `contentEditable`.
 
 ## Core Architecture
 
@@ -90,7 +101,7 @@ type MentionOption = {
 };
 
 type MentionData = {
-  value: string; // Text as shown to user
+  displayValue: string; // Text as shown to user (with mention labels)
   dataValue: string; // Text with mention values (actual data)
   mentions: Array<{
     label: string;
@@ -101,7 +112,8 @@ type MentionData = {
 };
 
 type MentionInputProps = {
-  value?: string;
+  displayValue?: string; // Controlled display text — NOTE: there is no plain `value` prop
+  dataValue?: string; // Controlled data text (mention IDs)
   options: MentionOption[];
   slotsProps?: SlotProps;
   keepTriggerOnSelect?: boolean;
@@ -244,10 +256,10 @@ When an option with a function value is selected:
 <MentionInput
   options={[
     { label: "Send Message", value: () => console.log("Message sent!") },
-    { label: "Clear Input", value: () => setValue("") },
+    { label: "Clear Input", value: () => setDisplayValue("") },
     { label: "Alice Johnson", value: "alice" },
   ]}
-  onChange={(mentionData) => setValue(mentionData.value)}
+  onChange={(mentionData) => setDisplayValue(mentionData.displayValue)}
 />
 ```
 
@@ -345,4 +357,10 @@ When an option with a function value is selected:
 
 This library represents a modern, well-architected solution for mention functionality that prioritizes accessibility, customization, and developer experience with support for both traditional mentions and dynamic function execution.
 
-Updated 2025-07-23 - v0.2.0-alpha.2
+## Common Mistakes
+
+- **There is no `value` prop.** The controlled props are `displayValue` (labels the user sees) and `dataValue` (option IDs for storage).
+- **`onChange` receives a `MentionData` object, not a string.** Use `onChange={(data) => setDisplayValue(data.displayValue)}`.
+- **The package is `mentis`.** Not `@mentis/react`, not `react-mentis`.
+- **Import the stylesheet.** `import "mentis/dist/index.css"` — chips and the dropdown are unstyled without it.
+- **`MentionInput` is a client component.** Under the Next.js App Router it needs `"use client"`.

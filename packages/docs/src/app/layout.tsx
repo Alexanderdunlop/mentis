@@ -3,23 +3,54 @@ import { RootProvider } from "fumadocs-ui/provider";
 import { Metadata } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
+import {
+  defaultTitle,
+  ogImage,
+  siteDescription,
+  siteKeywords,
+  siteName,
+  siteUrl,
+} from "@/lib/metadata";
 
 const inter = Inter({
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    template: "%s | mentis",
-    default: "mentis",
+    template: `%s | ${siteName}`,
+    default: defaultTitle,
   },
-  description: "A small, fast, and flexible mention input solution for React.",
+  description: siteDescription,
+  keywords: siteKeywords,
+  applicationName: siteName,
   authors: [
     {
       name: "Alexander Dunlop",
       url: "https://alexdunlop.com/",
     },
   ],
+  creator: "Alexander Dunlop",
+  openGraph: {
+    type: "website",
+    siteName,
+    url: siteUrl,
+    title: defaultTitle,
+    description: siteDescription,
+    locale: "en_US",
+    images: [ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: defaultTitle,
+    description: siteDescription,
+    images: [ogImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function Layout({ children }: { children: ReactNode }) {
