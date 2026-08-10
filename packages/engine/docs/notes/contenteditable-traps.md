@@ -108,6 +108,46 @@ exactly this reason.
 
 ---
 
+## `.length` is not how many characters there are
+
+**Symptom.** Backspace over an emoji leaves a `�` behind. The user cannot select it,
+cannot delete it, and never typed it. Or: an IME commits an emoji and the document ends
+up with a stray replacement character in the middle of it.
+
+**Mechanism.** A JavaScript string is UTF-16 code units, and almost nothing a reader
+would call "a character" is one of them:
+
+| | `.length` | why |
+|---|---|---|
+| `"a"` | 1 | |
+| `"👍"` | 2 | one surrogate pair |
+| `"🇳🇿"` | 4 | two regional indicators |
+| `"👍🏽"` | 4 | emoji plus a skin-tone modifier |
+| `"é"` typed as `e` + accent | 2 | a combining mark |
+| `"👨‍👩‍👧"` | 8 | three emoji joined by two ZWJs |
+
+So any code doing `at - 1`, or comparing strings a unit at a time, will eventually cut
+between a high surrogate and its low one. Half a pair is not a character; it is a
+permanent `�`.
+
+The nastiest version is a *diff*. Comparing `"👍"` with `"👎"` code unit by code unit
+finds a common prefix of one — they share `\uD83D` — and produces a change that inserts a
+lone `\uDC4E`. Every individual function looks right.
+
+**What to do.** `Intl.Segmenter` with `granularity: "grapheme"` is the only correct
+answer; splitting on code points (`[...text]`) keeps surrogate pairs together but still
+cuts a combining accent off its letter. Don't segment everywhere — decide where your code
+*invents* an offset rather than receiving one, and fix only those. The browser's
+`getTargetRanges()` is already grapheme-correct, which is most of why this stays small.
+
+**Where it shows up here.** `src/model/grapheme-boundary.ts` and
+`src/model/adjacent-position.ts`, applied at three sites: the fallback delete in
+`input/transaction-for.ts`, the narrowing in `model/diff-docs.ts`, and coalescing in
+`history/edit-shape.ts`. Reasoning in
+[ADR 0013](../adr/0013-positions-stay-code-units.md).
+
+---
+
 ## `setData` on a copy is discarded unless you cancel the event
 
 **Symptom.** You set `text/html` on a `copy` event, everything looks right in the

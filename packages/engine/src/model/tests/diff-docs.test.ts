@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createDoc } from "../create-doc";
 import { diffDocs } from "../diff-docs";
-import { atomNode, textNode } from "../nodes";
+import { atomNode, nodeText, textNode } from "../nodes";
 import type { Doc } from "../types";
 
 const doc = (...nodes: Doc["nodes"]): Doc => ({ nodes });
@@ -128,6 +128,88 @@ describe("diffDocs", () => {
       const diff = diffDocs(before, after)!;
       expect(diff.from).toBe(3);
       expect(diff.to).toBe(5);
+    });
+  });
+
+  describe("never narrows into the middle of a character", () => {
+    const THUMBS_UP = "\u{1F44D}";
+    const THUMBS_DOWN = "\u{1F44E}";
+    const FAMILY = "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}";
+
+    /** Any lone surrogate in the result is a `?` the user cannot select or delete. */
+    const hasLoneSurrogate = (text: string): boolean => {
+      for (let i = 0; i < text.length; i += 1) {
+        const code = text.charCodeAt(i);
+        const isHigh = code >= 0xd800 && code <= 0xdbff;
+        const isLow = code >= 0xdc00 && code <= 0xdfff;
+        if (isHigh) {
+          const next = text.charCodeAt(i + 1);
+          if (!(next >= 0xdc00 && next <= 0xdfff)) return true;
+          i += 1;
+        } else if (isLow) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    it("swaps a whole emoji even though both share a leading surrogate", () => {
+      // The scans compare code units, so they agreed on `\uD83D` and stopped mid-pair.
+      // Before the outward snap this produced an insert of a bare `\uDC4E`.
+      const diff = diffDocs(createDoc(THUMBS_UP), createDoc(THUMBS_DOWN))!;
+      expect(diff).toEqual({ from: 0, to: 2, slice: [textNode(THUMBS_DOWN)] });
+    });
+
+    it("leaves no lone surrogate behind, whatever the surrounding text", () => {
+      const cases: [string, string][] = [
+        [THUMBS_UP, THUMBS_DOWN],
+        [`hi ${THUMBS_UP}`, `hi ${THUMBS_DOWN}`],
+        [`${THUMBS_UP} bye`, `${THUMBS_DOWN} bye`],
+        [`a${THUMBS_UP}b`, `a${THUMBS_DOWN}b`],
+        ["", THUMBS_UP],
+        [THUMBS_UP, ""],
+        [THUMBS_UP, `${THUMBS_UP}${THUMBS_UP}`],
+      ];
+
+      for (const [from, to] of cases) {
+        const diff = diffDocs(createDoc(from), createDoc(to));
+        const inserted = diff?.slice.map(nodeText).join("") ?? "";
+        expect(hasLoneSurrogate(inserted)).toBe(false);
+      }
+    });
+
+    it("still reports a change when the two share their *trailing* surrogate", () => {
+      // U+1F44D and U+1F84D differ in the high surrogate and agree in the low one, so the
+      // suffix scan matches a unit the prefix scan did not. Snapping that end the wrong
+      // way collapsed the whole diff to `{from: 0, to: 0, slice: []}` — "nothing changed"
+      // for two documents that plainly differ, which would leave the model behind the DOM
+      // after a composition and never catch up.
+      const a = "\u{1F44D}";
+      const b = "\u{1F84D}";
+      expect(a.charCodeAt(1)).toBe(b.charCodeAt(1));
+
+      expect(diffDocs(createDoc(a), createDoc(b))).toEqual({
+        from: 0,
+        to: 2,
+        slice: [textNode(b)],
+      });
+    });
+
+    it("replaces a whole ZWJ sequence rather than an interior piece of it", () => {
+      const shorter = "\u{1F468}\u{200D}\u{1F469}";
+      const diff = diffDocs(createDoc(FAMILY), createDoc(shorter))!;
+      // Both ends land on cluster boundaries: the whole eight units are replaced.
+      expect(diff.from).toBe(0);
+      expect(diff.to).toBe(8);
+    });
+
+    it("still narrows plain text to the characters that changed", () => {
+      // The snap must not cost the narrowing that M4 relies on for one-character undo.
+      expect(diffDocs(createDoc("hello"), createDoc("hellp"))).toEqual({
+        from: 4,
+        to: 5,
+        slice: [textNode("p")],
+      });
     });
   });
 });

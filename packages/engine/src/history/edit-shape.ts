@@ -1,3 +1,4 @@
+import { isSingleGrapheme } from "../model/grapheme-boundary";
 import { isText } from "../model/nodes";
 import { sliceLength } from "../model/slice-between";
 import type { Transaction } from "../model/transaction";
@@ -30,7 +31,11 @@ export const editShapeOf = (transaction: Transaction): EditShape => {
     if (!node || rest.length > 0 || !isText(node)) return other;
     // A newline ends a typing run outright: undo should stop at the start of a line,
     // which is where a user expects it to stop.
-    if (node.text.length !== 1 || node.text === "\n") return other;
+    //
+    // One *grapheme*, not one code unit — `👍` is two units and `👨‍👩‍👧` is eight, and
+    // measuring in units would classify every typed emoji as "not typing" and give it its
+    // own undo step. `hi 👍` would then undo in three pieces rather than as one run.
+    if (!isSingleGrapheme(node.text) || node.text === "\n") return other;
 
     const size = sliceLength(step.slice);
     return {

@@ -277,6 +277,31 @@ break in `textContent` while Chromium and WebKit don't, which is the first real
 evidence bearing on [ADR 0001](adr/0001-line-breaks-as-newline-characters.md). Expect
 more of the engine's design constraints to arrive from that direction.
 
+> **Grapheme clusters: built.** [ADR 0013](adr/0013-positions-stay-code-units.md).
+>
+> Two bugs were reproduced before anything was designed, which is what kept the fix small.
+> `diffDocs` compared code units, so `👍` → `👎` — which share a leading surrogate —
+> produced a diff inserting a bare `\uDC4E`: a `�` the user can neither select nor delete.
+> And the fallback delete took exactly one position, which is half of any emoji;
+> [ADR 0004](adr/0004-take-edit-ranges-from-the-browser.md) had recorded that as knowingly
+> wrong and deferred it here. Both now have tests, confirmed red against the pre-fix code.
+>
+> **A position stays a UTF-16 code-unit offset.** Making a grapheme one position wide is
+> the tempting symmetry with ADR 0005 and is wrong three times over: it adds a *third*
+> coordinate space, it puts a segmentation walk on every `domToModel` call — those are
+> index arithmetic only because model and DOM offsets are the same unit — and the browser
+> hands us code units already grapheme-resolved. So the invariant is weaker and more
+> useful: **every position the engine produces is one the browser could have produced.**
+>
+> Only three places invent a boundary, which is the whole reason this stayed contained:
+> the fallback delete, the diff narrowing, and undo coalescing (a typed emoji is one
+> character, so `hi 👍` is one undo step rather than three). Everywhere else the offsets
+> come from `getTargetRanges()`.
+>
+> Still to do in M6: RTL/bidi, iOS autocorrect and dictation, Android word-level
+> replacement, and the engine's own cross-browser matrix — which is what would settle
+> whether every engine really does resolve clusters in `getTargetRanges()`.
+
 ### M7 — Adapters, as the victory lap
 
 React / Vue / Svelte / vanilla wrappers, ~100 lines each, all in one afternoon. That
@@ -356,5 +381,5 @@ pnpm install          # worktrees don't share node_modules
 - [x] M3 — undo stack
 - [x] M4 — IME / composition *(unverified against a real IME)*
 - [x] M5 — clipboard *(round trip unverified against a real clipboard)*
-- [ ] M6 — nasty-input gauntlet
+- [ ] M6 — nasty-input gauntlet *(graphemes done; bidi, mobile input and the browser matrix outstanding)*
 - [ ] M7 — adapters

@@ -9,7 +9,7 @@ pnpm --filter @mentis/engine test
 pnpm --filter @mentis/engine typecheck
 ```
 
-## Current state: M5 — the clipboard
+## Current state: M6 — grapheme clusters (in progress)
 
 The editor is engine-driven: `beforeinput` is intercepted, a transaction is applied to
 the document, and the DOM is patched to match. **The DOM is a projection of the model,
@@ -79,6 +79,18 @@ Copy and cut need their own listeners, since neither is a `beforeinput`
 unless the event is cancelled, so cut owns its own deletion — one transaction, one undo
 step, clipboard written before anything is removed. **None of this has met a real system
 clipboard**; the tests serialise and parse, which is everything but the OS in the middle.
+
+**A position is a UTF-16 code-unit offset and stays one**
+([ADR 0013](docs/adr/0013-positions-stay-code-units.md)) — not a grapheme index, because
+the DOM speaks code units too and that is the only reason position mapping is index
+arithmetic rather than a segmentation walk. What changed instead is that the engine never
+*invents* a position that is not a grapheme boundary. `"👍".length` is 2 and
+`"👨‍👩‍👧".length` is 8, so `at - 1` leaves half a surrogate pair — a `�` the user can
+neither select nor delete.
+
+Only three places invent a boundary, which is what keeps this small: the fallback delete,
+the diff narrowing that `compositionend` relies on, and undo coalescing. Everywhere else
+the offsets come from `getTargetRanges()`, which the browser has already resolved.
 
 Undo (<kbd>⌘Z</kbd> / <kbd>⌘⇧Z</kbd> / <kbd>Ctrl+Y</kbd>) is the engine's, since preventing
 every `beforeinput` empties the browser's own stack — see

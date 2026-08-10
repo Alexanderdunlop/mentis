@@ -1,3 +1,4 @@
+import { positionAfter, positionBefore } from "../model/adjacent-position";
 import { textNode } from "../model/nodes";
 import { sliceLength } from "../model/slice-between";
 import { replaceRange, type Transaction } from "../model/transaction";
@@ -94,7 +95,7 @@ const deletion = (from: number, to: number): Transaction => ({
 });
 
 export const transactionFor = (intent: InputIntent): Transaction | null => {
-  const { inputType, text, slice, range, rangeFromBrowser, docLength } = intent;
+  const { inputType, text, slice, range, rangeFromBrowser, doc } = intent;
 
   if (CLIPBOARD_INSERT.has(inputType)) {
     // A transfer we could not read leaves the plain text, which is what `inputText` took
@@ -111,15 +112,16 @@ export const transactionFor = (intent: InputIntent): Transaction | null => {
     // A collapsed range from the browser means "delete nothing" — that is information,
     // not an omission, and widening it turns a word delete into a character delete.
     if (rangeFromBrowser) return deletion(range.from, range.to);
-    // Our own fallback: guess one position. Correct for an atom, which is one position
-    // wide, but wrong for a grapheme cluster — see ADR 0004. M6 owns the real fix.
-    return deletion(Math.max(0, range.from - 1), range.from);
+    // Our own fallback: one *user-perceived character*, which is one position for an atom
+    // and however many code units the grapheme takes. ADR 0004 recorded guessing a single
+    // position as knowingly wrong here, and this is the fix it deferred to M6.
+    return deletion(positionBefore(doc, range.from), range.from);
   }
 
   if (DELETE_FORWARD.has(inputType)) {
     if (range.from !== range.to) return deletion(range.from, range.to);
     if (rangeFromBrowser) return deletion(range.from, range.to);
-    return deletion(range.from, Math.min(docLength, range.from + 1));
+    return deletion(range.from, positionAfter(doc, range.from));
   }
 
   return null;

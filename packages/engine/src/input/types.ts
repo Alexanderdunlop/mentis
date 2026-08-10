@@ -1,4 +1,4 @@
-import type { ModelRange, Slice } from "../model/types";
+import type { Doc, ModelRange, Slice } from "../model/types";
 
 export interface InputIntent {
   /** `InputEvent.inputType`. */
@@ -25,5 +25,13 @@ export interface InputIntent {
   range: ModelRange;
   /** Whether `range` came from the browser rather than from our own selection read. */
   rangeFromBrowser: boolean;
-  docLength: number;
+  /**
+   * The document the edit applies to.
+   *
+   * The whole document rather than just its length, because the fallback delete cannot be
+   * decided without it: "one character backwards" is one position for an atom and two for
+   * `👍`, and only the text can say which. This stays pure — a `Doc` is plain data — so
+   * `transactionFor` remains a function of its argument with no DOM and no engine state.
+   */
+  doc: Doc;
 }
